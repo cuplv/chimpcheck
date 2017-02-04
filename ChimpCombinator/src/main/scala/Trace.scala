@@ -42,7 +42,11 @@ case class RotateRight() extends ExtUserEvent
  */
 
 abstract class Trace {
-  def |:| (trace: Trace) : Trace = Seq(this, trace)
+  def |:| (event: UIEvent): Trace = Seq(this, Step(event))
+  def |:| (trace: Trace): Trace = Seq(this, trace)
+  def |+| (event: UIEvent): TraceGen = ISeq( Path(this), Path(Step(event)) )
+  def |+| (trace: Trace): TraceGen = ISeq( Path(this), Path(trace) )
+  def |+| (gen: TraceGen): TraceGen = ISeq( Path(this), gen )
 }
 
 case class Step(event: UIEvent) extends Trace
