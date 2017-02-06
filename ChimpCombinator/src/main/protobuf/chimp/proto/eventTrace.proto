@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package chimp.protobuf;
+
+import public "chimp/proto/appEvent.proto";
+import public "chimp/proto/extEvent.proto";
+
+// EventTrace = AppEvent | ExtEvent
+
+message EventTrace {
+  repeated UIEvent events = 1;
+}
+
+message UIEvent {
+  enum UIEventType {
+    APPEVENT = 1;
+    EXTEVENT = 2;
+  }
+  required UIEventType eventType = 1;
+  optional AppEvent appEvent = 2;
+  optional ExtEvent extEvent = 3;
+}

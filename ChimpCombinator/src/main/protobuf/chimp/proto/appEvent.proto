@@ -1,0 +1,50 @@
+syntax = "proto2";
+
+package chimp.protobuf;
+
+// AppEvent = ClickName(String) | ClickId(Int) | TypeInName(String,String) | TypeInId(Int,String) | Sleep(Int) | Skip
+
+message AppEvent {
+  enum AppEventType {
+    CLICKNAME  = 1;
+    CLICKID    = 2;
+    TYPEINNAME = 3;
+    TYPEINID   = 4;
+    SLEEP      = 5;
+    SKIP       = 6;
+  }
+  required AppEventType eventType = 1;
+  optional ClickName clickname = 2;
+  optional ClickId clickid = 3;
+  optional TypeInName typeinname = 4;
+  optional TypeInId typeinid = 5;
+  optional Sleep sleep = 6;
+  // optional Skip skip = 7;
+}
+
+message ClickName {
+  required string name = 1;
+}
+
+message ClickId {
+  required int32 id = 1;
+}
+
+message TypeInName {
+  required string name = 1;
+  required string input = 2;
+}
+
+message TypeInId {
+  required int32 id = 1;
+  required string input = 2;
+}
+
+message Sleep {
+  required int32 time = 1;
+}
+
+message Skip {
+}
+
+
