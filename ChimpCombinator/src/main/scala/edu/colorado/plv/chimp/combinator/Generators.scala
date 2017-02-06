@@ -72,7 +72,7 @@ case class Optional(gen: TraceGen) extends TraceGen {
 }
 case class Choose(gens: Seq[TraceGen]) extends TraceGen {
    override def generator(): Gen[EventTrace] = for {
-     n <- Gen.choose(0,gens.length)
+     n <- Gen.choose(0,gens.length-1)
      tr <- gens(n).generator()
    } yield tr
 }
@@ -88,14 +88,14 @@ case class LearnModel() extends TraceGen {
 object implicits {
 
   implicit class UIEventGen(event: UIEvent) {
-     def |+| (event: UIEvent): TraceGen    = Path(EventTrace.trace(event)) |+| event
+     def |+| (next: UIEvent): TraceGen    = Path(EventTrace.trace(event)) |+| next
      def |+| (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) |+| trace
      def |+| (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) |+| gen
   }
 
   implicit  class EventTraceGen(trace: EventTrace) {
     def |+| (event: UIEvent): TraceGen    = Path(trace) |+| event
-    def |+| (trace: EventTrace): TraceGen = Path(trace) |+| trace
+    def |+| (next: EventTrace): TraceGen = Path(trace) |+| next
     def |+| (gen: TraceGen): TraceGen     = Path(trace) |+| gen
   }
 
@@ -108,11 +108,17 @@ object TestGen {
 
   def main(args: Array[String]): Unit = {
 
-    val traces: TraceGen = ClickName("login") |+| TypeInName("userbox","test") |+| TypeInName("pwdbox","1234") |+| ClickName("Go")
+    val traces: TraceGen = ClickName("login") |+| TypeInName("userbox","test") |+| TypeInName("pwdbox","1234") |+| ClickName("Go") |+| LearnModel()
 
     val prop = forAll (traces.generator()) {
       tr => {
-        println(tr)
+        println(" ============================================================================= ")
+        println("Generated: " + tr.toString())
+        val b64 = tr.toBase64()
+        println("Base64 Encoded ProtoBuf: " + b64)
+        val trB = EventTrace.fromBase64( b64 )
+        println("Recovered: " + trB.toString())
+        println(" ============================================================================= ")
         true
       }
     }
