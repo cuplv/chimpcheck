@@ -5,7 +5,7 @@ package chimp.protobuf;
 import public "chimp/proto/appEvent.proto";
 import public "chimp/proto/extEvent.proto";
 
-// EventTrace = AppEvent | ExtEvent
+// EventTrace = EventTrace |:| EventTrace | AppEvent | ExtEvent
 
 message EventTrace {
   repeated UIEvent events = 1;

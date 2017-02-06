@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
-// AppEvent = ClickName(String) | ClickId(Int) | TypeInName(String,String) | TypeInId(Int,String) | Sleep(Int) | Skip
+// AppEvent = ClickName(String) | ClickId(Int) | TypeInName(String,String) | TypeInId(Int,String) | Sleep(Int) | Skip | Try(AppEvent,Trace,Trace)
 
 message AppEvent {
   enum AppEventType {
