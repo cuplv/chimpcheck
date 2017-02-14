@@ -104,11 +104,13 @@ object implicits {
 
 import edu.colorado.plv.chimp.combinator.implicits.UIEventGen
 
+import UIID_Implicits._
+
 object TestGen {
 
   def main(args: Array[String]): Unit = {
 
-    val traces: TraceGen = ClickName("login") |+| TypeInName("userbox","test") |+| TypeInName("pwdbox","1234") |+| ClickName("Go") |+| LearnModel()
+    val traces: TraceGen = Click("login") |+| Type("userbox","test") |+| Type("pwdbox","1234") |+| Click("Go") |+| LearnModel()
 
     val prop = forAll (traces.generator()) {
       tr => {

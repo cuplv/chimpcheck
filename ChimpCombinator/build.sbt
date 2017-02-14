@@ -3,6 +3,7 @@ lazy val commonSettings = Seq(
   organization := "edu.colorado.plv.chimp.combinator",
   version := "1.0",
   scalaVersion := "2.12.1"
+  // scalacOptions += "-target:jvm-1.7"
 )
 
 name := "ChimpCombinator"
@@ -12,6 +13,8 @@ organization := "edu.colorado.plv.chimp.combinator"
 version := "1.0"
 
 scalaVersion := "2.12.1"
+
+// scalacOptions += "-target:jvm-1.7"
 
 resolvers += "Local Maven Repository" at "file:///"+Path.userHome.absolutePath+"/.m2/repository"
 

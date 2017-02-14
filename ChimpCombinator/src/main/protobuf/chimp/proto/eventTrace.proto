@@ -5,7 +5,10 @@ package chimp.protobuf;
 import public "chimp/proto/appEvent.proto";
 import public "chimp/proto/extEvent.proto";
 
-// EventTrace = EventTrace |:| EventTrace | AppEvent | ExtEvent
+// PrimEvent = AppEvent | ExtEvent
+// Condition = PrimEvent
+// Alternatives = Condition ==> EventTrace | Condition ==> EventTrace , Alternatives
+// EventTrace = PrimEvent | Tactics { Alternatives } | EventTrace |:| EventTrace
 
 message EventTrace {
   repeated UIEvent events = 1;
@@ -15,8 +18,29 @@ message UIEvent {
   enum UIEventType {
     APPEVENT = 1;
     EXTEVENT = 2;
+    TACTICS  = 3;
   }
   required UIEventType eventType = 1;
   optional AppEvent appEvent = 2;
   optional ExtEvent extEvent = 3;
+  optional Tactics tactics = 4;
+}
+
+message Tactics {
+  repeated Alternatives alternatives = 1;
+}
+
+message Condition {
+  enum CondType {
+     APPEVENT = 1;
+     EXTEVENT = 2;
+  }
+  required CondType condType = 1;
+  optional AppEvent appEvent = 2;
+  optional ExtEvent extEvent = 3;
+}
+
+message Alternatives {
+  required Condition cond = 1;
+  required EventTrace events = 2;
 }

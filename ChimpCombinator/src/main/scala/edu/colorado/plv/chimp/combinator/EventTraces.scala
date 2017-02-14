@@ -4,6 +4,7 @@ package edu.colorado.plv.chimp.combinator
   * Created by edmund on 2/5/17.
   */
 
+import chimp.protobuf.{UIEvent, UIID, XYCoordin}
 import chimp.{protobuf => pb}
 import edu.colorado.plv.chimp.utils.Base64
 
@@ -30,12 +31,14 @@ object UIEvent {
          case pb.UIEvent.UIEventType.APPEVENT => {
             val appevent = event.getAppEvent
             appevent.eventType match {
-               case pb.AppEvent.AppEventType.CLICKNAME  => ClickName(appevent.getClickname.name)
-               case pb.AppEvent.AppEventType.CLICKID    => ClickId(appevent.getClickid.id)
-               case pb.AppEvent.AppEventType.TYPEINNAME => TypeInName(appevent.getTypeinname.name,appevent.getTypeinname.input)
-               case pb.AppEvent.AppEventType.TYPEINID   => TypeInId(appevent.getTypeinid.id,appevent.getTypeinid.input)
-               case pb.AppEvent.AppEventType.SLEEP      => Sleep(appevent.getSleep.time)
-               case pb.AppEvent.AppEventType.SKIP       => Skip()
+               case pb.AppEvent.AppEventType.CLICK     => Click( UIID.fromProto(appevent.getClick.uiid) )
+               case pb.AppEvent.AppEventType.LONGCLICK => LongClick( UIID.fromProto(appevent.getLongclick.uiid) )
+               case pb.AppEvent.AppEventType.TYPE      => Type( UIID.fromProto(appevent.getType.uiid), appevent.getType.input)
+               case pb.AppEvent.AppEventType.DRAG      => Drag( UIID.fromProto(appevent.getDrag.uiid), Coord.fromProto(appevent.getDrag.disp) )
+               case pb.AppEvent.AppEventType.PINCH     => Pinch( Coord.fromProto(appevent.getPinch.start), Coord.fromProto(appevent.getPinch.end) )
+               case pb.AppEvent.AppEventType.SWIPE     => Swipe( Coord.fromProto(appevent.getSwipe.start), Coord.fromProto(appevent.getSwipe.end) )
+               case pb.AppEvent.AppEventType.SLEEP     => Sleep(appevent.getSleep.time)
+               case pb.AppEvent.AppEventType.SKIP      => Skip()
             }
          }
          case pb.UIEvent.UIEventType.EXTEVENT => {
@@ -58,42 +61,93 @@ abstract class UIEvent extends ProtoMsg[pb.UIEvent] {
    def |:| (trace: EventTrace): EventTrace = EventTrace( this +: trace.events )
 
 }
+
+abstract class UIID extends ProtoMsg[pb.UIID]
+
+object UIID_Implicits {
+
+   implicit class RId(rid: Int) extends UIID {
+      override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.R_ID, Some(rid), None)
+      override def toString(): String = s"$rid"
+   }
+
+   implicit class Name(name: String) extends UIID {
+      override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.NAME_ID, None, Some(name))
+      override def toString(): String = name
+   }
+
+}
+
+import UIID_Implicits._
+
+object UIID {
+   def fromProto(pd_uiid: pb.UIID): UIID = {
+      pd_uiid.idType match {
+         case pb.UIID.UIIDType.R_ID    => pd_uiid.getRid
+         case pb.UIID.UIIDType.NAME_ID => pd_uiid.getNameid
+      }
+   }
+}
+
+
+object Coord {
+   def fromProto(pb_coord: pb.XYCoordin): Coord = Coord (pb_coord.x) (pb_coord.y)
+}
+case class Coord(x:Int)(y:Int) extends ProtoMsg[pb.XYCoordin] {
+   override def toMsg(): pb.XYCoordin = pb.XYCoordin(x,y)
+}
+
+
 abstract class AppEvent extends UIEvent
 
-case class ClickName(name: String) extends AppEvent {
+case class Click(uiid: UIID) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.CLICKNAME,
-        Some(pb.ClickName(name)), None, None, None, None))
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.CLICK,
+        Some(pb.Click(uiid.toMsg()))))
    }
 }
-case class ClickId(id:Int) extends AppEvent {
+case class LongClick(uiid: UIID) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.CLICKID,
-        None, Some(pb.ClickId(id)), None, None, None))
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.LONGCLICK,
+         None, Some(pb.LongClick(uiid.toMsg()))))
    }
 }
-case class TypeInName(name:String, input:String) extends AppEvent {
+case class Drag(uiid: UIID, coord: Coord) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.TYPEINNAME,
-        None, None, Some(pb.TypeInName(name, input)), None, None))
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.DRAG,
+         None, None, Some(pb.Drag(uiid.toMsg(), coord.toMsg()))))
    }
 }
-case class TypeInId(id: Int, input: String) extends AppEvent {
+
+case class Pinch(start: Coord, end: Coord) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.TYPEINID,
-        None, None, None, Some(pb.TypeInId(id, input)), None))
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.PINCH,
+         None, None, None, Some(pb.Pinch(start.toMsg(), end.toMsg()))))
+   }
+}
+
+case class Swipe(start: Coord, end: Coord) extends AppEvent {
+   override def toMsg(): pb.UIEvent = {
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SWIPE,
+         None, None, None, None, Some(pb.Swipe(start.toMsg(), end.toMsg()))))
+   }
+}
+
+case class Type(uiid:UIID, input:String) extends AppEvent {
+   override def toMsg(): pb.UIEvent = {
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.TYPE,
+        None, None, None, None, None, Some(pb.Type(uiid.toMsg(), input))))
    }
 }
 case class Sleep(time: Int) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SLEEP,
-        None, None, None, None, Some(pb.Sleep(time))))
+        None, None, None, None, None, None, Some(pb.Sleep(time))))
    }
 }
 case class Skip() extends AppEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SKIP,
-        None, None, None, None, None))
+      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SKIP))
    }
    override def toString(): String = "Skip"
 }
