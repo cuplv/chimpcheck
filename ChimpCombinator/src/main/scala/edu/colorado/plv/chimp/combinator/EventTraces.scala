@@ -4,7 +4,6 @@ package edu.colorado.plv.chimp.combinator
   * Created by edmund on 2/5/17.
   */
 
-import chimp.protobuf.{UIEvent, UIID, XYCoordin}
 import chimp.{protobuf => pb}
 import edu.colorado.plv.chimp.utils.Base64
 
@@ -59,7 +58,6 @@ object UIEvent {
 abstract class UIEvent extends ProtoMsg[pb.UIEvent] {
    def |:| (event: UIEvent): EventTrace = EventTrace(Seq(this, event))
    def |:| (trace: EventTrace): EventTrace = EventTrace( this +: trace.events )
-
 }
 
 abstract class UIID extends ProtoMsg[pb.UIID]
@@ -98,7 +96,12 @@ case class Coord(x:Int)(y:Int) extends ProtoMsg[pb.XYCoordin] {
 }
 
 
-abstract class AppEvent extends UIEvent
+
+
+abstract class AppEvent extends UIEvent {
+   def ==> (trace: EventTrace): Alternative = Alternative( AppEventCondition(this), trace )
+   def ==> (event: UIEvent): Alternative = Alternative( AppEventCondition(this), event |:| Skip() )
+}
 
 case class Click(uiid: UIID) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
@@ -152,7 +155,36 @@ case class Skip() extends AppEvent {
    override def toString(): String = "Skip"
 }
 
-abstract class ExtEvent extends UIEvent
+abstract class Condition extends ProtoMsg[pb.Condition]
+
+case class AppEventCondition(appevent: AppEvent) extends Condition {
+   override def toMsg(): pb.Condition = {
+      pb.Condition(pb.Condition.CondType.APPEVENT, Some(appevent.toMsg().getAppEvent))
+   }
+   override def toString(): String = appevent.toString
+}
+case class ExtEventCondition(extevent: ExtEvent) extends Condition {
+   override def toMsg(): pb.Condition = {
+      pb.Condition(pb.Condition.CondType.EXTEVENT, None, Some(extevent.toMsg().getExtEvent))
+   }
+   override def toString(): String = extevent.toString
+}
+
+case class Alternative(cond:Condition, trace:EventTrace) extends ProtoMsg[pb.Alternatives] {
+   override def toMsg(): pb.Alternatives = pb.Alternatives(cond.toMsg(), trace.toMsg())
+}
+
+case class Tactics(alts: Alternative*) extends UIEvent {
+   override def toMsg(): pb.UIEvent = ProtoMsg.mkUIEvent( pb.Tactics(alts.map(_.toMsg())) )
+}
+
+
+
+
+abstract class ExtEvent extends UIEvent {
+   def ==>(trace: EventTrace): Alternative = Alternative(ExtEventCondition(this), trace)
+   def ==>(event: UIEvent): Alternative = Alternative(ExtEventCondition(this), event |:| Skip())
+}
 
 case class ClickBack() extends ExtEvent {
    override def toMsg(): pb.UIEvent =  {

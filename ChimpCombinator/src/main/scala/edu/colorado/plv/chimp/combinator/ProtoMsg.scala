@@ -18,4 +18,8 @@ object ProtoMsg {
   def mkUIEvent(event: pb.ExtEvent): pb.UIEvent = {
     pb.UIEvent(pb.UIEvent.UIEventType.EXTEVENT, None, Some(event))
   }
+
+  def mkUIEvent(event: pb.Tactics): pb.UIEvent = {
+    pb.UIEvent(pb.UIEvent.UIEventType.TACTICS, None, None, Some(event))
+  }
 }

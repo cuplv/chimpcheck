@@ -7,7 +7,10 @@ package edu.colorado.plv.chimp.combinator
 import chimp.{protobuf => pb}
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Gen
-import Gen.const
+import Gen.{const}
+
+import org.scalacheck.Test
+import Test.{Parameters}
 
 /*
   TraceGen = Path(Trace) | TraceGen |:| TraceGen | TraceGen |+| TraceGen | Optional(TraceGen) | Choose [TraceGen]
