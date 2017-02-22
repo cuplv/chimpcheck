@@ -7,8 +7,9 @@ import public "chimp/proto/extEvent.proto";
 
 // PrimEvent = AppEvent | ExtEvent
 // Condition = PrimEvent
-// Alternatives = Condition ==> EventTrace | Condition ==> EventTrace , Alternatives
-// EventTrace = PrimEvent | Tactics { Alternatives } | EventTrace |:| EventTrace
+// Alternatives = Condition ==> EventTrace
+// EventTrace = PrimEvent | Try PrimEvent | Decide Condition EventTrace EvenTrace | EventTrace |:| EventTrace
+//            | DecideMany [Alternatives]
 
 message EventTrace {
   repeated UIEvent events = 1;
@@ -18,15 +19,35 @@ message UIEvent {
   enum UIEventType {
     APPEVENT = 1;
     EXTEVENT = 2;
-    TACTICS  = 3;
+    TRYEVENT = 3;
+    DECIDE   = 4;
+    DECIDEMANY = 5;
   }
   required UIEventType eventType = 1;
   optional AppEvent appEvent = 2;
   optional ExtEvent extEvent = 3;
-  optional Tactics tactics = 4;
+  optional TryEvent tryEvent = 4;
+  optional Decide decide = 5;
+  optional DecideMany decideMany = 6;
 }
 
-message Tactics {
+message TryEvent {
+  enum TryType {
+     APPEVENT = 1;
+     EXTEVENT = 2;
+  }
+  required TryType tryType   = 1;
+  optional AppEvent appEvent = 2;
+  optional ExtEvent extEvent = 3;
+}
+
+message Decide {
+  required Condition testCond = 1;
+  required EventTrace succTrace = 2;
+  required EventTrace failTrace = 3;
+}
+
+message DecideMany {
   repeated Alternatives alternatives = 1;
 }
 

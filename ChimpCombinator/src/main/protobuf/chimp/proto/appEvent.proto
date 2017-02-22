@@ -2,13 +2,14 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
-// UIID = String | Int       XY = (Int,Int)
+// UIID = String | Int | *      XY = (Int,Int)
 // AppEvent = Click(UUID) | LongClick(UUID) | Drag(UUID,XY) | Pinch(XY,XY) | Swipe(XY,XY) | Type(UUID,String) | Sleep(Int) | Skip
 
 message UIID {
   enum UIIDType {
-     R_ID    = 1;
-     NAME_ID = 2;
+     R_ID      = 1;
+     NAME_ID   = 2;
+     WILD_CARD = 3;
   }
   required UIIDType idType = 1;
   optional int32 rid = 2;

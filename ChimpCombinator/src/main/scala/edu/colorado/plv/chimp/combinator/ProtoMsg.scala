@@ -19,7 +19,15 @@ object ProtoMsg {
     pb.UIEvent(pb.UIEvent.UIEventType.EXTEVENT, None, Some(event))
   }
 
-  def mkUIEvent(event: pb.Tactics): pb.UIEvent = {
-    pb.UIEvent(pb.UIEvent.UIEventType.TACTICS, None, None, Some(event))
+  def mkUIEvent(event: pb.TryEvent): pb.UIEvent = {
+    pb.UIEvent(pb.UIEvent.UIEventType.TRYEVENT, None, None, Some(event))
+  }
+
+  def mkUIEvent(event: pb.Decide): pb.UIEvent = {
+    pb.UIEvent(pb.UIEvent.UIEventType.DECIDE, None, None, None, Some(event))
+  }
+
+  def mkUIEvent(event: pb.DecideMany): pb.UIEvent = {
+    pb.UIEvent(pb.UIEvent.UIEventType.DECIDEMANY, None, None, None, None, Some(event))
   }
 }

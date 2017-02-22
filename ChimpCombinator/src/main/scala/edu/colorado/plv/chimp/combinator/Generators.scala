@@ -13,7 +13,8 @@ import org.scalacheck.Test
 import Test.{Parameters}
 
 /*
-  TraceGen = Path(Trace) | TraceGen |:| TraceGen | TraceGen |+| TraceGen | Optional(TraceGen) | Choose [TraceGen]
+  TraceGen = Path(Trace) | TraceGen |:| TraceGen | TraceGen |+| TraceGen | Optional TraceGen | Decide Condition TraceGen TraceGen | Choose TraceGen TraceGen
+           | DecideMany [Alternative] | ChooseMany [TraceGen]
            | Monkey | LearnModel
  */
 
@@ -73,12 +74,54 @@ case class Optional(gen: TraceGen) extends TraceGen {
      tr2 <- Gen.frequency( (1,EventTrace.trace(Skip())), (2,tr1) )
    } yield tr2
 }
-case class Choose(gens: Seq[TraceGen]) extends TraceGen {
+case class DecideG(cond: Condition, succ:TraceGen, fail: TraceGen) extends TraceGen {
+  override def generator(): Gen[EventTrace] = for {
+    succTr <- succ.generator()
+    failTr <- fail.generator()
+  } yield EventTrace.trace( Decide(cond, succTr, failTr) )
+}
+case class Choose(gen1: TraceGen, gen2: TraceGen) extends TraceGen {
+   override def generator(): Gen[EventTrace] = for {
+     tr1 <- gen1.generator()
+     tr2 <- gen2.generator()
+     tr <- Gen.oneOf(Seq(tr1,tr2))
+   } yield tr
+}
+case class ChooseMany(gens: Seq[TraceGen]) extends TraceGen {
    override def generator(): Gen[EventTrace] = for {
      n <- Gen.choose(0,gens.length-1)
      tr <- gens(n).generator()
    } yield tr
 }
+
+case class AlternativeG(condition: Condition, gen: TraceGen) {
+   def generator(): Gen[Alternative] = for {
+      tr <- gen.generator()
+   } yield Alternative(condition, tr)
+}
+case class DecideGMany(alternatives: AlternativeG*) extends TraceGen {
+  override def generator(): Gen[EventTrace] = {
+    if (alternatives.length > 1) {
+       alternatives.head match {
+         case AlternativeG(cond, gen) => for {
+           tr <- gen.generator()
+           EventTrace(trs) <- DecideGMany( alternatives.tail:_* ).generator()
+         } yield {
+           val decideMany = trs.head.asInstanceOf[DecideMany]
+           EventTrace.trace( decideMany.add(Alternative(cond,tr)) )
+         }
+       }
+    } else {
+      alternatives.head match {
+        case AlternativeG(cond, gen) => for {
+           tr <- gen.generator()
+        } yield EventTrace.trace( DecideMany( Alternative(cond,tr) ) )
+      }
+    }
+  }
+}
+
+
 case class Monkey() extends TraceGen {
    // TODO
    override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip()))
