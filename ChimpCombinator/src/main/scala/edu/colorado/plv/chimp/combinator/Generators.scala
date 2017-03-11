@@ -156,7 +156,7 @@ object TestGen {
 
   def main(args: Array[String]): Unit = {
 
-    val traces: TraceGen = Click("login") |+| Type("userbox","test") |+| Type("pwdbox","1234") |+| Click("Go") |+| LearnModel()
+    val traces: TraceGen = Click("login") |+| Type("userbox","test") |+| Type("pwdbox","1234") |+| Click("Go")
 
     val prop = forAll (traces.generator()) {
       tr => {
