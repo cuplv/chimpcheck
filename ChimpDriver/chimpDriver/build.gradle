@@ -1,0 +1,120 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.google.protobuf'
+apply plugin: 'maven'
+
+group = 'edu.colorado.plv.fixr'
+version = '1.0'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.0'
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://" + System.getProperty("user.home") + "/.m2/repository")
+        }
+    }
+}
+
+/*
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title'   : 'Chimp Robot Driver',
+                   'Implementation-Version' : version
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title'   : 'Chimp Robot Driver',
+                   'Implementation-Version' : version
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    //Include Java classes
+    task.from variant.javaCompile.destinationDir
+    //Include dependent jars with some exceptions
+    task.from configurations.compile.findAll {
+        it.getName() != 'android.jar' && !it.getName().startsWith('hamcrest')
+    }.collect {
+        it.isDirectory() ? it : zipTree(it)
+    }
+    artifacts.add('archives', task);
+} */
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        // testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    compile 'junit:junit:4.12'
+
+    // compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.google.protobuf:protobuf-lite:3.0.1'
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+    plugins {
+        javalite {
+            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                remove java
+            }
+            task.plugins {
+                javalite { }
+            }
+        }
+    }
+}
+
+task createJar(type: Copy) {
+    from('build/intermediates/bundles/debug')
+    into('libs')
+    include('classes.jar')
+    rename('classes.jar', 'chimpcheck-lib.jar')
+}

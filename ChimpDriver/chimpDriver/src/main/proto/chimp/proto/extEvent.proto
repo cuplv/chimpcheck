@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package chimp.protobuf;
+
+// UserEvent = ClickBack | ClickHome | ClickMenu | PullDownSettings | ReturnToApp | RotateLeft | RotateRight
+
+
+message ExtEvent {
+  enum ExtEventType {
+    CLICKBACK = 1;
+    CLICKHOME = 2;
+    CLICKMENU = 3;
+    PULLDOWNSETTINGS = 4;
+    RETURNTOAPP = 5;
+    ROTATELEFT  = 6;
+    ROTATERIGHT = 7;
+  }
+  required ExtEventType eventType = 1;
+}
+
+message ClickBack {
+}
+
+message ClickHome {
+}
+
+message ClickMenu {
+}
+
+message PullDownSettings {
+}
+
+message ReturnToApp {
+}
+
+message RotateLeft {
+}
+
+message RotateRight {
+}
+
