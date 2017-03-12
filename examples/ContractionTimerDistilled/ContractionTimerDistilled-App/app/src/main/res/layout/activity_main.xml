@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dip"
+    android:weightSum="2"
+    >
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+
+        >
+
+        <Button
+            android:id="@+id/fragmentBtn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnFragmentOne"
+            android:layout_toLeftOf="@+id/centerPoint"
+            />
+
+        <TextView
+            android:id="@+id/centerPoint"
+            android:text=""
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/fragmentBtn2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btnFragmentTwo"
+            android:layout_toRightOf="@+id/centerPoint"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ContractionTimerDistilled</string>
+    <string name="btnFragmentOne">First Fragment</string>
+    <string name="btnFragmentTwo">Second Fragment</string>
+    <string name="mainText">Pre-Exec</string>
+</resources>
