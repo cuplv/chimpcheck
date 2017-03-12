@@ -10,7 +10,7 @@ name := "ChimpCombinator"
 
 organization := "edu.colorado.plv.chimp.combinator"
 
-version := "1.0"
+version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.12.1"
 
