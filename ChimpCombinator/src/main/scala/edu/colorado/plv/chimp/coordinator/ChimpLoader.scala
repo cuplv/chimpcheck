@@ -21,10 +21,10 @@ object ChimpLoader {
       appInfo  <- Aapt.parse(appAPKout) ;
       testInfo <- Aapt.parse(testAPKout) ;
 
-      uninstApp  <- doTry (Adb.uninstall(appInfo.packageName)) ! ;
-      uninstTest <- doTry (Adb.uninstall(testInfo.packageName)) ! ;
-      instApp  <- Adb.install(appAPKPath) ! ;
-      instTest <- Adb.install(chimpAPKPath) ! ;
+      uninstApp  <- doTry (Adb.target(emuID).uninstall(appInfo.packageName)) ! ;
+      uninstTest <- doTry (Adb.target(emuID).uninstall(testInfo.packageName)) ! ;
+      instApp  <- Adb.target(emuID).install(appAPKPath) ! ;
+      instTest <- Adb.target(emuID).install(chimpAPKPath) ! ;
 
       instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace)
         .components( appInfo.packageName, testerClass, testInfo.packageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!!
