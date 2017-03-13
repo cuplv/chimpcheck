@@ -1,6 +1,8 @@
 package edu.colorado.plv.chimp.driver;
 
+import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
 import android.util.Base64;
 import android.util.Log;
 import chimp.protobuf.AppEventOuterClass;
@@ -14,15 +16,21 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 /**
  * Created by edmund on 3/10/17.
  */
-public class ChimpDriver {
+public class ChimpDriver<A extends Activity> {
 
     protected EventTraceOuterClass.EventTrace trace = null;
     protected ChimpJUnitRunner runner = null;
+    protected ActivityTestRule<A> chimpActivityTestRule = null;
 
     protected void setEventTrace(EventTraceOuterClass.EventTrace trace) { this.trace = trace; }
     protected void setRunner() { runner = (ChimpJUnitRunner) InstrumentationRegistry.getInstrumentation(); }
+    protected void setActivityTestRule(Class<A> activityClass) {
+        chimpActivityTestRule = new ActivityTestRule<A>(activityClass);
+    }
 
     protected boolean isReady() { return trace != null && runner != null; }
+
+    protected void init() { }
 
     protected void runTrace() {
         if (runner == null) setRunner();
