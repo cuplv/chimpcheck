@@ -1,6 +1,7 @@
 package com.peilunzhang.contractiontimerdistilled;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.EspressoException;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -21,6 +22,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import chimp.protobuf.EventTraceOuterClass;
 import edu.colorado.plv.chimp.driver.ChimpDriver;
 import edu.colorado.plv.chimp.driver.ChimpJUnitRunner;
+import edu.colorado.plv.chimp.driver.EspressoChimpDriver;
 
 /**
  * Created by edmund on 3/10/17.
@@ -28,7 +30,7 @@ import edu.colorado.plv.chimp.driver.ChimpJUnitRunner;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TestExpresso extends ChimpDriver {
+public class TestExpresso extends EspressoChimpDriver<MainActivity> {
 
     @Rule
     public ActivityTestRule<MainActivity> activityTestRule =
