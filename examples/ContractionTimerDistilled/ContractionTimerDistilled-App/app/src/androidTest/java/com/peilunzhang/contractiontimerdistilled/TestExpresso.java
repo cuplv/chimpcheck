@@ -36,8 +36,11 @@ public class TestExpresso extends EspressoChimpDriver<MainActivity> {
     public ActivityTestRule<MainActivity> activityTestRule =
             new ActivityTestRule<>(MainActivity.class);
 
+    /*
     @Test
     public void test1() {
+
+
 
         // ChimpJUnitRunner driver = (ChimpJUnitRunner)   InstrumentationRegistry.getInstrumentation();
         // EventTraceOuterClass.EventTrace trace = driver.getEventTrace();
@@ -46,12 +49,17 @@ public class TestExpresso extends EspressoChimpDriver<MainActivity> {
 
         // setRunner();
         // setEventTrace(trace);
+
         runTrace();
 
 
 
         // onView(withId(R.id.fragmentBtn1)).perform(click());
 
-    }
+        // onView(withId(R.id.fragmentBtn2)).perform(click());
+
+
+
+    } */
 
 }

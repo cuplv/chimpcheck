@@ -26,7 +26,10 @@ object TestApp {
 
     implicit val logger = Logger(LoggerFactory.getLogger("chimp-tester"))
 
-    ChimpLoader.quickLoad(emuID, testTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome)
+    ChimpLoader.quickLoad(emuID, testTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome) match {
+      case Some(results) => println(s"Results: $results")
+      case None => println("No results!")
+    }
 
   }
 
