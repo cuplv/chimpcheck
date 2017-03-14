@@ -5,11 +5,6 @@ import android.app.Activity;
 /**
  * Created by edmund on 3/13/17.
  */
-public class RobotiumChimpDriver<A extends Activity> extends ChimpDriver<A> {
-
-    @Override
-    protected void init() {
-
-    }
+abstract public class RobotiumChimpDriver<A extends Activity> extends ChimpDriver<A> {
 
 }

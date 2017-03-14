@@ -1,125 +1,149 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
+import android.support.test.espresso.Espresso;
 import android.util.Log;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 import chimp.protobuf.ExtEventOuterClass;
+
+// import android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
  * Created by edmund on 3/13/17.
  */
 public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
 
-    @Override
-    protected void init() {  }
-
     // Try Event Block
 
     @Override
-    protected void executeEvent(EventTraceOuterClass.TryEvent tryEvent) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), tryEvent.toString());
+    protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), tryEvent.toString());
         // TODO
+        return tryEvent;
     }
 
     @Override
-    protected void executeEvent(EventTraceOuterClass.Decide decide) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), decide.toString());
+    protected EventTraceOuterClass.Decide launchDecideEvent(EventTraceOuterClass.Decide decide) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchDecideEvent"), decide.toString());
         // TODO
+        return decide;
     }
 
     @Override
-    protected void executeEvent(EventTraceOuterClass.DecideMany decideMany) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), decideMany.toString());
+    protected EventTraceOuterClass.DecideMany launchDecideManyEvent(EventTraceOuterClass.DecideMany decideMany) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchDecideManyEvent"), decideMany.toString());
         // TODO
+        return decideMany;
     }
 
     // User Events
 
     @Override
-    protected void executeEvent(AppEventOuterClass.Click click) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), click.toString());
+    protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
+
+        AppEventOuterClass.UIID uiid = click.getUiid();
+        switch (uiid.getIdType()) {
+            case R_ID: Espresso.onView(withId(uiid.getRid())).perform(click()); return click;
+            case NAME_ID: Espresso.onView(withText(uiid.getNameid())).perform(click()); return click;
+            case WILD_CARD:
+                // TODO: do wild card click and record the actual R_id and Text Name clicked.
+                // TODO: Should return click token with the UIID of the exact view clicked.
+                return click;
+        }
+
+        return click;
+    }
+
+    @Override
+    protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
+        // TODO
+        return longClick;
+    }
+
+    @Override
+    protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), type.toString());
+        // TODO
+        return type;
+    }
+
+    @Override
+    protected AppEventOuterClass.Drag launchDragEvent(AppEventOuterClass.Drag drag) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchDragEvent"), drag.toString());
+        // TODO
+        return drag;
+    }
+
+    @Override
+    protected AppEventOuterClass.Pinch launchPinchEvent(AppEventOuterClass.Pinch pinch) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchPinchEvent"), pinch.toString());
+        // TODO
+        return pinch;
+    }
+
+    @Override
+    protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
+        // TODO
+        return swipe;
+    }
+
+    @Override
+    protected AppEventOuterClass.Sleep launchSleepEvent(AppEventOuterClass.Sleep sleep) {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), sleep.toString());
+        try {
+            Thread.sleep(sleep.getTime());
+        } catch (Exception e) {
+            Log.e(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), "Chimp messed up while sleeping:" + e.toString());
+        }
+        return sleep;
+    }
+
+    @Override
+    protected void launchClickMenu() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
         // TODO
     }
 
     @Override
-    protected void executeEvent(AppEventOuterClass.LongClick longClick) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), longClick.toString());
+    protected void launchClickHome() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
         // TODO
     }
 
     @Override
-    protected void executeEvent(AppEventOuterClass.Type type) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), type.toString());
+    protected void launchClickBack() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
         // TODO
     }
 
     @Override
-    protected void executeEvent(AppEventOuterClass.Drag drag) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), drag.toString());
+    protected void launchPullDownSettings() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchPullDownSettings"), "PullDownSettings");
         // TODO
     }
 
     @Override
-    protected void executeEvent(AppEventOuterClass.Pinch pinch) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), pinch.toString());
+    protected void launchReturnToApp() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "ReturnToApp");
         // TODO
     }
 
     @Override
-    protected void executeEvent(AppEventOuterClass.Swipe swipe) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), swipe.toString());
+    protected void launchRotateLeft() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateLeft"), "RotateLeft");
         // TODO
     }
 
     @Override
-    protected void executeEvent(AppEventOuterClass.Sleep sleep) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), sleep.toString());
-        // TODO
-    }
-
-
-    // External Events
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.ClickBack clickBack) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), clickBack.toString());
-        // TODO
-    }
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.ClickHome clickHome) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), clickHome.toString());
-        // TODO
-    }
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.ClickMenu clickMenu) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), clickMenu.toString());
-        // TODO
-    }
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.PullDownSettings pullDownSettings) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), pullDownSettings.toString());
-        // TODO
-    }
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.ReturnToApp returnToApp) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), returnToApp.toString());
-        // TODO
-    }
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.RotateLeft rotateLeft) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), rotateLeft.toString());
-        // TODO
-    }
-
-    @Override
-    protected void executeEvent(ExtEventOuterClass.RotateRight rotateRight) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@executeEvent"), rotateRight.toString());
+    protected void launchRotateRight() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateRight"), "RotateRight");
         // TODO
     }
 
