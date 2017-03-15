@@ -2,9 +2,14 @@ package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.util.TreeIterables;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.Stage;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 import chimp.protobuf.ExtEventOuterClass;
@@ -12,12 +17,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 /**
  * Created by edmund on 3/10/17.
@@ -38,6 +43,32 @@ abstract public class ChimpDriver<A extends Activity> {
     protected List<EventTraceOuterClass.UIEvent> completedEvents = null;
 
     protected boolean isReady() { return trace != null && runner != null; }
+
+    protected Activity current;
+    protected Activity getActivityInstance(){
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+            public void run(){
+                Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+                for(Activity act : resumedActivity){
+                    current = act;
+                }
+            }
+        });
+        return current;
+    }
+
+    protected View getClickableView(){
+        View root = getActivityInstance().getWindow().getDecorView();
+        ArrayList<View>  clickableViews = new ArrayList<>();
+        for(View v : TreeIterables.breadthFirstViewTraversal(root)){
+            if(v.isClickable()){
+                clickableViews.add(v);
+            }
+        }
+        if(clickableViews.isEmpty()) throw new IllegalStateException("No clickable events at current state");
+        return clickableViews.get(ThreadLocalRandom.current().nextInt(0, clickableViews.size()));
+    }
+
 
     @Before
     public void init() {
