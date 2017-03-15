@@ -106,6 +106,11 @@ object UIID_Implicits {
 
 }
 
+object * extends UIID {
+   override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.WILD_CARD, None, None)
+   override def toString(): String = "*"
+}
+
 import UIID_Implicits._
 
 object UIID {
@@ -113,6 +118,7 @@ object UIID {
       pd_uiid.idType match {
          case pb.UIID.UIIDType.R_ID    => pd_uiid.getRid
          case pb.UIID.UIIDType.NAME_ID => pd_uiid.getNameid
+         case pb.UIID.UIIDType.WILD_CARD => *
       }
    }
 }
