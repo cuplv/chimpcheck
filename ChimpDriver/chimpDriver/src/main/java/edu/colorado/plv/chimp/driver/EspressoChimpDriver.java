@@ -1,6 +1,7 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.espresso.Espresso;
@@ -12,6 +13,7 @@ import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
@@ -48,7 +50,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
-
         AppEventOuterClass.UIID uiid = click.getUiid();
         switch (uiid.getIdType()) {
             case R_ID: Espresso.onView(withId(uiid.getRid()))
@@ -73,6 +74,25 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
+        AppEventOuterClass.UIID uiid = longClick.getUiid();
+        switch (uiid.getIdType()) {
+            case R_ID:
+                Espresso.onView(withId(uiid.getRid()))
+                        .perform(longClick());
+                return longClick;
+            case NAME_ID:
+                Espresso.onView(withText(uiid.getNameid()))
+                        .perform(longClick());
+                return longClick;
+            case WILD_CARD:
+                // TODO: do wild card click and record the actual R_id and Text Name clicked.
+                // TODO: Should return click token with the UIID of the exact view clicked.
+
+                Espresso.onView(withId(getClickableView().getId()))
+                        .perform(longClick());
+
+                return longClick;
+        }
         // TODO
         return longClick;
     }
@@ -162,12 +182,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected void launchRotateRight() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateRight"), "RotateRight");
-        Activity activity = getActivityInstance();
-
-        int orientation = activity.getApplicationContext().getResources().getConfiguration().orientation;
-        activity.setRequestedOrientation(
-                (orientation == Configuration.ORIENTATION_PORTRAIT) ?
-                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        launchRotateLeft();
     }
 
 }
