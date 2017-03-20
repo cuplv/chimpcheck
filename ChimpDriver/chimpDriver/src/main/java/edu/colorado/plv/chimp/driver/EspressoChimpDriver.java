@@ -5,16 +5,22 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.NoMatchingViewException;
 import android.util.Log;
-
+import android.view.KeyEvent;
 
 
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 
+import static android.support.test.espresso.Espresso.pressBack;
+
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
+import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
@@ -29,11 +35,10 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), tryEvent.toString());
         // TODO
-        try {
-           executeEvent(tryEvent.getAppEvent());
-        } catch (Exception e){
-            Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), e.getMessage());
-        }
+
+        // Exception: android.support.test.espresso.NoMatchingViewException:
+        // } catch (NoMatchingViewException e){ //
+
         return tryEvent;
     }
 
@@ -65,7 +70,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                                     .perform(click());
                         return click;
             case WILD_CARD:
-                // TODO: do wild card click and record the actual R_id and Text Name clicked.
                 // TODO: Should return click token with the UIID of the exact view clicked.
 
                 Espresso.onView(withId(getClickableView().getId()))
@@ -91,7 +95,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                         .perform(longClick());
                 return longClick;
             case WILD_CARD:
-                // TODO: do wild card click and record the actual R_id and Text Name clicked.
                 // TODO: Should return click token with the UIID of the exact view clicked.
 
                 Espresso.onView(withId(getClickableView().getId()))
@@ -164,6 +167,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchClickMenu() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
         //adb shell input keyevent KEYCODE_MENU
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
         // TODO
     }
 
@@ -171,6 +175,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchClickHome() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
         //adb shell input keyevent KEYCODE_HOME
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_MENU));
         // TODO
     }
 
@@ -178,6 +183,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchClickBack() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
         //adb shell input keyevent KEYCODE_BACK
+        pressBack();
         // TODO
     }
 
@@ -191,6 +197,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchReturnToApp() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "ReturnToApp");
         //adb shell input keyevent KEYCODE_APP_SWITCH && adb shell input keyevent KEYCODE_DPAD_DOWN && adb shell input keyevent KEYCODE_ENTER
+
         // TODO
     }
 
