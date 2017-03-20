@@ -57,16 +57,27 @@ abstract public class ChimpDriver<A extends Activity> {
         return current;
     }
 
-    protected View getClickableView(){
-        View root = getActivityInstance().getWindow().getDecorView();
-        ArrayList<View>  clickableViews = new ArrayList<>();
-        for(View v : TreeIterables.breadthFirstViewTraversal(root)){
-            if(v.isClickable()){
+    protected View getDecorView(){
+        return getActivityInstance().getWindow().getDecorView();
+    }
+
+    protected ArrayList<View> getAllClickableViews() {
+        View root = getDecorView();
+        ArrayList<View> clickableViews = new ArrayList<>();
+        for (View v : TreeIterables.breadthFirstViewTraversal(root)) {
+            if (v.isClickable()) {
                 clickableViews.add(v);
             }
         }
-        if(clickableViews.isEmpty()) throw new IllegalStateException("No clickable events at current state");
-        return clickableViews.get(ThreadLocalRandom.current().nextInt(0, clickableViews.size()));
+        return clickableViews;
+    }
+    protected  View getClickableView(){
+        ArrayList<View> clickableViews = getAllClickableViews();
+        if(clickableViews.isEmpty()) {
+            throw new IllegalStateException("No clickable events at current state");
+        } else {
+            return clickableViews.get(ThreadLocalRandom.current().nextInt(0, clickableViews.size()));
+        }
     }
 
 
