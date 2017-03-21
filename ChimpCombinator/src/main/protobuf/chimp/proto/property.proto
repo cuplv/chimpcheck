@@ -1,0 +1,46 @@
+syntax = "proto2";
+
+package chimp.protobuf;
+
+message Arg {
+    enum ArgType {
+        INT_ARG = 1;
+        STR_ARG = 2;
+        BOOL_ARG = 3;
+    }
+    required ArgType argType = 1;
+    optional int32 intVal  = 2;
+    optional string strVal = 3;
+    optional bool boolVal = 4;
+}
+
+message Pred {
+    required string name = 1;
+    repeated Arg args = 2;
+}
+
+message BaseProp {
+    enum BasePropType {
+        PRIM_TYPE = 1;
+        CONJ_BASE_TYPE = 2;
+        DISJ_BASE_TYPE = 3;
+    }
+    required BasePropType propType = 1;
+    optional Pred pred = 2;
+    optional BaseProp prop1 = 3;
+    optional BaseProp prop2 = 4;
+}
+
+message Prop {
+    enum PropType {
+        LIT_TYPE  = 1;
+        IMP_TYPE  = 2;
+        CONJ_TYPE = 3;
+        DISJ_TYPE = 4;
+    }
+    required PropType propType = 1;
+    optional BaseProp prem = 2;
+    optional BaseProp conc = 3;
+    optional Prop prop1 = 4;
+    optional Prop prop2 = 5;
+}
