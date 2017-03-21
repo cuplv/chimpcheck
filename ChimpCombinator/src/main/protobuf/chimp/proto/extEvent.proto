@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
-// UserEvent = ClickBack | ClickHome | ClickMenu | PullDownSettings | ReturnToApp | RotateLeft | RotateRight
+// UserEvent = ClickBack | ClickHome | ClickMenu | PullDownSettings | Resume | Rotate
 
 
 message ExtEvent {
@@ -11,9 +11,8 @@ message ExtEvent {
     CLICKHOME = 2;
     CLICKMENU = 3;
     PULLDOWNSETTINGS = 4;
-    RETURNTOAPP = 5;
-    ROTATELEFT  = 6;
-    ROTATERIGHT = 7;
+    RESUME = 5;
+    ROTATE  = 6;
   }
   required ExtEventType eventType = 1;
 }
@@ -30,12 +29,10 @@ message ClickMenu {
 message PullDownSettings {
 }
 
-message ReturnToApp {
+message Resume {
 }
 
-message RotateLeft {
+message Rotate {
 }
 
-message RotateRight {
-}
 

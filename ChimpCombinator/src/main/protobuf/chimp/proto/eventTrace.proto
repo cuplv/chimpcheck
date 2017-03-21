@@ -4,6 +4,7 @@ package chimp.protobuf;
 
 import public "chimp/proto/appEvent.proto";
 import public "chimp/proto/extEvent.proto";
+import public "chimp/proto/property.proto";
 
 // PrimEvent = AppEvent | ExtEvent
 // Condition = PrimEvent
@@ -22,6 +23,7 @@ message UIEvent {
     TRYEVENT = 3;
     DECIDE   = 4;
     DECIDEMANY = 5;
+    ASSERT = 6;
   }
   required UIEventType eventType = 1;
   optional AppEvent appEvent = 2;
@@ -29,6 +31,7 @@ message UIEvent {
   optional TryEvent tryEvent = 4;
   optional Decide decide = 5;
   optional DecideMany decideMany = 6;
+  optional Assert assert = 7;
 }
 
 message TryEvent {
@@ -55,13 +58,19 @@ message Condition {
   enum CondType {
      APPEVENT = 1;
      EXTEVENT = 2;
+     ASSERTION = 3;
   }
   required CondType condType = 1;
   optional AppEvent appEvent = 2;
   optional ExtEvent extEvent = 3;
+  optional Assert assert = 4;
 }
 
 message Alternatives {
   required Condition cond = 1;
   required EventTrace events = 2;
+}
+
+message Assert {
+  required Prop props = 1;
 }
