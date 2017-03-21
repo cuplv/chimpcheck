@@ -16,7 +16,7 @@ object TestApp {
 
     println( s"Yay: ${R.id.fragmentBtn2}" )
 
-    val testTrace:EventTrace = RotateLeft() |:| RotateRight() |:| Click(R.id.fragmentBtn1) |:| Sleep(11000) |:| Click(R.id.fragmentBtn2)
+    val testTrace:EventTrace = Rotate |:| Rotate |:| Click(R.id.fragmentBtn1) |:| Sleep(11000) |:| Click(R.id.fragmentBtn2)
 
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
