@@ -143,9 +143,8 @@ abstract public class ChimpDriver<A extends Activity> {
     abstract protected void launchClickHome();
     abstract protected void launchClickBack();
     abstract protected void launchPullDownSettings();
-    abstract protected void launchReturnToApp();
-    abstract protected void launchRotateLeft();
-    abstract protected void launchRotateRight();
+    abstract protected void launchResume();
+    abstract protected void launchRotate();
 
     // Execute Event methods. Implemented in a very sad way, because of how ProtoBufs handle union type.
     // Better ideas are welcomed...
@@ -225,9 +224,8 @@ abstract public class ChimpDriver<A extends Activity> {
             case CLICKHOME: executeEvent( ExtEventOuterClass.ClickHome.getDefaultInstance() ); break;
             case CLICKMENU: executeEvent( ExtEventOuterClass.ClickMenu.getDefaultInstance() ); break;
             case PULLDOWNSETTINGS: executeEvent( ExtEventOuterClass.PullDownSettings.getDefaultInstance() ); break;
-            case RETURNTOAPP: executeEvent( ExtEventOuterClass.ReturnToApp.getDefaultInstance() ); break;
-            case ROTATELEFT:  executeEvent( ExtEventOuterClass.RotateLeft.getDefaultInstance() ); break;
-            case ROTATERIGHT: executeEvent( ExtEventOuterClass.RotateRight.getDefaultInstance() ); break;
+            case RESUME: executeEvent( ExtEventOuterClass.Resume.getDefaultInstance() ); break;
+            case ROTATE:  executeEvent( ExtEventOuterClass.Rotate.getDefaultInstance() ); break;
         }
     }
 
@@ -339,27 +337,19 @@ abstract public class ChimpDriver<A extends Activity> {
         );
     }
 
-    protected void executeEvent(ExtEventOuterClass.ReturnToApp returnToApp) {
-        Log.i(runner.chimpTag("@executeEvent"), returnToApp.toString());
-        launchReturnToApp();
+    protected void executeEvent(ExtEventOuterClass.Resume resume) {
+        Log.i(runner.chimpTag("@executeEvent"), resume.toString());
+        launchResume();
         completedEvents.add(
-                mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.RETURNTOAPP).build())
+                mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.RESUME).build())
         );
     }
 
-    protected void executeEvent(ExtEventOuterClass.RotateLeft rotateLeft) {
-        Log.i(runner.chimpTag("@executeEvent"), rotateLeft.toString());
-        launchRotateLeft();
+    protected void executeEvent(ExtEventOuterClass.Rotate rotate) {
+        Log.i(runner.chimpTag("@executeEvent"), rotate.toString());
+        launchRotate();
         completedEvents.add(
-           mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.ROTATELEFT).build())
-        );
-    }
-
-    protected void executeEvent(ExtEventOuterClass.RotateRight rotateRight) {
-        Log.i(runner.chimpTag("@executeEvent"), rotateRight.toString());
-        launchRotateRight();
-        completedEvents.add(
-           mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.ROTATERIGHT).build())
+           mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.ROTATE).build())
         );
     }
 

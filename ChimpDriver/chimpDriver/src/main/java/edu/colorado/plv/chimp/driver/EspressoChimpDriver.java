@@ -194,16 +194,16 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     }
 
     @Override
-    protected void launchReturnToApp() {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "ReturnToApp");
+    protected void launchResume() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "Resume");
         //adb shell input keyevent KEYCODE_APP_SWITCH && adb shell input keyevent KEYCODE_DPAD_DOWN && adb shell input keyevent KEYCODE_ENTER
 
         // TODO
     }
 
     @Override
-    protected void launchRotateLeft() {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateLeft"), "RotateLeft");
+    protected void launchRotate() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateLeft"), "Rotate");
 
         Activity activity = getActivityInstance();
         int orientation = activity.getApplicationContext().getResources().getConfiguration().orientation;
@@ -212,12 +212,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
-    }
-
-    @Override
-    protected void launchRotateRight() {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateRight"), "RotateRight");
-        launchRotateLeft();
     }
 
 }
