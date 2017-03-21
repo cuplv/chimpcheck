@@ -142,14 +142,14 @@ object AppEvent {
          case pb.AppEvent.AppEventType.PINCH     => Pinch( Coord.fromProto(appevent.getPinch.start), Coord.fromProto(appevent.getPinch.end) )
          case pb.AppEvent.AppEventType.SWIPE     => Swipe( Coord.fromProto(appevent.getSwipe.start), Coord.fromProto(appevent.getSwipe.end) )
          case pb.AppEvent.AppEventType.SLEEP     => Sleep(appevent.getSleep.time)
-         case pb.AppEvent.AppEventType.SKIP      => Skip()
+         case pb.AppEvent.AppEventType.SKIP      => Skip
       }
    }
 }
 
 abstract class AppEvent extends UIEvent {
    def ==> (trace: EventTrace): Alternative = Alternative( AppEventCondition(this), trace )
-   def ==> (event: UIEvent): Alternative = Alternative( AppEventCondition(this), event |:| Skip() )
+   def ==> (event: UIEvent): Alternative = Alternative( AppEventCondition(this), event |:| Skip )
    def ==> (gen: TraceGen): AlternativeG = AlternativeG( AppEventCondition(this), gen)
 }
 
@@ -198,7 +198,7 @@ case class Sleep(time: Int) extends AppEvent {
         None, None, None, None, None, None, Some(pb.Sleep(time))))
    }
 }
-case class Skip() extends AppEvent {
+object Skip extends AppEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SKIP))
    }
@@ -287,62 +287,55 @@ case class DecideMany(alts: Alternative*) extends UIEvent {
 object ExtEvent {
    def fromProto(extevent: pb.ExtEvent): ExtEvent = {
       extevent.eventType match {
-        case pb.ExtEvent.ExtEventType.CLICKBACK => ClickBack ()
-        case pb.ExtEvent.ExtEventType.CLICKHOME => ClickHome ()
-        case pb.ExtEvent.ExtEventType.CLICKMENU => ClickMenu ()
-        case pb.ExtEvent.ExtEventType.PULLDOWNSETTINGS => PullDownSettings ()
-        case pb.ExtEvent.ExtEventType.RETURNTOAPP => ReturnToApp ()
-        case pb.ExtEvent.ExtEventType.ROTATELEFT => RotateLeft ()
-        case pb.ExtEvent.ExtEventType.ROTATERIGHT => RotateRight ()
+        case pb.ExtEvent.ExtEventType.CLICKBACK => ClickBack
+        case pb.ExtEvent.ExtEventType.CLICKHOME => ClickHome
+        case pb.ExtEvent.ExtEventType.CLICKMENU => ClickMenu
+        case pb.ExtEvent.ExtEventType.PULLDOWNSETTINGS => PullDownSettings
+        case pb.ExtEvent.ExtEventType.RESUME => Resume
+        case pb.ExtEvent.ExtEventType.ROTATE => Rotate
      }
    }
 }
 
 abstract class ExtEvent extends UIEvent {
    def ==>(trace: EventTrace): Alternative = Alternative(ExtEventCondition(this), trace)
-   def ==>(event: UIEvent): Alternative = Alternative(ExtEventCondition(this), event |:| Skip())
+   def ==>(event: UIEvent): Alternative = Alternative(ExtEventCondition(this), event |:| Skip)
    def ==>(gen: TraceGen): AlternativeG = AlternativeG(ExtEventCondition(this), gen)
 }
 
-case class ClickBack() extends ExtEvent {
+object ClickBack extends ExtEvent {
    override def toMsg(): pb.UIEvent =  {
      ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.CLICKBACK))
    }
    override def toString: String = "ClickBack"
 }
-case class ClickHome() extends ExtEvent {
+object ClickHome extends ExtEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.CLICKHOME))
    }
    override def toString: String = "ClickHome"
 }
-case class ClickMenu() extends ExtEvent {
+object ClickMenu extends ExtEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.CLICKMENU))
    }
    override def toString: String = "ClickMenu"
 }
-case class PullDownSettings() extends ExtEvent {
+object PullDownSettings extends ExtEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.PULLDOWNSETTINGS))
    }
    override def toString: String = "PullDownSettings"
 }
-case class ReturnToApp() extends ExtEvent {
+object Resume extends ExtEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.RETURNTOAPP))
+      ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.RESUME))
    }
    override def toString: String = "ReturnToApp"
 }
-case class RotateLeft() extends ExtEvent {
+object Rotate extends ExtEvent {
    override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.ROTATELEFT))
+      ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.ROTATE))
    }
-   override def toString: String = "RotateLeft"
-}
-case class RotateRight() extends ExtEvent {
-   override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.ExtEvent(pb.ExtEvent.ExtEventType.ROTATERIGHT))
-   }
-   override def toString: String = "RotateRight"
+   override def toString: String = "Rotate"
 }

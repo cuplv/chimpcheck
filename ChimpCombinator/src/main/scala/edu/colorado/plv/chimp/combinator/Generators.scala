@@ -21,12 +21,10 @@ import Test.{Parameters}
 object TraceGen {
 
   val defaultUserInterrupts: Seq[EventTrace] = Seq(
-    EventTrace.trace(RotateLeft()),
-    EventTrace.trace(RotateRight()),
-    RotateLeft() |:| RotateRight(),
-    ClickHome() |:| ReturnToApp(),
-    ClickMenu() |:| ReturnToApp(),
-    PullDownSettings() |:| ReturnToApp()
+    EventTrace.trace(Rotate),
+    ClickHome |:| Resume,
+    ClickMenu |:| Resume,
+    PullDownSettings |:| Resume
   )
 
   def pick(n:Int): Gen[EventTrace] =
@@ -36,7 +34,7 @@ object TraceGen {
         events <- pick(n - 1)
       } yield event |:| events
     } else {
-      const(EventTrace.trace(Skip()))
+      const(EventTrace.trace(Skip))
     }
 }
 
@@ -71,7 +69,7 @@ case class InterSeq(gen1: TraceGen, gen2: TraceGen) extends TraceGen {
 case class Optional(gen: TraceGen) extends TraceGen {
    override def generator(): Gen[EventTrace] = for {
      tr1 <- gen.generator()
-     tr2 <- Gen.frequency( (1,EventTrace.trace(Skip())), (2,tr1) )
+     tr2 <- Gen.frequency( (1,EventTrace.trace(Skip)), (2,tr1) )
    } yield tr2
 }
 case class DecideG(cond: Condition, succ:TraceGen, fail: TraceGen) extends TraceGen {
@@ -124,11 +122,11 @@ case class DecideGMany(alternatives: AlternativeG*) extends TraceGen {
 
 case class Monkey() extends TraceGen {
    // TODO
-   override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip()))
+   override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip))
 }
 case class LearnModel() extends TraceGen {
    // TODO
-   override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip()))
+   override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip))
 }
 
 object implicits {
