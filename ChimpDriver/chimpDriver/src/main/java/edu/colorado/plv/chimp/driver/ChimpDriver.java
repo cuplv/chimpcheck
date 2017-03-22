@@ -27,7 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by edmund on 3/10/17.
  */
-abstract public class ChimpDriver<A extends Activity> {
+abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
     protected EventTraceOuterClass.EventTrace trace = null;
     protected ChimpJUnitRunner runner = null;
@@ -40,10 +40,12 @@ abstract public class ChimpDriver<A extends Activity> {
     }
 
     protected boolean traceCompleted = false;
+    protected boolean noOp = false;
     protected List<EventTraceOuterClass.UIEvent> completedEvents = null;
 
     protected boolean isReady() { return trace != null && runner != null; }
 
+    /*
     protected Activity current;
     protected Activity getActivityInstance(){
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
@@ -71,15 +73,17 @@ abstract public class ChimpDriver<A extends Activity> {
         }
         return clickableViews;
     }
-    protected  View getClickableView(){
+    protected  View getClickableView() throws NoViewEnabledException {
         ArrayList<View> clickableViews = getAllClickableViews();
         if(clickableViews.isEmpty()) {
-            throw new IllegalStateException("No clickable events at current state");
+            // WHY PEILUN? WHY IllegalStateException ?!
+            // throw new IllegalStateException("No clickable events at current state");
+            throw new NoViewEnabledException("No clickable events at current state");
         } else {
             return clickableViews.get(ThreadLocalRandom.current().nextInt(0, clickableViews.size()));
         }
     }
-
+    */
 
     @Before
     public void init() {
@@ -97,10 +101,17 @@ abstract public class ChimpDriver<A extends Activity> {
         }
 
         traceCompleted = false;
+        noOp = false;
         completedEvents = new ArrayList<EventTraceOuterClass.UIEvent>();
 
         for(EventTraceOuterClass.UIEvent event :trace.getEventsList()) {
-            executeEvent(event);
+            try {
+                executeEvent(event);
+            } catch (NoViewEnabledException e) {
+                noOp = true;
+                return;
+            }
+            // need to catch more stuff here as well, Espresso "I can't click this" exceptions
         }
 
         traceCompleted = true;
@@ -114,6 +125,12 @@ abstract public class ChimpDriver<A extends Activity> {
         } else {
             runner.addReport("ChimpTraceResult", "Failed");
         }
+        if (noOp) {
+            runner.addReport("ChimpTraceBlocked", "Yes");
+        } else {
+            runner.addReport("ChimpTraceBlocked", "No");
+        }
+
         // runner.addReport("ChimpTraceCompleted", Base64.encodeToString(trace.toByteArray(), Base64.DEFAULT));
 
         EventTraceOuterClass.EventTrace.Builder builder = EventTraceOuterClass.EventTrace.newBuilder();
@@ -131,9 +148,9 @@ abstract public class ChimpDriver<A extends Activity> {
     abstract protected EventTraceOuterClass.Decide launchDecideEvent(EventTraceOuterClass.Decide decide);
     abstract protected EventTraceOuterClass.DecideMany launchDecideManyEvent(EventTraceOuterClass.DecideMany decideMany);
 
-    abstract protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click);
-    abstract protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick);
-    abstract protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type);
+    abstract protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException;
+    abstract protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException;
+    abstract protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException;
     abstract protected AppEventOuterClass.Drag launchDragEvent(AppEventOuterClass.Drag drag);
     abstract protected AppEventOuterClass.Pinch launchPinchEvent(AppEventOuterClass.Pinch pinch);
     abstract protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe);
@@ -195,7 +212,7 @@ abstract public class ChimpDriver<A extends Activity> {
     }
 
 
-    protected void executeEvent(EventTraceOuterClass.UIEvent event) {
+    protected void executeEvent(EventTraceOuterClass.UIEvent event) throws NoViewEnabledException {
         switch (event.getEventType()) {
             case APPEVENT: executeEvent(event.getAppEvent()); break;
             case EXTEVENT: executeEvent(event.getExtEvent()); break;
@@ -205,7 +222,7 @@ abstract public class ChimpDriver<A extends Activity> {
         }
     }
 
-    protected void executeEvent(AppEventOuterClass.AppEvent appevent) {
+    protected void executeEvent(AppEventOuterClass.AppEvent appevent) throws NoViewEnabledException {
         switch (appevent.getEventType()) {
             case CLICK: executeEvent(appevent.getClick()); break;
             case LONGCLICK: executeEvent( appevent.getLongclick() ); break;
@@ -234,10 +251,13 @@ abstract public class ChimpDriver<A extends Activity> {
     protected void executeEvent(EventTraceOuterClass.TryEvent tryEvent) {
         Log.i(runner.chimpTag("@executeEvent"), tryEvent.toString());
         EventTraceOuterClass.TryEvent newTryEvent = launchTryEvent(tryEvent);
+
+        // Skip logging try events (child events are already logged)
+        /*
         completedEvents.add(
            EventTraceOuterClass.UIEvent.newBuilder().setEventType(EventTraceOuterClass.UIEvent.UIEventType.TRYEVENT)
                 .setTryEvent(newTryEvent).build()
-        );
+        ); */
     }
 
     protected void executeEvent(EventTraceOuterClass.Decide decide) {
@@ -260,19 +280,19 @@ abstract public class ChimpDriver<A extends Activity> {
 
     // User Events
 
-    protected void executeEvent(AppEventOuterClass.Click click) {
+    protected void executeEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
        Log.i(runner.chimpTag("@executeEvent"), click.toString());
        AppEventOuterClass.Click launchedClick = launchClickEvent(click);
        completedEvents.add( mkUIEvent(mkAppEvent(launchedClick)) );
     }
 
-    protected void executeEvent(AppEventOuterClass.LongClick longClick) {
+    protected void executeEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("@executeEvent"), longClick.toString());
         AppEventOuterClass.LongClick launchedLongClick = launchLongClickEvent(longClick);
         completedEvents.add( mkUIEvent(mkAppEvent(launchedLongClick)) );
     }
 
-    protected void executeEvent(AppEventOuterClass.Type type) {
+    protected void executeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException {
         Log.i(runner.chimpTag("@executeEvent"), type.toString());
         AppEventOuterClass.Type launchedType = launchTypeEvent(type);
         completedEvents.add( mkUIEvent(mkAppEvent(launchedType)) );
