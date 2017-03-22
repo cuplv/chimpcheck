@@ -18,6 +18,8 @@ object TestApp {
 
     val testTrace:EventTrace = Rotate |:| Rotate |:| Click(R.id.fragmentBtn1) |:| Sleep(11000) |:| Click(R.id.fragmentBtn2)
 
+    val testGorilla:EventTrace = Rotate |:| Sleep(2000) |:| Rotate |:| Sleep(2000) |:| Gorilla.generator().sample.get
+
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
     val appAPKPath = "/data/chimp/ContractionTimer/app-debug.apk"
@@ -26,7 +28,7 @@ object TestApp {
 
     implicit val logger = Logger(LoggerFactory.getLogger("chimp-tester"))
 
-    ChimpLoader.quickLoad(emuID, testTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome) match {
+    ChimpLoader.quickLoad(emuID, testGorilla, appAPKPath, chimpAPKPath, testerClass, aaptHome) match {
       case Some(results) => println(s"Results: $results")
       case None => println("No results!")
     }
