@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.action.ViewActions;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -202,7 +203,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchClickMenu() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
         //adb shell input keyevent KEYCODE_MENU
-        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_MENU));
         // TODO
     }
 
@@ -210,7 +211,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchClickHome() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
         //adb shell input keyevent KEYCODE_HOME
-        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_MENU));
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
         // TODO
     }
 
@@ -218,7 +219,9 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchClickBack() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
         //adb shell input keyevent KEYCODE_BACK
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
         pressBack();
+
         // TODO
     }
 
@@ -232,8 +235,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchResume() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "Resume");
         //adb shell input keyevent KEYCODE_APP_SWITCH && adb shell input keyevent KEYCODE_DPAD_DOWN && adb shell input keyevent KEYCODE_ENTER
-
-        // TODO
     }
 
     @Override
