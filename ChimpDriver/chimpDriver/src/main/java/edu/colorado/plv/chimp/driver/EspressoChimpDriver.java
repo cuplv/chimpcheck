@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 
+import android.view.View;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
+
+import java.util.*;
 
 import static android.support.test.espresso.Espresso.pressBack;
 
@@ -34,10 +37,25 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), tryEvent.toString());
-        // TODO
 
+        try {
+            EventTraceOuterClass.TryEvent.TryType tryType = tryEvent.getTryType();
+            switch (tryType) {
+                case APPEVENT: executeEvent( tryEvent.getAppEvent() ); break;
+                case EXTEVENT: executeEvent( tryEvent.getExtEvent() ); break;
+                case TRACE:
+                    for (EventTraceOuterClass.UIEvent uiEvent : tryEvent.getTrace().getEventsList()) {
+                        executeEvent( uiEvent );
+                    }
+                    break;
+            }
+        } catch (NoViewEnabledException e) {
+            Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), e.toString());
+        }
+        /* Probably more catching here to do. Find out what Espresso throws when the view you click is not there.
         // Exception: android.support.test.espresso.NoMatchingViewException:
-        // } catch (NoMatchingViewException e){ //
+         catch (NoMatchingViewException e) { }
+        */
 
         return tryEvent;
     }
@@ -59,7 +77,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     // User Events
 
     @Override
-    protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) {
+    protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
         AppEventOuterClass.UIID uiid = click.getUiid();
         switch (uiid.getIdType()) {
@@ -70,19 +88,25 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                                     .perform(click());
                         return click;
             case WILD_CARD:
-                // TODO: Should return click token with the UIID of the exact view clicked.
+                View view = getClickableView();
 
-                Espresso.onView(withId(getClickableView().getId()))
+                Espresso.onView(withId(view.getId()))
                         .perform(click());
 
-                return click;
+                // Should return click token with the UIID of the exact view clicked.
+                // That's what below is doing. However, find out if there is better way to retain human-readable information on
+                // this view (Display Text?)
+                AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
+                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()));
+
+                return builder.build();
         }
 
         return click;
     }
 
     @Override
-    protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) {
+    protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
         AppEventOuterClass.UIID uiid = longClick.getUiid();
         switch (uiid.getIdType()) {
@@ -95,19 +119,23 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                         .perform(longClick());
                 return longClick;
             case WILD_CARD:
-                // TODO: Should return click token with the UIID of the exact view clicked.
 
-                Espresso.onView(withId(getClickableView().getId()))
+                View view = getClickableView();
+
+                Espresso.onView(withId(view.getId()))
                         .perform(longClick());
 
-                return longClick;
+                // Should return click token with the UIID of the exact view clicked.
+                AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
+                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()));
+
+                return builder.build();
         }
-        // TODO
         return longClick;
     }
 
     @Override
-    protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) {
+    protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), type.toString());
         AppEventOuterClass.UIID uiid = type.getUiid();
         String text = type.getInput();
@@ -122,10 +150,17 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 return type;
             case WILD_CARD:
 
-                Espresso.onView(withId(getClickableView().getId()))
+                View view = getTypeableView(); // getClickableView();
+
+                Espresso.onView(withId(view.getId()))
                         .perform(typeText(text));
 
-                return type;
+                AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
+                builder
+                  .setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()))
+                  .setInput(text);
+
+                return builder.build();
         }
         // TODO
         return type;
