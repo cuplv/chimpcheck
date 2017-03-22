@@ -6,17 +6,18 @@ package edu.colorado.plv.chimp.combinator
 
 import chimp.{protobuf => pb}
 import org.scalacheck.Prop.forAll
-import org.scalacheck.Gen
-import Gen.{const}
+import org.scalacheck.{Arbitrary, Gen, Test}
+import Gen.const
+import Test.Parameters
 
-import org.scalacheck.Test
-import Test.{Parameters}
+import TryEvent_Implicits._
 
 /*
   TraceGen = Path(Trace) | TraceGen |:| TraceGen | TraceGen |+| TraceGen | Optional TraceGen | Decide Condition TraceGen TraceGen | Choose TraceGen TraceGen
-           | DecideMany [Alternative] | ChooseMany [TraceGen]
+           | DecideMany [Alternative] | ChooseMany [TraceGen] | Repeat n TraceGen
            | Monkey | LearnModel
  */
+
 
 object TraceGen {
 
@@ -91,6 +92,20 @@ case class ChooseMany(gens: Seq[TraceGen]) extends TraceGen {
      tr <- gens(n).generator()
    } yield tr
 }
+case class ChooseWithFreq(gens: Seq[(Int,TraceGen)]) extends TraceGen {
+  override def generator(): Gen[EventTrace] = {
+    val freqs = gens.map( (freq:(Int,TraceGen)) => (freq._1,freq._2.generator()) )
+    for {
+      tr <- Gen.frequency[EventTrace]( freqs:_* )
+    } yield tr
+  }
+}
+
+case class TryG(gen: TraceGen) extends TraceGen {
+  override def generator(): Gen[EventTrace] = for {
+    tr <- gen.generator()
+  } yield EventTrace.trace( Try(tr) )
+}
 
 case class AlternativeG(condition: Condition, gen: TraceGen) {
    def generator(): Gen[Alternative] = for {
@@ -119,10 +134,59 @@ case class DecideGMany(alternatives: AlternativeG*) extends TraceGen {
   }
 }
 
+case class Repeat(n:Int, gen:TraceGen) extends TraceGen {
+  override def generator(): Gen[EventTrace] =
+    if (n > 0) {
+      for {
+        tr1 <- gen.generator()
+        tr2 <- Repeat(n-1, gen).generator()
+      } yield tr1 |:| tr2
+    } else {
+      const(EventTrace.trace(Skip))
+    }
+}
+
+// Derivable Generators
+
+case class TypeG(idGen:Gen[UIID], strGen:Gen[String]) extends TraceGen {
+  override def generator(): Gen[EventTrace] = const( EventTrace.trace( Type(idGen.sample.get, strGen.sample.get) ) )
+}
+
+case class SleepG(nGen:Gen[Int]) extends TraceGen {
+  override def generator(): Gen[EventTrace] = const( EventTrace.trace( Sleep(nGen.sample.get) ) )
+}
+
+
+// Gorilla Combinator
+
+case class GorillaConfig(steps:Int, freqs:Seq[(Int,TraceGen)]) {
+}
+
+object Gorilla extends TraceGen {
+
+  val defaultGorillaEvents:Seq[(Int,TraceGen)] = Seq(
+    (20,Path(EventTrace.trace(Click(*)))),
+    (5,Path(EventTrace.trace(LongClick(*)))),
+    (5,TypeG(const(*), Arbitrary.arbitrary[String])),
+    (1,SleepG(Gen.choose(2000,5000)))
+  ).map( (f:(Int,TraceGen)) => (f._1, TryG(f._2) ) )
+
+  val defaultGorillaConfig:GorillaConfig = GorillaConfig(50, defaultGorillaEvents)
+
+  override def generator(): Gen[EventTrace] = Gorilla(defaultGorillaConfig).generator()
+
+}
+
+case class Gorilla(gorillaConfig: GorillaConfig) extends TraceGen {
+  override def generator(): Gen[EventTrace] = {
+    Repeat(gorillaConfig.steps, ChooseWithFreq(gorillaConfig.freqs)).generator()
+  }
+}
+
+// Monkey Combinator
 
 case class Monkey() extends TraceGen {
-   // TODO
-   override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip))
+   override def generator(): Gen[EventTrace] = ???
 }
 case class LearnModel() extends TraceGen {
    // TODO
@@ -154,7 +218,7 @@ object TestGen {
 
   def main(args: Array[String]): Unit = {
 
-    val traces: TraceGen = Click("login") |+| Click(*) |+| Type("userbox","test") |+| Type("pwdbox","1234") |+| Click("Go")
+    val traces: TraceGen = Click("login") |+| Click(*) |+| Type("userbox","test") |+| Type("pwdbox","1234") |+| Click("Go") |+| Gorilla
 
     val prop = forAll (traces.generator()) {
       tr => {

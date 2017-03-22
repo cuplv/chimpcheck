@@ -6,8 +6,9 @@ package edu.colorado.plv.chimp.combinator
 
 import chimp.protobuf.UIEvent
 import chimp.{protobuf => pb}
-import edu.colorado.plv.chimp.combinator.TryEvent_Implicits.{TryAppEvent, TryExtEvent}
+import edu.colorado.plv.chimp.combinator.TryEvent_Implicits.{TryAppEvent, TryExtEvent, TryTrace}
 import edu.colorado.plv.chimp.utils.Base64
+import org.scalacheck.Prop.False
 
 object EventTrace {
    def trace(event: UIEvent): EventTrace = EventTrace(Seq(event))
@@ -68,6 +69,9 @@ object UIEvent {
                }
                case pb.TryEvent.TryType.EXTEVENT => {
                   Try( new TryExtEvent( ExtEvent.fromProto( tryevent.getExtEvent ) ) )
+               }
+               case pb.TryEvent.TryType.TRACE => {
+                  Try( new TryTrace( EventTrace.fromProto( tryevent.getTrace ) ) )
                }
             }
          }
@@ -207,37 +211,56 @@ object Skip extends AppEvent {
 
 abstract class TryEvent {
    def event(): UIEvent
+   def trace(): EventTrace
+   def isTrace(): Boolean
 }
 
 object TryEvent_Implicits {
 
    implicit class TryAppEvent(appevent: AppEvent) extends TryEvent {
       override def event(): UIEvent = appevent
+      override def trace(): EventTrace = null
+      override def isTrace(): Boolean = false
    }
 
    implicit class TryExtEvent(extevent: ExtEvent) extends TryEvent {
       override def event(): UIEvent = extevent
+      override def trace(): EventTrace = null
+      override def isTrace(): Boolean = false
+   }
+
+   implicit class TryTrace(tr: EventTrace) extends TryEvent {
+      override def event(): UIEvent = null
+      override def trace(): EventTrace = tr
+      override def isTrace(): Boolean = true
    }
 
 }
 
 case class Try(event: TryEvent) extends UIEvent {
    override def toMsg(): pb.UIEvent = {
-      val pbevent = event.event().toMsg()
-      pbevent.eventType match {
-         case pb.UIEvent.UIEventType.APPEVENT => {
-             ProtoMsg.mkUIEvent(
-                pb.TryEvent( pb.TryEvent.TryType.APPEVENT, Some(pbevent.getAppEvent) )
-             )
+      if (!event.isTrace()) {
+         val pbevent = event.event().toMsg()
+         pbevent.eventType match {
+            case pb.UIEvent.UIEventType.APPEVENT => {
+               ProtoMsg.mkUIEvent(
+                  pb.TryEvent(pb.TryEvent.TryType.APPEVENT, Some(pbevent.getAppEvent))
+               )
+            }
+            case pb.UIEvent.UIEventType.EXTEVENT => {
+               ProtoMsg.mkUIEvent(
+                  pb.TryEvent(pb.TryEvent.TryType.APPEVENT, None, Some(pbevent.getExtEvent))
+               )
+            }
          }
-         case pb.UIEvent.UIEventType.EXTEVENT => {
-            ProtoMsg.mkUIEvent(
-               pb.TryEvent( pb.TryEvent.TryType.APPEVENT, None, Some(pbevent.getExtEvent) )
-            )
-         }
+      } else {
+         ProtoMsg.mkUIEvent(
+            pb.TryEvent(pb.TryEvent.TryType.TRACE, None, None, Some(event.trace().toMsg()))
+         )
       }
    }
-   override def toString(): String = s"Try ${event.event()}"
+   override def toString(): String =
+      if (!event.isTrace()) s"Try ${event.event()}" else s"Try ${event.trace()}"
 }
 
 object Condition {
