@@ -1,9 +1,12 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.SystemClock;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.action.ViewActions;
@@ -11,6 +14,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 
+import android.view.MotionEvent;
 import android.view.View;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
@@ -185,6 +189,41 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
         // TODO
+        Instrumentation inst = InstrumentationRegistry.getInstrumentation();
+        float fromY = swipe.getStart().getY();
+        float fromX = swipe.getStart().getX();
+        float toY = swipe.getEnd().getY();
+        float toX = swipe.getEnd().getX();
+
+        //
+            int stepCount = 10;
+        //
+
+        System.out.println("this drag actions");
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime= SystemClock.uptimeMillis();
+        float y = fromY;
+        float x = fromX;
+        float yStep = (toY - fromY) / stepCount;
+        float xStep = (toX - fromX) / stepCount;
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, fromX, fromY, 0);
+        try {
+            inst.sendPointerSync(event);
+        } catch (SecurityException ignored) {System.out.println("error 1");}
+        for (int i = 0; i < stepCount; ++i){
+            y += yStep;
+            x += xStep;
+            eventTime = SystemClock.uptimeMillis();
+            event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 0);
+            try{
+                inst.sendPointerSync(event);
+            } catch (SecurityException ignored){System.out.println("error 2");}
+        }
+        eventTime = SystemClock.uptimeMillis();
+        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP,toX, toY, 0);
+        try {
+            inst.sendPointerSync(event);
+        } catch (SecurityException ignored) {System.out.println("error 3");}
         return swipe;
     }
 
