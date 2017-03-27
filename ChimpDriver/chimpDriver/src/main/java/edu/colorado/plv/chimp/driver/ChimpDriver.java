@@ -151,7 +151,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
     abstract protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException;
     abstract protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException;
     abstract protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException;
-    abstract protected AppEventOuterClass.Drag launchDragEvent(AppEventOuterClass.Drag drag);
     abstract protected AppEventOuterClass.Pinch launchPinchEvent(AppEventOuterClass.Pinch pinch);
     abstract protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe);
     abstract protected AppEventOuterClass.Sleep launchSleepEvent(AppEventOuterClass.Sleep sleep);
@@ -179,11 +178,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
     protected AppEventOuterClass.AppEvent mkAppEvent(AppEventOuterClass.Sleep sleep) {
         return AppEventOuterClass.AppEvent.newBuilder().setEventType(AppEventOuterClass.AppEvent.AppEventType.SLEEP)
                 .setSleep(sleep).build();
-    }
-
-    protected AppEventOuterClass.AppEvent mkAppEvent(AppEventOuterClass.Drag drag) {
-        return AppEventOuterClass.AppEvent.newBuilder().setEventType(AppEventOuterClass.AppEvent.AppEventType.DRAG)
-                .setDrag(drag).build();
     }
 
     protected AppEventOuterClass.AppEvent mkAppEvent(AppEventOuterClass.Type type) {
@@ -227,7 +221,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
             case CLICK: executeEvent(appevent.getClick()); break;
             case LONGCLICK: executeEvent( appevent.getLongclick() ); break;
             case TYPE: executeEvent( appevent.getType() ); break;
-            case DRAG: executeEvent( appevent.getDrag() ); break;
             case PINCH: executeEvent( appevent.getPinch() ); break;
             case SWIPE: executeEvent( appevent.getSwipe() ); break;
             case SLEEP: executeEvent( appevent.getSleep() ); break;
@@ -296,12 +289,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
         Log.i(runner.chimpTag("@executeEvent"), type.toString());
         AppEventOuterClass.Type launchedType = launchTypeEvent(type);
         completedEvents.add( mkUIEvent(mkAppEvent(launchedType)) );
-    }
-
-    protected void executeEvent(AppEventOuterClass.Drag drag) {
-        Log.i(runner.chimpTag("@executeEvent"), drag.toString());
-        AppEventOuterClass.Drag launchedDrag = launchDragEvent(drag);
-        completedEvents.add( mkUIEvent(mkAppEvent(launchedDrag)) );
     }
 
     protected void executeEvent(AppEventOuterClass.Pinch pinch) {
