@@ -16,9 +16,9 @@ object TestApp {
 
     println( s"Yay: ${R.id.fragmentBtn2}" )
 
-    val testTrace:EventTrace = Rotate |:| Rotate |:| Click(R.id.fragmentBtn1) |:| Sleep(11000) |:| Click(R.id.fragmentBtn2)
+    val testTrace:EventTrace = Rotate :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Sleep(11000) :>> Click(R.id.fragmentBtn2)
 
-    val testGorilla:EventTrace = Rotate |:| Sleep(2000) |:| Rotate |:| Sleep(2000) |:| Gorilla.generator().sample.get
+    val testGorilla:EventTrace = Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Gorilla.generator().sample.get
 
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
