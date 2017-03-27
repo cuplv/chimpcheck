@@ -4,7 +4,8 @@ package edu.colorado.plv.chimp.combinator
   * Created by edmund on 2/5/17.
   */
 
-import chimp.protobuf.UIEvent
+import chimp.protobuf.Orientation.OrientType.{DOWN, LEFT, RIGHT, UP, XY_TYPE}
+import chimp.protobuf.{Orientation, UIEvent, UIID}
 import chimp.{protobuf => pb}
 import edu.colorado.plv.chimp.combinator.TryEvent_Implicits.{TryAppEvent, TryExtEvent, TryTrace}
 import edu.colorado.plv.chimp.utils.Base64
@@ -23,10 +24,11 @@ object EventTrace {
 }
 
 case class EventTrace(events: Seq[UIEvent]) extends ProtoMsg[pb.EventTrace] {
-   def |:| (event: UIEvent): EventTrace = EventTrace( events :+ event )
-   def |:| (trace: EventTrace): EventTrace = EventTrace( events ++ trace.events )
+   def :>>(event: UIEvent): EventTrace = EventTrace( events :+ event )
+   def :>>(trace: EventTrace): EventTrace = EventTrace( events ++ trace.events )
+   def :>>(traceGen: TraceGen): TraceGen = AtomSeq(Path(this),traceGen)
    override def toMsg(): pb.EventTrace = pb.EventTrace( events.map(_.toMsg()) )
-   override def toString(): String = events.mkString(" |:| ")
+   override def toString(): String = events.mkString(" :> ")
    def toBase64(): String = Base64.encode( toMsg().toByteArray )
 }
 
@@ -90,8 +92,9 @@ object UIEvent {
 }
 
 abstract class UIEvent extends ProtoMsg[pb.UIEvent] {
-   def |:| (event: UIEvent): EventTrace = EventTrace(Seq(this, event))
-   def |:| (trace: EventTrace): EventTrace = EventTrace( this +: trace.events )
+   def :>>(event: UIEvent): EventTrace = EventTrace(Seq(this, event))
+   def :>>(trace: EventTrace): EventTrace = EventTrace( this +: trace.events )
+   def :>>(traceGen: TraceGen): TraceGen = AtomSeq(Path(EventTrace(Seq(this))) , traceGen)
 }
 
 abstract class UIID extends ProtoMsg[pb.UIID]
@@ -106,6 +109,11 @@ object UIID_Implicits {
    implicit class Name(name: String) extends UIID {
       override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.NAME_ID, None, Some(name))
       override def toString(): String = name
+   }
+
+   implicit class XY(xy: Coord) extends UIID {
+      override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.XY_ID, None, None, Some(xy.toMsg()))
+      override def toString: String = s"<${xy.x},${xy.y}>"
    }
 
 }
@@ -123,16 +131,63 @@ object UIID {
          case pb.UIID.UIIDType.R_ID    => pd_uiid.getRid
          case pb.UIID.UIIDType.NAME_ID => pd_uiid.getNameid
          case pb.UIID.UIIDType.WILD_CARD => *
+         case pb.UIID.UIIDType.XY_ID => {
+            val pbXY = pd_uiid.getXyid
+            Coord(pbXY.x, pbXY.y)
+         }
       }
    }
 }
 
 
 object Coord {
-   def fromProto(pb_coord: pb.XYCoordin): Coord = Coord (pb_coord.x) (pb_coord.y)
+   def fromProto(pb_coord: pb.XYCoordin): Coord = Coord (pb_coord.x, pb_coord.y)
 }
-case class Coord(x:Int)(y:Int) extends ProtoMsg[pb.XYCoordin] {
+case class Coord(x:Int,y:Int) extends ProtoMsg[pb.XYCoordin] {
    override def toMsg(): pb.XYCoordin = pb.XYCoordin(x,y)
+   override def toString: String = s"<$x,$y>"
+}
+
+
+abstract class Orientation extends ProtoMsg[pb.Orientation]
+
+object Orient_Implicits {
+
+   implicit class XYOrient(xy : Coord) extends Orientation {
+      override def toMsg(): pb.Orientation = pb.Orientation( pb.Orientation.OrientType.XY_TYPE, Some(xy.toMsg()) )
+      override def toString: String = xy.toString
+   }
+
+}
+
+object Left extends Orientation {
+   override def toMsg(): pb.Orientation = pb.Orientation(pb.Orientation.OrientType.LEFT, None)
+   override def toString: String = "Left"
+}
+object Right extends Orientation {
+   override def toMsg(): pb.Orientation = pb.Orientation(pb.Orientation.OrientType.RIGHT, None)
+   override def toString: String = "Right"
+}
+object Up extends Orientation {
+   override def toMsg(): pb.Orientation = pb.Orientation(pb.Orientation.OrientType.UP, None)
+   override def toString: String = "Up"
+}
+object Down extends Orientation {
+   override def toMsg(): pb.Orientation = pb.Orientation(pb.Orientation.OrientType.DOWN, None)
+   override def toString: String = "Down"
+}
+
+import Orient_Implicits._
+
+object Orientation {
+   def fromProto(pb_orientation: pb.Orientation): Orientation =
+      pb_orientation.orientType match {
+         case XY_TYPE => Coord(pb_orientation.getXy.x, pb_orientation.getXy.y)
+         case LEFT => Left
+         case RIGHT => Right
+         case UP => Up
+         case DOWN => Down
+      }
 }
 
 
@@ -142,9 +197,11 @@ object AppEvent {
          case pb.AppEvent.AppEventType.CLICK     => Click( UIID.fromProto(appevent.getClick.uiid) )
          case pb.AppEvent.AppEventType.LONGCLICK => LongClick( UIID.fromProto(appevent.getLongclick.uiid) )
          case pb.AppEvent.AppEventType.TYPE      => Type( UIID.fromProto(appevent.getType.uiid), appevent.getType.input)
-         case pb.AppEvent.AppEventType.DRAG      => Drag( UIID.fromProto(appevent.getDrag.uiid), Coord.fromProto(appevent.getDrag.disp) )
-         case pb.AppEvent.AppEventType.PINCH     => Pinch( Coord.fromProto(appevent.getPinch.start), Coord.fromProto(appevent.getPinch.end) )
-         case pb.AppEvent.AppEventType.SWIPE     => Swipe( Coord.fromProto(appevent.getSwipe.start), Coord.fromProto(appevent.getSwipe.end) )
+         case pb.AppEvent.AppEventType.PINCH     =>
+            Pinch( Coord.fromProto(appevent.getPinch.start1), Coord.fromProto(appevent.getPinch.start2),
+                   Coord.fromProto(appevent.getPinch.end1), Coord.fromProto(appevent.getPinch.end2) )
+         case pb.AppEvent.AppEventType.SWIPE     => Swipe( UIID.fromProto(appevent.getSwipe.uiid),
+                                                           Orientation.fromProto( appevent.getSwipe.pos ) )
          case pb.AppEvent.AppEventType.SLEEP     => Sleep(appevent.getSleep.time)
          case pb.AppEvent.AppEventType.SKIP      => Skip
       }
@@ -153,7 +210,7 @@ object AppEvent {
 
 abstract class AppEvent extends UIEvent {
    def ==> (trace: EventTrace): Alternative = Alternative( AppEventCondition(this), trace )
-   def ==> (event: UIEvent): Alternative = Alternative( AppEventCondition(this), event |:| Skip )
+   def ==> (event: UIEvent): Alternative = Alternative( AppEventCondition(this), event :>> Skip )
    def ==> (gen: TraceGen): AlternativeG = AlternativeG( AppEventCondition(this), gen)
 }
 
@@ -169,37 +226,32 @@ case class LongClick(uiid: UIID) extends AppEvent {
          None, Some(pb.LongClick(uiid.toMsg()))))
    }
 }
-case class Drag(uiid: UIID, coord: Coord) extends AppEvent {
-   override def toMsg(): pb.UIEvent = {
-      ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.DRAG,
-         None, None, Some(pb.Drag(uiid.toMsg(), coord.toMsg()))))
-   }
-}
 
-case class Pinch(start: Coord, end: Coord) extends AppEvent {
+
+case class Pinch(start1: Coord, start2:Coord, end1: Coord, end2:Coord) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.PINCH,
-         None, None, None, Some(pb.Pinch(start.toMsg(), end.toMsg()))))
+         None, None, Some(pb.Pinch(start1.toMsg(), start2.toMsg(), end1.toMsg(), end2.toMsg()))))
    }
 }
 
-case class Swipe(start: Coord, end: Coord) extends AppEvent {
+case class Swipe(uiid: UIID, orient: Orientation) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SWIPE,
-         None, None, None, None, Some(pb.Swipe(start.toMsg(), end.toMsg()))))
+         None, None, None, Some(pb.Swipe(uiid.toMsg(), orient.toMsg()))))
    }
 }
 
 case class Type(uiid:UIID, input:String) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.TYPE,
-        None, None, None, None, None, Some(pb.Type(uiid.toMsg(), input))))
+        None, None, None, None, Some(pb.Type(uiid.toMsg(), input))))
    }
 }
 case class Sleep(time: Int) extends AppEvent {
    override def toMsg(): pb.UIEvent = {
       ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SLEEP,
-        None, None, None, None, None, None, Some(pb.Sleep(time))))
+        None, None, None, None, None, Some(pb.Sleep(time))))
    }
 }
 object Skip extends AppEvent {
@@ -322,7 +374,7 @@ object ExtEvent {
 
 abstract class ExtEvent extends UIEvent {
    def ==>(trace: EventTrace): Alternative = Alternative(ExtEventCondition(this), trace)
-   def ==>(event: UIEvent): Alternative = Alternative(ExtEventCondition(this), event |:| Skip)
+   def ==>(event: UIEvent): Alternative = Alternative(ExtEventCondition(this), event :>> Skip)
    def ==>(gen: TraceGen): AlternativeG = AlternativeG(ExtEventCondition(this), gen)
 }
 

@@ -23,9 +23,9 @@ object TraceGen {
 
   val defaultUserInterrupts: Seq[EventTrace] = Seq(
     EventTrace.trace(Rotate),
-    ClickHome |:| Resume,
-    ClickMenu |:| Resume,
-    PullDownSettings |:| Resume
+    ClickHome :>> Resume,
+    ClickMenu :>> Resume,
+    PullDownSettings :>> Resume
   )
 
   def pick(n:Int): Gen[EventTrace] =
@@ -33,19 +33,22 @@ object TraceGen {
       for {
         event <- Gen.oneOf(defaultUserInterrupts)
         events <- pick(n - 1)
-      } yield event |:| events
+      } yield event :>> events
     } else {
       const(EventTrace.trace(Skip))
     }
 }
 
 abstract class TraceGen {
-   def |:| (event: UIEvent): TraceGen    = AtomSeq(this, Path(EventTrace.trace(event)))
-   def |:| (trace: EventTrace): TraceGen = AtomSeq(this, Path(trace))
-   def |:| (gen: TraceGen): TraceGen     = AtomSeq(this, gen)
-   def |+| (event: UIEvent): TraceGen   = InterSeq(this, Path(EventTrace.trace(event)))
-   def |+| (trace:EventTrace): TraceGen = InterSeq(this, Path(trace))
-   def |+| (gen: TraceGen): TraceGen    = InterSeq(this, gen)
+   def :>> (event: UIEvent): TraceGen    = AtomSeq(this, Path(EventTrace.trace(event)))
+   def :>> (trace: EventTrace): TraceGen = AtomSeq(this, Path(trace))
+   def :>> (gen: TraceGen): TraceGen     = AtomSeq(this, gen)
+   def *>> (event: UIEvent): TraceGen    = InterSeq(this, Path(EventTrace.trace(event)))
+   def *>> (trace:EventTrace): TraceGen  = InterSeq(this, Path(trace))
+   def *>> (gen: TraceGen): TraceGen     = InterSeq(this, gen)
+   def <+> (event: UIEvent): TraceGen    = Choose(this, Path(EventTrace.trace(event)))
+   def <+> (trace: EventTrace): TraceGen = Choose(this, Path(trace))
+   def <+> (gen: TraceGen): TraceGen     = Choose(this, gen)
 
    def generator(): Gen[EventTrace]
 }
@@ -57,7 +60,7 @@ case class AtomSeq(gen1: TraceGen, gen2: TraceGen) extends TraceGen {
    override def generator(): Gen[EventTrace] = for {
      tr1 <- gen1.generator()
      tr2 <- gen2.generator()
-   } yield (tr1 |:| tr2)
+   } yield (tr1 :>> tr2)
 }
 case class InterSeq(gen1: TraceGen, gen2: TraceGen) extends TraceGen {
    override def generator(): Gen[EventTrace] = for {
@@ -65,7 +68,7 @@ case class InterSeq(gen1: TraceGen, gen2: TraceGen) extends TraceGen {
      tr2 <- gen2.generator()
      n <- Gen.frequency( (1,0), (4,1), (2,2), (1,3) )
      itrs <- TraceGen.pick(n)
-   } yield (tr1 |:| itrs |:| tr2)
+   } yield (tr1 :>> itrs :>> tr2)
 }
 case class Optional(gen: TraceGen) extends TraceGen {
    override def generator(): Gen[EventTrace] = for {
@@ -140,7 +143,7 @@ case class Repeat(n:Int, gen:TraceGen) extends TraceGen {
       for {
         tr1 <- gen.generator()
         tr2 <- Repeat(n-1, gen).generator()
-      } yield tr1 |:| tr2
+      } yield tr1 :>> tr2
     } else {
       const(EventTrace.trace(Skip))
     }
@@ -193,32 +196,40 @@ case class LearnModel() extends TraceGen {
    override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip))
 }
 
-object implicits {
+object genImplicits {
 
   implicit class UIEventGen(event: UIEvent) {
-     def |+| (next: UIEvent): TraceGen    = Path(EventTrace.trace(event)) |+| next
-     def |+| (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) |+| trace
-     def |+| (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) |+| gen
+     def *>> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) *>> next
+     def *>> (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) *>> trace
+     def *>> (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) *>> gen
+     def <+> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) <+> next
+     def <+> (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) <+> trace
+     def <+> (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) <+> gen
   }
 
   implicit  class EventTraceGen(trace: EventTrace) {
-    def |+| (event: UIEvent): TraceGen    = Path(trace) |+| event
-    def |+| (next: EventTrace): TraceGen = Path(trace) |+| next
-    def |+| (gen: TraceGen): TraceGen     = Path(trace) |+| gen
+    def *>>(event: UIEvent): TraceGen   = Path(trace) *>> event
+    def *>>(next: EventTrace): TraceGen = Path(trace) *>> next
+    def *>>(gen: TraceGen): TraceGen    = Path(trace) *>> gen
+    def <+> (event: UIEvent): TraceGen   = Path(trace) <+> event
+    def <+> (next: EventTrace): TraceGen = Path(trace) <+> next
+    def <+> (gen: TraceGen): TraceGen    = Path(trace) <+> gen
   }
 
 }
 
 
-import edu.colorado.plv.chimp.combinator.implicits.UIEventGen
+import edu.colorado.plv.chimp.combinator.genImplicits._
 
 import UIID_Implicits._
+import Orient_Implicits._
 
 object TestGen {
 
   def main(args: Array[String]): Unit = {
 
-    val traces: TraceGen = Click("login") |+| Click(*) |+| Type("userbox","test") |+| Type("pwdbox","1234") |+| Click("Go") |+| Gorilla
+    val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>>
+                           Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2"))
 
     val prop = forAll (traces.generator()) {
       tr => {

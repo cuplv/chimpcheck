@@ -2,18 +2,20 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
-// UIID = String | Int | *      XY = (Int,Int)
-// AppEvent = Click(UUID) | LongClick(UUID) | Drag(UUID,XY) | Pinch(XY,XY) | Swipe(XY,XY) | Type(UUID,String) | Sleep(Int) | Skip
+// UIID = String | Int | * | XY      XY = (Int,Int)    Orientation = XY | Left | Right | UP | Down
+// AppEvent = Click(UIID) | LongClick(UIID) | Pinch(XY,XY,XY,XY) | Swipe(UIID,Orientation) | Type(UUID,String) | Sleep(Int) | Skip
 
 message UIID {
   enum UIIDType {
      R_ID      = 1;
      NAME_ID   = 2;
      WILD_CARD = 3;
+     XY_ID = 4;
   }
   required UIIDType idType = 1;
   optional int32 rid = 2;
   optional string nameid = 3;
+  optional XYCoordin xyid = 4;
 }
 
 message XYCoordin {
@@ -21,54 +23,66 @@ message XYCoordin {
    required int32 y = 2;
 }
 
+message Orientation {
+   enum OrientType {
+      XY_TYPE = 1;
+      LEFT  = 2;
+      RIGHT = 3;
+      UP    = 4;
+      DOWN  = 5;
+   }
+   required OrientType orientType = 1;
+   optional XYCoordin xy = 2;
+}
+
 message AppEvent {
   enum AppEventType {
     CLICK  = 1;
     LONGCLICK = 2;
-    DRAG  = 3;
-    PINCH = 4;
-    SWIPE = 5;
-    TYPE  = 6;
-    SLEEP = 7;
-    SKIP  = 8;
+    PINCH = 3;
+    SWIPE = 4;
+    TYPE  = 5;
+    SLEEP = 6;
+    SKIP  = 7;
   }
   required AppEventType eventType = 1;
   optional Click click = 2;
   optional LongClick longclick = 3;
-  optional Drag drag   = 4;
-  optional Pinch pinch = 5;
-  optional Swipe swipe = 6;
-  optional Type type = 7;
-  optional Sleep sleep = 8;
+  optional Pinch pinch = 4;
+  optional Swipe swipe = 5;
+  optional Type type = 6;
+  optional Sleep sleep = 7;
   // optional Skip skip = 7;
 }
 
 message Click {
   required UIID uiid = 1;
+  optional string display = 2;
 }
 
 message LongClick {
   required UIID uiid = 1;
-}
-
-message Drag {
-  required UIID uiid = 1;
-  required XYCoordin disp = 2;
+  optional string display = 2;
 }
 
 message Pinch {
-  required XYCoordin start = 1;
-  required XYCoordin end = 2;
+  required XYCoordin start1 = 1;
+  required XYCoordin start2 = 2;
+  required XYCoordin end1 = 3;
+  required XYCoordin end2 = 4;
+  optional string display = 5;
 }
 
 message Swipe {
-  required XYCoordin start = 1;
-  required XYCoordin end = 2;
+  required UIID uiid = 1;
+  required Orientation pos = 2;
+  optional string display = 3;
 }
 
 message Type {
    required UIID uiid = 1;
    required string input = 2;
+   optional string display = 3;
 }
 
 message Sleep {
