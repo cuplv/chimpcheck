@@ -172,13 +172,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     }
 
     @Override
-    protected AppEventOuterClass.Drag launchDragEvent(AppEventOuterClass.Drag drag) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchDragEvent"), drag.toString());
-        // TODO
-        return drag;
-    }
-
-    @Override
     protected AppEventOuterClass.Pinch launchPinchEvent(AppEventOuterClass.Pinch pinch) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchPinchEvent"), pinch.toString());
         // TODO
@@ -190,11 +183,32 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
         // TODO
         Instrumentation inst = InstrumentationRegistry.getInstrumentation();
+
+        /*
         float fromY = swipe.getStart().getY();
         float fromX = swipe.getStart().getX();
         float toY = swipe.getEnd().getY();
         float toX = swipe.getEnd().getX();
+        */
 
+        AppEventOuterClass.UIID uiid = swipe.getUiid();
+        switch(uiid.getIdType()) {
+            case R_ID: uiid.getRid(); // R.id.XXX type
+            case NAME_ID: uiid.getNameid(); // Display name type
+            case WILD_CARD: // Wild card type
+            case XY_ID:  uiid.getXyid(); // XY coordinate type
+        }
+
+        AppEventOuterClass.Orientation orientation = swipe.getPos();
+        switch(orientation.getOrientType()) {
+            case XY_TYPE: orientation.getXy(); // XY coordinate type
+            case LEFT:
+            case RIGHT:
+            case UP:
+            case DOWN:
+        }
+
+        /*
         //
             int stepCount = 10;
         //
@@ -224,6 +238,8 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         try {
             inst.sendPointerSync(event);
         } catch (SecurityException ignored) {System.out.println("error 3");}
+        */
+
         return swipe;
     }
 
