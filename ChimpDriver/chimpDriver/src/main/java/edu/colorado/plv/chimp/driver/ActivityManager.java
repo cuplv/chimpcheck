@@ -101,7 +101,11 @@ public class ActivityManager {
     }
 
     protected View getTypeableView() throws NoViewEnabledException {
-        return getRandomView( getAllViews( allOf(hasLinks(), isEnabled(), isDisplayed()) ), "No views that supports input methods at current state" );
+        return getRandomView( getAllViews( allOf(supportsInputMethods(), isEnabled(), isDisplayed()) ), "No views that supports input methods at current state" );
+    }
+
+    protected String getResName(View v){
+        return v.getResources().getResourceEntryName(v.getId());
     }
 
 }
