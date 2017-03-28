@@ -314,7 +314,7 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
     protected void executeEvent(ExtEventOuterClass.ClickBack clickBack) {
         Log.i(runner.chimpTag("@executeEvent"), clickBack.toString());
-        launchClickHome();
+        launchClickBack();
         completedEvents.add(
                 mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.CLICKBACK).build())
         );
