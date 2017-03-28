@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -167,7 +168,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
 
                 return builder.build();
         }
-        // TODO
         return type;
     }
 
@@ -184,63 +184,23 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         // TODO
         Instrumentation inst = InstrumentationRegistry.getInstrumentation();
 
-        /*
-        float fromY = swipe.getStart().getY();
-        float fromX = swipe.getStart().getX();
-        float toY = swipe.getEnd().getY();
-        float toX = swipe.getEnd().getX();
-        */
 
         AppEventOuterClass.UIID uiid = swipe.getUiid();
         switch(uiid.getIdType()) {
-            case R_ID: uiid.getRid(); // R.id.XXX type
-            case NAME_ID: uiid.getNameid(); // Display name type
+            case R_ID:
+                FingerGestures.swipeOnView(Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
+                return swipe;
+            case NAME_ID:
+                FingerGestures.swipeOnView(Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
+                return swipe;
+            case XY_ID:
+                AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type
+                FingerGestures.drag(xy,  swipe.getPos());
             case WILD_CARD: // Wild card type
-            case XY_ID:  uiid.getXyid(); // XY coordinate type
+                return swipe;
+            default:
+                return swipe;
         }
-
-        AppEventOuterClass.Orientation orientation = swipe.getPos();
-        switch(orientation.getOrientType()) {
-            case XY_TYPE: orientation.getXy(); // XY coordinate type
-            case LEFT:
-            case RIGHT:
-            case UP:
-            case DOWN:
-        }
-
-        /*
-        //
-            int stepCount = 10;
-        //
-
-        System.out.println("this drag actions");
-        long downTime = SystemClock.uptimeMillis();
-        long eventTime= SystemClock.uptimeMillis();
-        float y = fromY;
-        float x = fromX;
-        float yStep = (toY - fromY) / stepCount;
-        float xStep = (toX - fromX) / stepCount;
-        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, fromX, fromY, 0);
-        try {
-            inst.sendPointerSync(event);
-        } catch (SecurityException ignored) {System.out.println("error 1");}
-        for (int i = 0; i < stepCount; ++i){
-            y += yStep;
-            x += xStep;
-            eventTime = SystemClock.uptimeMillis();
-            event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 0);
-            try{
-                inst.sendPointerSync(event);
-            } catch (SecurityException ignored){System.out.println("error 2");}
-        }
-        eventTime = SystemClock.uptimeMillis();
-        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP,toX, toY, 0);
-        try {
-            inst.sendPointerSync(event);
-        } catch (SecurityException ignored) {System.out.println("error 3");}
-        */
-
-        return swipe;
     }
 
     @Override
