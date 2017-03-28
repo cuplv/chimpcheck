@@ -7,6 +7,8 @@ import edu.colorado.plv.chimp.combinator.UIID_Implicits._
 import edu.colorado.plv.chimp.coordinator.ChimpLoader
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext
+
 /**
   * Created by edmund on 3/11/17.
   */
@@ -18,7 +20,7 @@ object TestApp {
 
     val testTrace:EventTrace = Rotate :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Sleep(11000) :>> Click(R.id.fragmentBtn2)
 
-    val testGorilla:EventTrace = Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Gorilla.generator().sample.get
+    // val testGorilla:EventTrace = Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Gorilla.generator().sample.get
 
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
@@ -28,7 +30,10 @@ object TestApp {
 
     implicit val logger = Logger(LoggerFactory.getLogger("chimp-tester"))
 
-    ChimpLoader.quickLoad(emuID, testGorilla, appAPKPath, chimpAPKPath, testerClass, aaptHome) match {
+    // This is needed now, because in quickLoad, we spin off a future computation: The kick back routine
+    implicit val ec = ExecutionContext.global
+
+    ChimpLoader.quickLoad(emuID, testTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome) match {
       case Some(results) => println(s"Results: $results")
       case None => println("No results!")
     }
