@@ -32,7 +32,8 @@ public class FingerGestures {
             case DOWN: vi.perform(swipeDown()); break;
             case LEFT: vi.perform(swipeLeft()); break;
             case RIGHT: vi.perform(swipeRight()); break;
-            case XY_TYPE: break;
+            case XY_TYPE:
+                break;
         }
     }
     public static void drag(AppEventOuterClass.XYCoordin fromXY, AppEventOuterClass.Orientation ori){
@@ -83,23 +84,6 @@ public class FingerGestures {
         } catch (SecurityException ignored) {System.out.println("error 3");}
     }
 
-    public static ViewAction waitFor(final long millis) {
-        return new ViewAction() {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isRoot();
-            }
 
-            @Override
-            public String getDescription() {
-                return "Wait for " + millis + " milliseconds.";
-            }
-
-            @Override
-            public void perform(UiController uiController, final View view) {
-                uiController.loopMainThreadForAtLeast(millis);
-            }
-        };
-    }
 
 }

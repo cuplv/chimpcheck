@@ -2,6 +2,8 @@ package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.util.TreeIterables;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static org.hamcrest.Matchers.allOf;
 
 import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
@@ -104,6 +107,23 @@ public class ActivityManager {
         return v.getResources().getResourceEntryName(v.getId());
     }
 
+    public static ViewAction waitFor(final long millis) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
 
+            @Override
+            public String getDescription() {
+                return "Wait for " + millis + " milliseconds.";
+            }
+
+            @Override
+            public void perform(UiController uiController, final View view) {
+                uiController.loopMainThreadForAtLeast(millis);
+            }
+        };
+    }
 
 }

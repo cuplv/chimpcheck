@@ -1,40 +1,30 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
-import android.app.Instrumentation;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.os.SystemClock;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoActivityResumedException;
-import android.support.test.espresso.NoMatchingViewException;
-import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.action.ViewActions;
 import android.util.Log;
 import android.view.KeyEvent;
 
 
-import android.view.MotionEvent;
 import android.view.View;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 
-import java.util.*;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.pressBack;
 
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
+import static android.support.test.espresso.action.ViewActions.pressBack;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static edu.colorado.plv.chimp.driver.FingerGestures.waitFor;
+import static edu.colorado.plv.chimp.driver.FingerGestures.drag;
+import static edu.colorado.plv.chimp.driver.FingerGestures.swipeOnView;
 
 /**
  * Created by edmund on 3/13/17.
@@ -188,14 +178,14 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         AppEventOuterClass.UIID uiid = swipe.getUiid();
         switch(uiid.getIdType()) {
             case R_ID:
-                FingerGestures.swipeOnView(Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
+                swipeOnView(Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
                 return swipe;
             case NAME_ID:
-                FingerGestures.swipeOnView(Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
+                swipeOnView(Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
                 return swipe;
             case XY_ID:
                 AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type
-                FingerGestures.drag(xy,  swipe.getPos());
+                drag(xy,  swipe.getPos());
             case WILD_CARD: // Wild card type
                 return swipe;
             default:
