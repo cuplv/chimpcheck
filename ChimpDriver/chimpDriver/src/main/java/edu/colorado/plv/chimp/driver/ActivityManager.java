@@ -2,8 +2,6 @@ package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.espresso.util.TreeIterables;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
@@ -15,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 import static org.hamcrest.Matchers.allOf;
 
@@ -23,7 +20,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.supportsInputMethods;
-import static android.support.test.espresso.matcher.ViewMatchers.hasLinks;
 
 /**
  * Created by edmund on 3/21/17.
@@ -107,5 +103,7 @@ public class ActivityManager {
     protected String getResName(View v){
         return v.getResources().getResourceEntryName(v.getId());
     }
+
+
 
 }

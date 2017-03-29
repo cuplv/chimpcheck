@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.NoActivityResumedException;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
@@ -22,6 +23,7 @@ import chimp.protobuf.EventTraceOuterClass;
 
 import java.util.*;
 
+import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.pressBack;
 
 import static android.support.test.espresso.action.ViewActions.click;
@@ -32,6 +34,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static edu.colorado.plv.chimp.driver.FingerGestures.waitFor;
 
 /**
  * Created by edmund on 3/13/17.
@@ -181,9 +184,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
-        // TODO
-        Instrumentation inst = InstrumentationRegistry.getInstrumentation();
-
 
         AppEventOuterClass.UIID uiid = swipe.getUiid();
         switch(uiid.getIdType()) {
@@ -207,7 +207,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected AppEventOuterClass.Sleep launchSleepEvent(AppEventOuterClass.Sleep sleep) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), sleep.toString());
         try {
-            Thread.sleep(sleep.getTime());
+            Espresso.onView(isRoot()).perform(waitFor(sleep.getTime()));
         } catch (Exception e) {
             Log.e(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), "Chimp messed up while sleeping:" + e.toString());
         }
@@ -217,15 +217,12 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected void launchClickMenu() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
-        //adb shell input keyevent KEYCODE_MENU
         Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_MENU));
-        // TODO
     }
 
     @Override
     protected void launchClickHome() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
-        //adb shell input keyevent KEYCODE_HOME
         Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
         // TODO
     }
@@ -233,9 +230,16 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected void launchClickBack() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
-        //adb shell input keyevent KEYCODE_BACK
-        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
-        pressBack();
+        try {
+            Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
+        } catch(NoActivityResumedException e){
+            try{
+                Thread.sleep(100000);
+            } catch(InterruptedException ie) {
+                ie.printStackTrace();
+            }
+            e.printStackTrace();
+        }
 
         // TODO
     }

@@ -4,9 +4,13 @@ import android.app.Instrumentation;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
 import android.view.MotionEvent;
 import android.view.View;
+
+import org.hamcrest.Matcher;
 
 import chimp.protobuf.AppEventOuterClass;
 
@@ -14,6 +18,7 @@ import static android.support.test.espresso.action.ViewActions.swipeDown;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.swipeUp;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 
 /**
  * Created by Pezh on 3/28/17.
@@ -76,6 +81,25 @@ public class FingerGestures {
         try {
             inst.sendPointerSync(event);
         } catch (SecurityException ignored) {System.out.println("error 3");}
+    }
+
+    public static ViewAction waitFor(final long millis) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Wait for " + millis + " milliseconds.";
+            }
+
+            @Override
+            public void perform(UiController uiController, final View view) {
+                uiController.loopMainThreadForAtLeast(millis);
+            }
+        };
     }
 
 }
