@@ -2,8 +2,8 @@ package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.util.TreeIterables;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
@@ -15,15 +15,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static org.hamcrest.Matchers.allOf;
 
 import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.supportsInputMethods;
-import static android.support.test.espresso.matcher.ViewMatchers.hasLinks;
 
 /**
  * Created by edmund on 3/21/17.
@@ -101,7 +100,30 @@ public class ActivityManager {
     }
 
     protected View getTypeableView() throws NoViewEnabledException {
-        return getRandomView( getAllViews( allOf(hasLinks(), isEnabled(), isDisplayed()) ), "No views that supports input methods at current state" );
+        return getRandomView( getAllViews( allOf(supportsInputMethods(), isEnabled(), isDisplayed()) ), "No views that supports input methods at current state" );
+    }
+
+    protected String getResName(View v){
+        return v.getResources().getResourceEntryName(v.getId());
+    }
+
+    public static ViewAction waitFor(final long millis) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Wait for " + millis + " milliseconds.";
+            }
+
+            @Override
+            public void perform(UiController uiController, final View view) {
+                uiController.loopMainThreadForAtLeast(millis);
+            }
+        };
     }
 
 }
