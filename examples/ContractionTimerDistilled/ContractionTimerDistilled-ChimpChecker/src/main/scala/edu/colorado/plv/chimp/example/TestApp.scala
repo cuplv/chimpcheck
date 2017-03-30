@@ -18,7 +18,13 @@ object TestApp {
 
     println( s"Yay: ${R.id.fragmentBtn2}" )
 
-    val testTrace:EventTrace = Rotate :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Sleep(11000) :>> Click(R.id.fragmentBtn2)
+    val testGoodTrace:EventTrace = Rotate :>> Sleep(3000) :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Sleep(11000) :>> Click(R.id.fragmentBtn2)
+
+    val testCrashTrace:EventTrace = Rotate :>> Sleep(3000) :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Sleep(20000)
+
+    val testCrashTrace2:EventTrace = Rotate :>> Sleep(3000) :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Sleep(7000) :>>
+       Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>>
+       Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2)
 
     // val testGorilla:EventTrace = Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Gorilla.generator().sample.get
 
@@ -33,10 +39,9 @@ object TestApp {
     // This is needed now, because in quickLoad, we spin off a future computation: The kick back routine
     implicit val ec = ExecutionContext.global
 
-    ChimpLoader.quickLoad(emuID, testTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome) match {
-      case Some(results) => println(s"Results: $results")
-      case None => println("No results!")
-    }
+    val outcome = ChimpLoader.quickLoad(emuID, testCrashTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome)
+
+    println(s"\nOutcome: $outcome")
 
   }
 
