@@ -196,7 +196,7 @@ case class LearnModel() extends TraceGen {
    override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip))
 }
 
-object genImplicits {
+object Generator_Implicits {
 
   implicit class UIEventGen(event: UIEvent) {
      def *>> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) *>> next
@@ -219,7 +219,7 @@ object genImplicits {
 }
 
 
-import edu.colorado.plv.chimp.combinator.genImplicits._
+import edu.colorado.plv.chimp.combinator.Generator_Implicits._
 
 import UIID_Implicits._
 import Orient_Implicits._
@@ -231,20 +231,22 @@ object TestGen {
     val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>>
                            Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2"))
 
-    val prop = forAll (traces.generator()) {
+
+    val myParam = Parameters.default.withMinSuccessfulTests(10)
+
+    forAll(traces.generator()) {
       tr => {
         println(" ============================================================================= ")
         println("Generated: " + tr.toString())
         val b64 = tr.toBase64()
         println("Base64 Encoded ProtoBuf: " + b64)
-        val trB = EventTrace.fromBase64( b64 )
+        val trB = EventTrace.fromBase64(b64)
         println("Recovered: " + trB.toString())
         println(" ============================================================================= ")
         true
       }
-    }
+    }.check(myParam)
 
-    prop.check
 
   }
 

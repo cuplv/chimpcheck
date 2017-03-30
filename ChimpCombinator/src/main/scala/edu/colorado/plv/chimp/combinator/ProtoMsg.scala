@@ -30,4 +30,8 @@ object ProtoMsg {
   def mkUIEvent(event: pb.DecideMany): pb.UIEvent = {
     pb.UIEvent(pb.UIEvent.UIEventType.DECIDEMANY, None, None, None, None, Some(event))
   }
+
+  def mkUIEvent(event: pb.Assert): pb.UIEvent = {
+    pb.UIEvent(pb.UIEvent.UIEventType.ASSERT, None, None, None, None, None, Some(event))
+  }
 }
