@@ -196,11 +196,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected AppEventOuterClass.Sleep launchSleepEvent(AppEventOuterClass.Sleep sleep) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), sleep.toString());
-        try {
-            Espresso.onView(isRoot()).perform(waitFor(sleep.getTime()));
-        } catch (Exception e) {
-            Log.e(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), "Chimp messed up while sleeping:" + e.toString());
-        }
+        Espresso.onView(isRoot()).perform(waitFor(sleep.getTime()));
         return sleep;
     }
 

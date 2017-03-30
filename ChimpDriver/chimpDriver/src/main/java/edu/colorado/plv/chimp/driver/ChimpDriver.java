@@ -2,6 +2,7 @@ package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.util.TreeIterables;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
@@ -29,6 +30,10 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
+    enum Outcome {
+        UNKNOWN, SUCCESS, CRASHED, ASSERTFAILED, BLOCKED, DRIVEREXCEPT
+    }
+
     protected EventTraceOuterClass.EventTrace trace = null;
     protected ChimpJUnitRunner runner = null;
     protected ActivityTestRule<A> chimpActivityTestRule = null;
@@ -41,49 +46,12 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
     protected boolean traceCompleted = false;
     protected boolean noOp = false;
+
+    protected Outcome outcome = Outcome.UNKNOWN;
+
     protected List<EventTraceOuterClass.UIEvent> completedEvents = null;
 
     protected boolean isReady() { return trace != null && runner != null; }
-
-    /*
-    protected Activity current;
-    protected Activity getActivityInstance(){
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            public void run(){
-                Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
-                for(Activity act : resumedActivity){
-                    current = act;
-                }
-            }
-        });
-        return current;
-    }
-
-    protected View getDecorView(){
-        return getActivityInstance().getWindow().getDecorView();
-    }
-
-    protected ArrayList<View> getAllClickableViews() {
-        View root = getDecorView();
-        ArrayList<View> clickableViews = new ArrayList<>();
-        for (View v : TreeIterables.breadthFirstViewTraversal(root)) {
-            if (v.isClickable()) {
-                clickableViews.add(v);
-            }
-        }
-        return clickableViews;
-    }
-    protected  View getClickableView() throws NoViewEnabledException {
-        ArrayList<View> clickableViews = getAllClickableViews();
-        if(clickableViews.isEmpty()) {
-            // WHY PEILUN? WHY IllegalStateException ?!
-            // throw new IllegalStateException("No clickable events at current state");
-            throw new NoViewEnabledException("No clickable events at current state");
-        } else {
-            return clickableViews.get(ThreadLocalRandom.current().nextInt(0, clickableViews.size()));
-        }
-    }
-    */
 
     @Before
     public void init() {
@@ -102,22 +70,74 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
         traceCompleted = false;
         noOp = false;
+        outcome = Outcome.UNKNOWN;
+
         completedEvents = new ArrayList<EventTraceOuterClass.UIEvent>();
 
         for(EventTraceOuterClass.UIEvent event :trace.getEventsList()) {
             try {
                 executeEvent(event);
             } catch (NoViewEnabledException e) {
+                Log.e(runner.chimpTag("@runTrace"), "ChimpDriver view exception: " + e.toString());
+                outcome = Outcome.BLOCKED;
                 noOp = true;
                 return;
+            } catch (NoMatchingViewException e) {
+                Log.e(runner.chimpTag("@runTrace"), "Espresso no matching view exception: " + e.toString());
+                outcome = Outcome.BLOCKED;
+                noOp = true;
+                return;
+            } catch (Exception e) {
+                // Trying to intercept all exceptions now.
+                /* TODO: My hunch is that we cannot distinguish between App or Chimp Driver crash here.
+                   TODO: Investigate more... */
+                Log.e(runner.chimpTag("@runTrace"), "Either App or Chimp Driver crashed: " + e.toString());
+                outcome = Outcome.CRASHED;
+                // Catch and release, because we want the Test Driver to recognize the exception and react accordingly.
+                throw e;
             }
-            // need to catch more stuff here as well, Espresso "I can't click this" exceptions
         }
 
+        Log.i(runner.chimpTag("@runTrace"), "Trace Completed!");
         traceCompleted = true;
-        // runner.addReport("Ran-Trace", Base64.encodeToString(trace.toByteArray(), Base64.DEFAULT));
+        outcome = Outcome.SUCCESS;
     }
 
+    @After
+    public void processTraceReport() {
+        Log.i(runner.chimpTag("@processTraceReport"), "Processing trace report...");
+
+        // Append Executed Trace Report
+        EventTraceOuterClass.EventTrace.Builder builder = EventTraceOuterClass.EventTrace.newBuilder();
+        for(EventTraceOuterClass.UIEvent event: completedEvents) {
+            builder.addEvents( event );
+        }
+
+        String base64Output = Base64.encodeToString(builder.build().toByteArray(), Base64.DEFAULT);
+        runner.addReport("ChimpDriver-ExecutedTrace", base64Output);
+
+        // Append Assert failure report if applicable.
+        if (outcome == Outcome.ASSERTFAILED) {
+            // TODO: Implement assert failure report.
+        }
+
+        // Append Trace Outcome Report
+        String outcomeStr = "Unknown";
+        switch (outcome) {
+            case CRASHED: outcomeStr  = "Crashed"; break;
+            case BLOCKED: outcomeStr  = "Blocked"; break;
+            case ASSERTFAILED: outcomeStr = "AssertFailed"; break;
+            case UNKNOWN: outcomeStr  = "Unknown"; break;
+            case SUCCESS: outcomeStr  = "Success"; break;
+        }
+        runner.addReport("ChimpDriver-Outcome", outcomeStr);
+
+        Log.i(runner.chimpTag("@processTraceReport"), "Trace report completed!");
+    }
+
+
+    /* TO BE DEPRECATED SOON */
+    /*
     @After
     public void compileTraceReport() {
         if (traceCompleted) {
@@ -140,7 +160,7 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
         String base64Output = Base64.encodeToString(builder.build().toByteArray(), Base64.DEFAULT);
         runner.addReport("ChimpTraceCompleted", base64Output);
-    }
+    }*/
 
     // Abstract Launch event methods
 
