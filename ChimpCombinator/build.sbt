@@ -28,4 +28,6 @@ libraryDependencies += "com.trueaccord.scalapb" %% "scalapb-runtime" % com.truea
 
 libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4"
 
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.17"
+
 libraryDependencies += "edu.colorado.plv.fixr" %% "scalabashing" % "1.0-SNAPSHOT"
