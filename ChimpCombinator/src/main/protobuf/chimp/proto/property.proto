@@ -2,6 +2,10 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
+//  args ::=  n  |  s  | args,args
+//  B    ::=  p(args)  |  B /\ B  |  B \/ B
+//  P    ::=  B  |  B => B  |  P /\ P  |  P \/ P
+
 message Arg {
     enum ArgType {
         INT_ARG = 1;
