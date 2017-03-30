@@ -2,8 +2,8 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
-//  args ::=  n  |  s  | args,args
-//  B    ::=  p(args)  |  B /\ B  |  B \/ B
+//  args ::=  n  |  s  |  b  | args,args
+//  B    ::=  BOT  |  TOP  |  p(args)  |  B /\ B  |  B \/ B
 //  P    ::=  B  |  B => B  |  P /\ P  |  P \/ P
 
 message Arg {
