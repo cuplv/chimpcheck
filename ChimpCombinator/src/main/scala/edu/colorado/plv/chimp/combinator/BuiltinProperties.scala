@@ -1,5 +1,6 @@
 package edu.colorado.plv.chimp.combinator
 
+import chimp.protobuf.BaseProp
 import chimp.{protobuf => pb}
 import edu.colorado.plv.chimp.combinator.PropArg_Implicits.{IntArg, StrArg}
 
@@ -35,4 +36,8 @@ case class isEnabled(vID: ViewID) extends BaseProp {
 
 case class supportInputMethods(vID: ViewID) extends BaseProp {
   override def toMsg(): pb.BaseProp = Predicate("supportInputMethods", vID.toArg).toMsg()
+}
+
+object dummy extends BaseProp {
+  override def toMsg(): pb.BaseProp = Predicate("dummy", Seq():_*).toMsg();
 }
