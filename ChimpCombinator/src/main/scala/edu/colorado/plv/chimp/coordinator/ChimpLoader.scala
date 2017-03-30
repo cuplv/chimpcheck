@@ -1,7 +1,7 @@
 package edu.colorado.plv.chimp.coordinator
 
 import com.typesafe.scalalogging.Logger
-import edu.colorado.plv.chimp.combinator.EventTrace
+import edu.colorado.plv.chimp.combinator.{EventTrace, Prop_Implicits, dummy}
 import edu.colorado.plv.fixr.bash.{Cmd, Fail, Lift, Succ}
 import edu.colorado.plv.fixr.bash.android.{Aapt, Adb, AmInstrument, Emulator}
 import edu.colorado.plv.fixr.bash.utils.{FailTry, SuccTry, doTry, repeat}
@@ -16,10 +16,8 @@ import scala.util.Random
   */
 object ChimpLoader {
 
-  def extractValueWithKey(key:String, line:String): String = line.split(key)(1).drop(1).trim()
-
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, packageNamesOpt:Option[(String,String)])
-               (implicit bashLogger: Logger, ec: ExecutionContext): Option[ChimpTraceResults] = {
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = {
     val b64ProtoTrace = eventTrace.toBase64()
 
     val (appPackageName,testPackageName) = packageNamesOpt match {
@@ -33,7 +31,7 @@ object ChimpLoader {
          } yield (appInfo.packageName,testInfo.packageName)
          packageOut match {
            case SuccTry(packageNames) => packageNames
-           case default => return None
+           case FailTry(Fail(c,ec,o,e)) => return ChimpLoaderFailedChimpOutcome( s"Failed while attempting to extract package names. Exitcode: $ec ; ErrOut: $e" )
          }
       }
     }
@@ -56,7 +54,10 @@ object ChimpLoader {
       instTest <- Adb.target(emuID).install(chimpAPKPath) ! ;
 
       instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("syncFile",kickBackLockName)
-        .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!!
+        .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!! ;
+
+      wait <- Lift !!! Thread.sleep(1000) ;
+      kill <- Adb.shell(s"am force-stop $appPackageName") !
     } yield instrOut
 
     // println(s"Done! $instrOut")
@@ -65,6 +66,7 @@ object ChimpLoader {
 
     instrOut match {
       case SuccTry(o) => {
+         /*
          var results:Option[Boolean] = None
          var trace:Option[EventTrace] = None
          for(seg <- o.replace("\n","").split("INSTRUMENTATION")) {
@@ -84,19 +86,71 @@ object ChimpLoader {
         (trace,results) match {
           case (Some(tr),Some(res)) => Some( ChimpTraceResults(tr,res) )
           case default => None
-        }
+        } */
+        parseOutcome(o)
       }
-      case FailTry(Fail(c, ec, o, e)) => None
+      case FailTry(Fail(c, ec, o, e)) => {
+        ChimpLoaderFailedChimpOutcome( s"Failed while bashing with Adb. Exitcode: $ec ; ErrOut: $e" )
+      }
     }
 
   }
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String)
-               (implicit bashLogger: Logger, ec: ExecutionContext): Option[ChimpTraceResults] = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None)
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, appPackageName:String, testPackageName:String)
-               (implicit bashLogger: Logger, ec: ExecutionContext): Option[ChimpTraceResults] = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName))
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName))
 
+
+  def extractValueWithKey(key:String, line:String): String = line.split(key)(1).drop(1).trim()
+
+  def parseOutcome(stdout: String): ChimpOutcome = {
+    var outcomeStr:String = ""
+    var traceOpt:Option[String] = None
+    var propertyOpt:Option[String] = None
+    var stackTraceOpt: Option[String] = None
+    for(seg <- stdout.replace("\n","").split("INSTRUMENTATION")) {
+      if(seg contains "ChimpDriver-Outcome") {
+        outcomeStr = extractValueWithKey("ChimpDriver-Outcome", seg)
+      }
+      if(seg contains "ChimpDriver-ExecutedTrace") {
+        // val trstr = extractValueWithKey("ChimpTraceCompleted", seg)
+        // println(s"Here it is: $trstr")
+        traceOpt = Some( extractValueWithKey("ChimpDriver-ExecutedTrace", seg) )
+      }
+      if(seg contains "stack") {
+        stackTraceOpt = Some( extractValueWithKey("stack", seg) )
+      }
+      // TODO: Parse violated property if present
+    }
+
+    traceOpt match {
+      case Some(traceStr) => {
+        var trace:EventTrace = null
+        try {
+          trace = EventTrace.fromBase64( traceStr )
+        } catch {
+          case e:Exception => return ParseFailChimpOutcome( s"Trace ProtoBuf is malformed: $traceStr" )
+        }
+        outcomeStr match {
+          case "Success" => return SuccChimpOutcome(trace)
+          case "Crashed" => return CrashChimpOutcome(trace, stackTraceOpt match { case Some(st) => st ; case None => "Cannot find stacktrace" } )
+          case "Blocked" => return BlockChimpOutcome(trace, stackTraceOpt)
+          case "Unknown" => return UnknownChimpDriverChimpOutcome(Some(trace), stackTraceOpt)
+          case "AssertFailed" => return AssertFailChimpOutcome( trace, Prop_Implicits.LitProp( dummy ) )
+          case default => return ParseFailChimpOutcome( "Cannot find outcome" )
+        }
+      }
+      case None => {
+        outcomeStr match {
+          case "Unknown" => return UnknownChimpDriverChimpOutcome(None, Some("<TODO: Implement this>"))
+          case default   => return ParseFailChimpOutcome( "Cannot find executed trace" )
+        }
+      }
+    }
+
+  }
 
   def kickBack(emuID:String, appPackageName:String, syncFilePath:String) (implicit bashLogger:Logger): Unit = {
     for {
@@ -107,7 +161,7 @@ object ChimpLoader {
       }
     } yield p
 
-    Thread.sleep(2000)
+    Thread.sleep(5000)
     bashLogger.info("App started, KickBack routine now active...")
 
     var kickBackAttemptActive = false
@@ -132,7 +186,7 @@ object ChimpLoader {
             kickBackAttemptActive = true
             bashLogger.info("App exited! Kicking back now!")
             for {
-              p0 <- Lift !!! Thread.sleep(1500) ;
+              p0 <- Lift !!! Thread.sleep(2000) ;
               p1 <- Adb.target(emuID).shell("input keyevent KEYCODE_APP_SWITCH") ! ;
               p2 <- Lift !!! Thread.sleep(2000) ;
               p3 <- Adb.target(emuID).shell("input keyevent KEYCODE_DPAD_DOWN") ! ;
@@ -150,7 +204,7 @@ object ChimpLoader {
         }
         case default =>
       }
-      Thread.sleep(2000)
+      Thread.sleep(3000)
     }
 
   }

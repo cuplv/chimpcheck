@@ -21,7 +21,7 @@ import scala.concurrent.{Await, ExecutionContext}
 
 object MissionControl {
   case class NewTrace(trace: EventTrace)
-  case class Results(deviceID:String, res: ChimpTraceResults)
+  case class Results(deviceID:String, outcome: ChimpOutcome)
   case class Init(chimpConfig: ChimpConfig)
 }
 
@@ -141,12 +141,10 @@ class ChimpLoaderActor extends Actor {
       implicit val logger = Logger(LoggerFactory.getLogger(s"Chimp-$deviceID"))
       implicit val ec = ExecutionContext.global
 
-      val resultOpt = ChimpLoader.quickLoad(deviceID, event, chimpConfig.appAPKPath, chimpConfig.chimpAPKPath,
+      val outcome = ChimpLoader.quickLoad(deviceID, event, chimpConfig.appAPKPath, chimpConfig.chimpAPKPath,
                                         chimpConfig.testerClass, chimpConfig.aaptHomePath:String, chimpConfig.packageNamesOpt)
-      resultOpt match {
-        case Some(result) => sender() ! MissionControl.Results( deviceID, result )
-        case None => // TODO: Perhaps do a few retries first, then report failure
-      }
+
+      sender() ! MissionControl.Results( deviceID, outcome )
 
     }
   }
@@ -162,7 +160,7 @@ class ChimpTesterActor extends Actor {
     case ChimpLoaderActor.Job(event) => {
       log.info(s"Loader $deviceID : $event")
       Thread.sleep(3000)
-      sender() ! MissionControl.Results( deviceID, ChimpTraceResults(event, true) )
+      sender() ! MissionControl.Results( deviceID, SuccChimpOutcome(event) )
     }
   }
 }
@@ -173,7 +171,7 @@ object Trace_Implicits {
 
     def chimpCheck(prop: Prop) (implicit control: ActorRef, timeout: Timeout): Boolean = {
        val future = control ? MissionControl.NewTrace(trace :>> Assert(prop))
-       val result = Await.result(future, timeout.duration).asInstanceOf[ChimpTraceResults]
+       val result = Await.result(future, timeout.duration).asInstanceOf[ChimpOutcome]
        print(result)
        true
     }
