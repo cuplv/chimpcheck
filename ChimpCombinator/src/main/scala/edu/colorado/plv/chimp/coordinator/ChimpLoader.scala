@@ -1,7 +1,7 @@
 package edu.colorado.plv.chimp.coordinator
 
 import com.typesafe.scalalogging.Logger
-import edu.colorado.plv.chimp.combinator.{EventTrace, Prop_Implicits, dummy}
+import edu.colorado.plv.chimp.combinator.{EventTrace, Prop, Prop_Implicits, dummy}
 import edu.colorado.plv.fixr.bash.{Cmd, Fail, Lift, Succ}
 import edu.colorado.plv.fixr.bash.android.{Aapt, Adb, AmInstrument, Emulator}
 import edu.colorado.plv.fixr.bash.utils.{FailTry, SuccTry, doTry, repeat}
@@ -122,7 +122,9 @@ object ChimpLoader {
       if(seg contains "stack") {
         stackTraceOpt = Some( extractValueWithKey("stack", seg) )
       }
-      // TODO: Parse violated property if present
+      if(seg contains "ChimpDriver-ViolatedProperty") {
+        propertyOpt = Some( extractValueWithKey("ChimpDriver-ViolatedProperty", seg) )
+      }
     }
 
     traceOpt match {
@@ -138,7 +140,19 @@ object ChimpLoader {
           case "Crashed" => return CrashChimpOutcome(trace, stackTraceOpt match { case Some(st) => st ; case None => "Cannot find stacktrace" } )
           case "Blocked" => return BlockChimpOutcome(trace, stackTraceOpt)
           case "Unknown" => return UnknownChimpDriverChimpOutcome(Some(trace), stackTraceOpt)
-          case "AssertFailed" => return AssertFailChimpOutcome( trace, Prop_Implicits.LitProp( dummy ) )
+          case "AssertFailed" => {
+            propertyOpt match {
+              case Some(propertyStr) => {
+                var prop:Prop = null
+                try { prop = Prop.fromBase64( propertyStr ) }
+                catch {
+                  case e:Exception => return ParseFailChimpOutcome( s"Property ProtoBuf is malformed: $propertyStr" )
+                }
+                return AssertFailChimpOutcome(trace, prop)
+              }
+              case None => return ParseFailChimpOutcome( s"Cannot find violated property" )
+            }
+          }
           case default => return ParseFailChimpOutcome( "Cannot find outcome" )
         }
       }

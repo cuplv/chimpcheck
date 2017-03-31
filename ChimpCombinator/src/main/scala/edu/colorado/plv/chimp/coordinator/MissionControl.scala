@@ -185,6 +185,9 @@ import UIID_Implicits._
 import Orient_Implicits._
 import ViewID_Implicits._
 import Trace_Implicits._
+import edu.colorado.plv.chimp.combinator.Prop_Implicits._
+import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
+
 
 object TestActors {
 
@@ -209,7 +212,7 @@ object TestActors {
 
     forAll(traces.generator()) {
       tr => tr chimpCheck {
-        (isClickable(1) ==> isEnabled(1)) /\ (isClickable(2) ==> isEnabled(2))
+        (isClickable(1) ==> isEnabled(1)) /\ (isClickable(2) ==> isEnabled(2)) /\ true
       }
       /* {
          val future = control ? MissionControl.NewTrace(tr)
