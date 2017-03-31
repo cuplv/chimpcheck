@@ -12,19 +12,20 @@ import android.view.KeyEvent;
 import android.view.View;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
-
+import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
+import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
+import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
 
 
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
-import static android.support.test.espresso.action.ViewActions.pressBack;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static edu.colorado.plv.chimp.driver.FingerGestures.drag;
-import static edu.colorado.plv.chimp.driver.FingerGestures.swipeOnView;
+import static edu.colorado.plv.chimp.components.FingerGestures.drag;
+import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnView;
 
 /**
  * Created by edmund on 3/13/17.
@@ -34,7 +35,8 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     // Try Event Block
 
     @Override
-    protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent) {
+    protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent)
+    throws MalformedBuiltinPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), tryEvent.toString());
 
         try {
@@ -252,6 +254,21 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 (orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+
+    }
+
+    // Handling Properties
+    @Override
+    protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
+                      throws MalformedBuiltinPredicateException,PropertyViolatedException {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchAssertEvent"), assertProp.toString());
+
+        PropResult res = check( assertProp.getProps() );
+        if (res.success) {
+            return assertProp;
+        } else {
+            throw new PropertyViolatedException("Assertion failed",res.violatedProp);
+        }
 
     }
 

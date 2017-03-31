@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 
+import edu.colorado.plv.chimp.combinator.Prop_Implicits._
+import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
+import edu.colorado.plv.chimp.combinator.PropArg_Implicits._
+import edu.colorado.plv.chimp.combinator.ViewID_Implicits._
+
 /**
   * Created by edmund on 3/11/17.
   */
@@ -23,10 +28,13 @@ object TestApp {
     val testCrashTrace:EventTrace = Rotate :>> Sleep(3000) :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Sleep(20000)
 
     val testCrashTrace2:EventTrace = Rotate :>> Sleep(3000) :>> Rotate :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Sleep(7000) :>>
-       Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>>
+       Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>>
+       Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>>
        Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2) :>> Click(R.id.fragmentBtn1) :>> Click(R.id.fragmentBtn2)
 
-    // val testGorilla:EventTrace = Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Gorilla.generator().sample.get
+    val testGorilla:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( isClickable(R.id.fragmentBtn1) ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Gorilla.generator().sample.get
+
+    val testAssert:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( isClickable("Crap") ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000)
 
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
@@ -39,7 +47,7 @@ object TestApp {
     // This is needed now, because in quickLoad, we spin off a future computation: The kick back routine
     implicit val ec = ExecutionContext.global
 
-    val outcome = ChimpLoader.quickLoad(emuID, testCrashTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome)
+    val outcome = ChimpLoader.quickLoad(emuID, testGoodTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome)
 
     println(s"\nOutcome: $outcome")
 
