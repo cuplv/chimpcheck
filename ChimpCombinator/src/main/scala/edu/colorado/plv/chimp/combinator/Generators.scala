@@ -223,13 +223,18 @@ import edu.colorado.plv.chimp.combinator.Generator_Implicits._
 
 import UIID_Implicits._
 import Orient_Implicits._
+import PropArg_Implicits._
+import BaseProp_Implicits._
+import Prop_Implicits._
+import ViewID_Implicits._
 
 object TestGen {
 
   def main(args: Array[String]): Unit = {
 
     val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>>
-                           Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2"))
+                           Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2")) *>>
+                           Assert( Not(isClickable("crap")) )
 
 
     val myParam = Parameters.default.withMinSuccessfulTests(10)

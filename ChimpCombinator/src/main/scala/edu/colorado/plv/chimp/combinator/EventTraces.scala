@@ -8,6 +8,7 @@ import chimp.protobuf.Orientation.OrientType.{DOWN, LEFT, RIGHT, UP, XY_TYPE}
 import chimp.{protobuf => pb}
 import Prop_Implicits.LitProp
 import TryEvent_Implicits.{TryAppEvent, TryExtEvent, TryTrace}
+import edu.colorado.plv.chimp.combinator.BaseProp_Implicits.BasePropUnit
 import edu.colorado.plv.chimp.combinator.PropArg_Implicits.{BoolArg, IntArg, StrArg}
 import edu.colorado.plv.chimp.utils.Base64
 import org.scalacheck.Prop.False
@@ -415,6 +416,9 @@ object BaseProp {
          case pb.BaseProp.BasePropType.DISJ_BASE_TYPE => {
             BaseDisjunct( BaseProp.fromProto(pbBaseProp.getProp1), BaseProp.fromProto(pbBaseProp.getProp2) )
          }
+         case pb.BaseProp.BasePropType.TOP_TYPE => new BasePropUnit(true)
+         case pb.BaseProp.BasePropType.BOT_TYPE => new BasePropUnit(false)
+         case pb.BaseProp.BasePropType.NEG_TYPE => Not( BaseProp.fromProto(pbBaseProp.getProp1) )
       }
    }
 }
@@ -425,6 +429,7 @@ abstract class BaseProp extends ProtoMsg[pb.BaseProp] {
    def /\ (prop: Prop): Prop = Conjunct(this, prop)
    def \/ (prop: Prop): Prop = Disjunct(this, prop)
    def ==> (baseProp: BaseProp): Prop = ImpProp(this, baseProp)
+   def unary_!(): BaseProp = Not(this)
 }
 
 case class Predicate(name:String, args: PropArg*) extends BaseProp {
@@ -450,6 +455,13 @@ case class BaseDisjunct(b1: BaseProp, b2: BaseProp) extends BaseProp {
    override def toString: String = s"$b1 \\/ $b2"
 }
 
+case class Not(b: BaseProp) extends BaseProp {
+   override def toMsg(): pb.BaseProp = {
+      pb.BaseProp(pb.BaseProp.BasePropType.NEG_TYPE, None, Some(b.toMsg()))
+   }
+   override def toString: String = s"!$b"
+}
+
 object Prop {
 
    def fromProto(pbProp: pb.Prop): Prop = {
@@ -465,6 +477,10 @@ object Prop {
             Disjunct( Prop.fromProto(pbProp.getProp1), Prop.fromProto(pbProp.getProp2) )
          }
       }
+   }
+
+   def fromBase64(b64: String): Prop = {
+      fromProto( pb.Prop.parseFrom( Base64.decode(b64) ) )
    }
 
 }
