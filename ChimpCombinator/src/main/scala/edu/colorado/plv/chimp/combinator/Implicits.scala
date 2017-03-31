@@ -4,7 +4,10 @@ package edu.colorado.plv.chimp.combinator
   * Created by edmund on 3/29/17.
   */
 
+import chimp.protobuf.BaseProp
 import chimp.{protobuf => pb}
+import edu.colorado.plv.chimp.combinator.BaseProp_Implicits.BasePropUnit
+import edu.colorado.plv.chimp.combinator.PropArg_Implicits.{IntArg, StrArg}
 
 object UIID_Implicits {
 
@@ -86,6 +89,16 @@ object PropArg_Implicits {
 
 }
 
+object BaseProp_Implicits {
+  implicit class BasePropUnit(b: Boolean) extends BaseProp {
+    override def toMsg(): pb.BaseProp = {
+      if (b) pb.BaseProp(pb.BaseProp.BasePropType.TOP_TYPE)
+      else pb.BaseProp(pb.BaseProp.BasePropType.BOT_TYPE)
+    }
+    override def toString: String = s"$b"
+  }
+}
+
 object Prop_Implicits {
 
   implicit class LitProp(b: BaseProp) extends Prop {
@@ -93,6 +106,27 @@ object Prop_Implicits {
       pb.Prop(pb.Prop.PropType.LIT_TYPE, Some(b.toMsg()))
     }
     override def toString: String = b.toString
+  }
+
+  implicit class UnitProp(b: Boolean) extends Prop {
+    override def toMsg(): pb.Prop = {
+      (new LitProp(new BasePropUnit(b))).toMsg()
+    }
+    override def toString: String = s"$b"
+  }
+
+}
+
+object ViewID_Implicits {
+
+  implicit class ViewNameID(name: String) extends ViewID {
+    def toArg(): PropArg = new StrArg(name)
+    override def toString: String = name
+  }
+
+  implicit class ViewRID(rid: Int) extends ViewID {
+    def toArg(): PropArg = new IntArg(rid)
+    override def toString: String = s"$rid"
   }
 
 }
