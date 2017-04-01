@@ -14,6 +14,7 @@ case class BlockChimpOutcome(executedTrace:EventTrace, error: Option[String]) ex
 case class CrashChimpOutcome(executedTrace:EventTrace, error: String) extends ChimpOutcome
 case class AssertFailChimpOutcome(executedTrace:EventTrace, violatedProp: Prop) extends ChimpOutcome
 case class UnknownChimpDriverChimpOutcome(executedTraceOpt: Option[EventTrace], error: Option[String]) extends ChimpOutcome
+case class ChimpDriverExceptChimpOutcome(executedTraceOpt: Option[EventTrace], error: Option[String]) extends ChimpOutcome
 
 // MissionControl outcomes
 object TimedoutChimpOutcome$ extends ChimpOutcome
