@@ -36,6 +36,12 @@ public class TestExpresso extends EspressoChimpDriver<MainActivity> {
     public ActivityTestRule<MainActivity> activityTestRule =
             new ActivityTestRule<>(MainActivity.class);
 
+    public boolean reflectTestPass() { return true; }
+
+    public boolean reflectTestAlwaysFail() { return false; }
+
+    public boolean moreThanThree(int i) { return i > 3; }
+
     /*
     @Test
     public void test1() {
