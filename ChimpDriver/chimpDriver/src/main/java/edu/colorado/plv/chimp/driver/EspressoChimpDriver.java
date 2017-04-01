@@ -24,7 +24,7 @@ import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static edu.colorado.plv.chimp.components.FingerGestures.drag;
+import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnCoord;
 import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnView;
 
 /**
@@ -187,7 +187,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 return swipe;
             case XY_ID:
                 AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type
-                drag(xy,  swipe.getPos());
+                swipeOnCoord(Espresso.onView(isRoot()), xy, swipe.getPos());
             case WILD_CARD: // Wild card type
                 return swipe;
             default:

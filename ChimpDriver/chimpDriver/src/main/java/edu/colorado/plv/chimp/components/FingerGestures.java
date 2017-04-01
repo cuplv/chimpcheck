@@ -36,23 +36,44 @@ public class FingerGestures {
                 break;
         }
     }
-    public static void drag(AppEventOuterClass.XYCoordin fromXY, AppEventOuterClass.Orientation ori){
+    public static void swipeOnCoord(ViewInteraction vi, AppEventOuterClass.XYCoordin fromXY, AppEventOuterClass.Orientation ori){
         float fromX = fromXY.getX();
         float fromY = fromXY.getY();
 
         float offset = 100;
         switch(ori.getOrientType()){
-            case UP: drag(fromX, fromY, fromX, fromY - offset); break;
-            case DOWN: drag(fromX, fromY, fromX, fromY + offset); break;
-            case LEFT: drag(fromX, fromY, fromX - offset, fromY); break;
-            case RIGHT: drag(fromX, fromY, fromX + offset, fromY); break;
+            case UP: vi.perform(swipeOnCoord(fromX, fromY, fromX, fromY - offset));
+            case DOWN: vi.perform(swipeOnCoord(fromX, fromY, fromX, fromY + offset));
+            case LEFT: vi.perform(swipeOnCoord(fromX, fromY, fromX - offset, fromY));
+            case RIGHT: vi.perform(swipeOnCoord(fromX, fromY, fromX + offset, fromY));
             case XY_TYPE:
                 AppEventOuterClass.XYCoordin ToXY = ori.getXy();
                 float toX = ToXY.getX();
                 float toY = ToXY.getY();
-                drag(fromX, fromY, toX, toY);
+                vi.perform(swipeOnCoord(fromX, fromY, toX, toY));
+            default:
+                break;
         }
 
+    }
+    public static ViewAction swipeOnCoord(final float fromX, final float fromY, final float toX, final float toY) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
+
+            @Override
+            public String getDescription() {
+
+                return "Swipe from" + fromX + ", " + fromY + " to " + toX + ", " + toY;
+            }
+
+            @Override
+            public void perform(UiController uiController, final View view) {
+                drag(fromX, fromY, toX, toY);
+            }
+        };
     }
 
     public static void drag(float fromX, float fromY, float toX, float toY){
