@@ -36,6 +36,8 @@ object TestApp {
 
     val testAssert:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( isClickable("Crap") ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000)
 
+    val testReflect:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( Predicate("moreThanThree", 2) ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000)
+
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
     val appAPKPath = "/data/chimp/ContractionTimer/app-debug.apk"
@@ -47,7 +49,7 @@ object TestApp {
     // This is needed now, because in quickLoad, we spin off a future computation: The kick back routine
     implicit val ec = ExecutionContext.global
 
-    val outcome = ChimpLoader.quickLoad(emuID, testGoodTrace, appAPKPath, chimpAPKPath, testerClass, aaptHome)
+    val outcome = ChimpLoader.quickLoad(emuID, testReflect, appAPKPath, chimpAPKPath, testerClass, aaptHome)
 
     println(s"\nOutcome: $outcome")
 

@@ -110,6 +110,7 @@ object ChimpLoader {
     var traceOpt:Option[String] = None
     var propertyOpt:Option[String] = None
     var stackTraceOpt: Option[String] = None
+    var driverExceptOpt: Option[String] = None
     for(seg <- stdout.replace("\n","").split("INSTRUMENTATION")) {
       if(seg contains "ChimpDriver-Outcome") {
         outcomeStr = extractValueWithKey("ChimpDriver-Outcome", seg)
@@ -124,6 +125,9 @@ object ChimpLoader {
       }
       if(seg contains "ChimpDriver-ViolatedProperty") {
         propertyOpt = Some( extractValueWithKey("ChimpDriver-ViolatedProperty", seg) )
+      }
+      if(seg contains "ChimpDriver-Exception") {
+        driverExceptOpt = Some( extractValueWithKey("ChimpDriver-Exception", seg) )
       }
     }
 
@@ -153,6 +157,7 @@ object ChimpLoader {
               case None => return ParseFailChimpOutcome( s"Cannot find violated property" )
             }
           }
+          case "DriverExcept" =>return ChimpDriverExceptChimpOutcome(Some(trace), driverExceptOpt)
           case default => return ParseFailChimpOutcome( "Cannot find outcome" )
         }
       }

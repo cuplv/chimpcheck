@@ -15,6 +15,7 @@ import chimp.protobuf.EventTraceOuterClass;
 import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
+import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 
 
 import static android.support.test.espresso.action.ViewActions.click;
@@ -36,7 +37,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
 
     @Override
     protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent)
-    throws MalformedBuiltinPredicateException, PropertyViolatedException {
+    throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), tryEvent.toString());
 
         try {
@@ -260,7 +261,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     // Handling Properties
     @Override
     protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
-                      throws MalformedBuiltinPredicateException,PropertyViolatedException {
+                      throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchAssertEvent"), assertProp.toString());
 
         PropResult res = check( assertProp.getProps() );
