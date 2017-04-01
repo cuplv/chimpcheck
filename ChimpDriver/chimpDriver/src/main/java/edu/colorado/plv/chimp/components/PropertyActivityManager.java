@@ -3,13 +3,17 @@ package edu.colorado.plv.chimp.components;
 /**
  * Created by edmund on 3/30/17.
  */
+import android.util.Log;
 import android.view.View;
 import chimp.protobuf.Property;
 import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
+import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 import org.hamcrest.Matcher;
 
 import android.support.test.espresso.matcher.ViewMatchers;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +53,8 @@ public class PropertyActivityManager extends ActivityManager {
    protected PropResult violatedProp(Property.Prop prop) { return new PropResult(prop); }
    protected PropResult violatedProp(Property.BaseProp baseProp) { return new PropResult(baseProp); }
 
-   protected PropResult check(Property.Pred predicate) throws MalformedBuiltinPredicateException {
+   protected PropResult check(Property.Pred predicate)
+           throws MalformedBuiltinPredicateException, ReflectionPredicateException {
        // Check if predicate is a ViewBuiltinPredicate
        if( ViewBuiltInPredicates.containsKey(predicate.getName()) ) {
            Matcher<View> predicateMatcher = ViewBuiltInPredicates.get(predicate.getName());
@@ -81,10 +86,59 @@ public class PropertyActivityManager extends ActivityManager {
            }
        }
        // TODO: Implement reflection call on top-level Chimp Driver
-       return success();
+       /* Not builtin predicate. Assume that this predicate is mapped to a method of the same name declared by the
+          Chimp driver instance */
+
+       String methodName = predicate.getName();
+       Class[] arguments = new Class[predicate.getArgsCount()];
+       Object[] values   = new Object[predicate.getArgsCount()];
+       for (int i=0; i < predicate.getArgsCount(); i++) {
+           Property.Arg arg = predicate.getArgs(i);
+           switch(arg.getArgType()) {
+               case STR_ARG:
+                   arguments[i] = String.class;
+                   values[i] = arg.getStrVal();
+                   break;
+               case INT_ARG:
+                   arguments[i] = Integer.TYPE;
+                   values[i] = arg.getIntVal();
+                   break;
+               case BOOL_ARG:
+                   arguments[i] = Boolean.TYPE;
+                   values[i] = arg.getBoolVal();
+                   break;
+           }
+       }
+
+       Class myClass = this.getClass();
+
+       try {
+           Method method = myClass.getDeclaredMethod(methodName, arguments);
+           boolean res = (Boolean) method.invoke(this, values);
+           if (res) return success();
+           else return violatedProp(Property.BaseProp.newBuilder().setPropType(Property.BaseProp.BasePropType.PRIM_TYPE)
+                   .setPred(predicate).build() );
+       } catch (NoSuchMethodException e) {
+           String msg = "No method found associated to: " + predicate.toString();
+           Log.e("@check(Predicate)", msg, e);
+           throw new ReflectionPredicateException(msg);
+       } catch (IllegalAccessException e) {
+           String msg = "No permission to access method associated to: " + predicate.toString();
+           Log.e("@check(Predicate)", msg, e);
+           throw new ReflectionPredicateException(msg);
+       } catch (InvocationTargetException e) {
+           String msg = "Cannot invoke method associated to: " + predicate.toString();
+           Log.e("@check(Predicate)", msg, e);
+           throw new ReflectionPredicateException(msg);
+       } catch (ClassCastException e) {
+           String msg = "No boolean return for method associated to: " + predicate.toString();
+           Log.e("@check(Predicate)", msg, e);
+           throw new ReflectionPredicateException(msg);
+       }
    }
 
-   protected PropResult check(Property.BaseProp baseProp) throws MalformedBuiltinPredicateException {
+   protected PropResult check(Property.BaseProp baseProp)
+           throws MalformedBuiltinPredicateException, ReflectionPredicateException {
        switch (baseProp.getPropType()) {
            case BOT_TYPE: return violatedProp(baseProp);
            case TOP_TYPE: return success();
@@ -130,7 +184,8 @@ public class PropertyActivityManager extends ActivityManager {
        return null;
    }
 
-   protected PropResult check(Property.Prop prop) throws MalformedBuiltinPredicateException {
+   protected PropResult check(Property.Prop prop)
+           throws MalformedBuiltinPredicateException,ReflectionPredicateException {
        switch(prop.getPropType()) {
            case LIT_TYPE:
                PropResult litRes = check( prop.getPrem() );

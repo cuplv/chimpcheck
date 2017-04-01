@@ -15,6 +15,7 @@ import edu.colorado.plv.chimp.components.PropertyActivityManager;
 import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
+import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,6 +97,10 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
                 outcome = Outcome.DRIVEREXCEPT;
                 exceptMsg = e.toString();
                 return;
+            } catch (ReflectionPredicateException e) {
+                outcome = Outcome.DRIVEREXCEPT;
+                exceptMsg = e.toString();
+                return;
             } catch (Exception e) {
                 // Trying to intercept all exceptions now.
                 /* TODO: My hunch is that we cannot distinguish between App or Chimp Driver crash here.
@@ -150,42 +155,15 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
         Log.i(runner.chimpTag("@processTraceReport"), "Trace report completed!");
     }
 
-
-    /* TO BE DEPRECATED SOON */
-    /*
-    @After
-    public void compileTraceReport() {
-        if (traceCompleted) {
-            runner.addReport("ChimpTraceResult", "Success");
-        } else {
-            runner.addReport("ChimpTraceResult", "Failed");
-        }
-        if (noOp) {
-            runner.addReport("ChimpTraceBlocked", "Yes");
-        } else {
-            runner.addReport("ChimpTraceBlocked", "No");
-        }
-
-        // runner.addReport("ChimpTraceCompleted", Base64.encodeToString(trace.toByteArray(), Base64.DEFAULT));
-
-        EventTraceOuterClass.EventTrace.Builder builder = EventTraceOuterClass.EventTrace.newBuilder();
-        for(EventTraceOuterClass.UIEvent event: completedEvents) {
-            builder.addEvents( event );
-        }
-
-        String base64Output = Base64.encodeToString(builder.build().toByteArray(), Base64.DEFAULT);
-        runner.addReport("ChimpTraceCompleted", base64Output);
-    }*/
-
     // Abstract Launch event methods
 
     abstract protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryevent)
-            throws MalformedBuiltinPredicateException, PropertyViolatedException;
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException;
     abstract protected EventTraceOuterClass.Decide launchDecideEvent(EventTraceOuterClass.Decide decide);
     abstract protected EventTraceOuterClass.DecideMany launchDecideManyEvent(EventTraceOuterClass.DecideMany decideMany);
 
     abstract protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
-            throws MalformedBuiltinPredicateException, PropertyViolatedException;
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException;
 
     abstract protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException;
     abstract protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException;
@@ -246,7 +224,7 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
 
 
     protected void executeEvent(EventTraceOuterClass.UIEvent event)
-            throws NoViewEnabledException,MalformedBuiltinPredicateException,PropertyViolatedException {
+            throws NoViewEnabledException,MalformedBuiltinPredicateException,ReflectionPredicateException,PropertyViolatedException {
         switch (event.getEventType()) {
             case APPEVENT: executeEvent(event.getAppEvent()); break;
             case EXTEVENT: executeEvent(event.getExtEvent()); break;
@@ -283,7 +261,7 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
     // Try Event Block
 
     protected void executeEvent(EventTraceOuterClass.TryEvent tryEvent)
-                throws MalformedBuiltinPredicateException, PropertyViolatedException {
+                throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("@executeEvent"), tryEvent.toString());
         EventTraceOuterClass.TryEvent newTryEvent = launchTryEvent(tryEvent);
 
@@ -314,7 +292,7 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
     }
 
     protected void executeEvent(EventTraceOuterClass.Assert assertProp)
-            throws MalformedBuiltinPredicateException,PropertyViolatedException {
+            throws MalformedBuiltinPredicateException,ReflectionPredicateException,PropertyViolatedException {
         Log.i(runner.chimpTag("@executeEvent"), assertProp.toString());
         launchAssertEvent(assertProp);
         // Currently throwing away the response: For now, don't log assert P's.
