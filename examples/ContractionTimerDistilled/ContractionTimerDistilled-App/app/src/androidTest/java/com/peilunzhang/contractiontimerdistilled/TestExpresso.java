@@ -42,6 +42,10 @@ public class TestExpresso extends EspressoChimpDriver<MainActivity> {
 
     public boolean moreThanThree(int i) { return i > 3; }
 
+    public boolean checkCount(int i) {
+        return activityTestRule.getActivity().getCount() == i;
+    }
+
     /*
     @Test
     public void test1() {
