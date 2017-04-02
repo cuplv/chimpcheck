@@ -2,13 +2,12 @@ package edu.colorado.plv.chimp.example
 
 import com.peilunzhang.contractiontimerdistilled.R
 import com.typesafe.scalalogging.Logger
-import edu.colorado.plv.chimp.combinator._
+import edu.colorado.plv.chimp.combinator.{Assert, Rotate, _}
 import edu.colorado.plv.chimp.combinator.UIID_Implicits._
 import edu.colorado.plv.chimp.coordinator.ChimpLoader
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
-
 import edu.colorado.plv.chimp.combinator.Prop_Implicits._
 import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
 import edu.colorado.plv.chimp.combinator.PropArg_Implicits._
@@ -36,7 +35,12 @@ object TestApp {
 
     val testAssert:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( isClickable("Crap") ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000)
 
-    val testReflect:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( Predicate("moreThanThree", 2) ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000)
+    val testReflect:EventTrace = Assert( isClickable(R.id.fragmentBtn1) ) :>> Rotate :>> Assert( Predicate("moreThanThree", 20) ) :>> Sleep(2000) :>> Rotate :>> Sleep(2000)
+
+    val testRotate:EventTrace = Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Rotate :>> Sleep(2000) :>> Rotate
+
+    val testSync:EventTrace = Assert( Predicate("checkCount", 1) ) :>> Click(R.id.fragmentBtn2) :>> Assert( Predicate("checkCount", 2) ) :>> Click(R.id.fragmentBtn2) :>> Assert( Predicate("checkCount", 3) ) :>>
+                                Click(R.id.fragmentBtn2) :>> Assert( Predicate("checkCount", 4) ) :>> Sleep(2000)
 
     val aaptHome = "/usr/local/android-sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
@@ -49,7 +53,7 @@ object TestApp {
     // This is needed now, because in quickLoad, we spin off a future computation: The kick back routine
     implicit val ec = ExecutionContext.global
 
-    val outcome = ChimpLoader.quickLoad(emuID, testReflect, appAPKPath, chimpAPKPath, testerClass, aaptHome)
+    val outcome = ChimpLoader.quickLoad(emuID, testSync, appAPKPath, chimpAPKPath, testerClass, aaptHome)
 
     println(s"\nOutcome: $outcome")
 
