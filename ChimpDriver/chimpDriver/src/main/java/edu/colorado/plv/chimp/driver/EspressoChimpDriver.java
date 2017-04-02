@@ -28,6 +28,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnCoord;
 import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnView;
 
+import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
+import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
+
 /**
  * Created by edmund on 3/13/17.
  */
@@ -247,14 +250,21 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
 
     @Override
     protected void launchRotate() {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateLeft"), "Rotate");
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotate"), "Rotate");
 
         Activity activity = getActivityInstance();
         int orientation = activity.getApplicationContext().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
+        } else {
+            Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationPortrait());
+        }
+
+        /*
         activity.setRequestedOrientation(
                 (orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        */
 
     }
 
@@ -263,6 +273,8 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
                       throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchAssertEvent"), assertProp.toString());
+
+        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
         PropResult res = check( assertProp.getProps() );
         if (res.success) {

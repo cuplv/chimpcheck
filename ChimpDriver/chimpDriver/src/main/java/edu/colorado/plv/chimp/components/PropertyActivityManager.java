@@ -112,6 +112,13 @@ public class PropertyActivityManager extends ActivityManager {
 
        Class myClass = this.getClass();
 
+       String valStr = "";
+       for (int x=0; x<values.length; x++) {
+           valStr += values[x].toString();
+           if (x < values.length-2) valStr += ", ";
+       }
+       Log.i("ChimpDriver-check-Pred",String.format("Invoking %s with arguments %s", methodName, valStr));
+
        try {
            Method method = myClass.getDeclaredMethod(methodName, arguments);
            boolean res = (Boolean) method.invoke(this, values);
@@ -184,7 +191,7 @@ public class PropertyActivityManager extends ActivityManager {
        return null;
    }
 
-   protected PropResult check(Property.Prop prop)
+   public PropResult check(Property.Prop prop)
            throws MalformedBuiltinPredicateException,ReflectionPredicateException {
        switch(prop.getPropType()) {
            case LIT_TYPE:
