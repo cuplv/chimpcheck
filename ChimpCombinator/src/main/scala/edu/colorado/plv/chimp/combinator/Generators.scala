@@ -196,28 +196,6 @@ case class LearnModel() extends TraceGen {
    override def generator(): Gen[EventTrace] = const(EventTrace.trace(Skip))
 }
 
-object Generator_Implicits {
-
-  implicit class UIEventGen(event: UIEvent) {
-     def *>> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) *>> next
-     def *>> (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) *>> trace
-     def *>> (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) *>> gen
-     def <+> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) <+> next
-     def <+> (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) <+> trace
-     def <+> (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) <+> gen
-  }
-
-  implicit  class EventTraceGen(trace: EventTrace) {
-    def *>>(event: UIEvent): TraceGen   = Path(trace) *>> event
-    def *>>(next: EventTrace): TraceGen = Path(trace) *>> next
-    def *>>(gen: TraceGen): TraceGen    = Path(trace) *>> gen
-    def <+> (event: UIEvent): TraceGen   = Path(trace) <+> event
-    def <+> (next: EventTrace): TraceGen = Path(trace) <+> next
-    def <+> (gen: TraceGen): TraceGen    = Path(trace) <+> gen
-  }
-
-}
-
 
 import edu.colorado.plv.chimp.combinator.Generator_Implicits._
 
