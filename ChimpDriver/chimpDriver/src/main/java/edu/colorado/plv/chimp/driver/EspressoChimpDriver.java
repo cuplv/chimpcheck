@@ -23,6 +23,7 @@ import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnCoord;
@@ -93,11 +94,17 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                                     .perform(click());
                         return click;
             case WILD_CARD:
+                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
                 View view = getClickableView();
-
-                Espresso.onView(withId(view.getId()))
-                        .perform(click());
-
+                if(view.getId() != -1) {
+                    Espresso.onView(withId(view.getId()))
+                            .perform(click());
+                } else {
+                    String des = view.getContentDescription().toString();
+                    Espresso.onView(withContentDescription(des))
+                            .perform(click());
+                }
                 // Should return click token with the UIID of the exact view clicked.
                 // That's what below is doing. However, find out if there is better way to retain human-readable information on
                 // this view (Display Text?)
@@ -124,11 +131,16 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                         .perform(longClick());
                 return longClick;
             case WILD_CARD:
-
+                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
                 View view = getClickableView();
-
-                Espresso.onView(withId(view.getId()))
-                        .perform(longClick());
+                if(view.getId() != -1) {
+                    Espresso.onView(withId(view.getId()))
+                            .perform(longClick());
+                } else {
+                    String des = view.getContentDescription().toString();
+                    Espresso.onView(withContentDescription(des))
+                            .perform(longClick());
+                }
 
                 // Should return click token with the UIID of the exact view clicked.
                 AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
