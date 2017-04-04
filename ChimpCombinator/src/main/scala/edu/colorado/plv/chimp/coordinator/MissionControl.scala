@@ -188,8 +188,10 @@ import Trace_Implicits._
 import edu.colorado.plv.chimp.combinator.Prop_Implicits._
 import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
 
+import org.scalacheck.Properties
 
 object TestActors {
+
 
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem("my-system")
