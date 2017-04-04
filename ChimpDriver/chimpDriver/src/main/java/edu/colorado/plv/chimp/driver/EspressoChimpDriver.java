@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
+import edu.colorado.plv.chimp.components.ViewID;
 import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
@@ -31,6 +32,8 @@ import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnView;
 
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
+
+import java.util.ArrayList;
 
 /**
  * Created by edmund on 3/13/17.
@@ -96,7 +99,9 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
+                /*
                 View view = getClickableView();
+
                 if(view.getId() != -1) {
                     Espresso.onView(withId(view.getId()))
                             .perform(click());
@@ -104,12 +109,25 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                     String des = view.getContentDescription().toString();
                     Espresso.onView(withContentDescription(des))
                             .perform(click());
-                }
+                }*/
+
+                ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
+                Espresso.onView(vid.matcher()).perform(click());
+
                 // Should return click token with the UIID of the exact view clicked.
                 // That's what below is doing. However, find out if there is better way to retain human-readable information on
                 // this view (Display Text?)
                 AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
-                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()));
+
+                switch(vid.type()) {
+                  case RID:
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                  case DISPLAY_TEXT:
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                    case CONTENT_DESC:
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                }
+
 
                 return builder.build();
         }
