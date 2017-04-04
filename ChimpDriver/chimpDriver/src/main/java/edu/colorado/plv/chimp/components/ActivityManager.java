@@ -1,28 +1,29 @@
 package edu.colorado.plv.chimp.components;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.Fragment;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.UiController;
-import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.*;
 import android.support.test.espresso.util.TreeIterables;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
+import android.util.Log;
 import android.view.View;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import org.hamcrest.Matcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
-
-import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.RootMatchers.isDialog;
+import static android.support.test.espresso.matcher.ViewMatchers.*;
 import static org.hamcrest.Matchers.allOf;
-
-import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
-import static android.support.test.espresso.matcher.ViewMatchers.supportsInputMethods;
 
 /**
  * Created by edmund on 3/21/17.
@@ -30,12 +31,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.supportsInputMe
 public class ActivityManager {
 
     protected Activity current;
+    protected Random seed = new Random();
 
     protected Activity getActivityInstance(){
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             public void run(){
                 Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
                 for(Activity act : resumedActivity){
+                    // Log.i("Chimp-needs-to-know","Got activity : " + act.toString());
                     current = act;
                 }
             }
@@ -52,8 +55,18 @@ public class ActivityManager {
         View root = getDecorView();
         ArrayList<View> views = new ArrayList<>();
         for (View v : TreeIterables.breadthFirstViewTraversal(root)) {
-                views.add(v);
+            // Log.i("Chimp-needs-to-know","Active View: " + v.toString());
+            views.add(v);
         }
+
+        /*
+        View focus = getActivityInstance().getCurrentFocus();
+        if (focus != null) {
+            for (View v : TreeIterables.breadthFirstViewTraversal(focus)) {
+                Log.i("Chimp-needs-to-know", "In focus View: " + v.toString());
+            }
+        } */
+
         return views;
     }
 
@@ -69,7 +82,8 @@ public class ActivityManager {
 
     protected View getRandomView(ArrayList<View> views, String msg) throws NoViewEnabledException {
         if (views.isEmpty()) throw new NoViewEnabledException(msg);
-        return views.get(ThreadLocalRandom.current().nextInt(0, views.size()));
+        // return views.get(ThreadLocalRandom.current().nextInt(0, views.size()));
+        return views.get(seed.nextInt(views.size())) ;
     }
 
 
@@ -126,6 +140,77 @@ public class ActivityManager {
                 uiController.loopMainThreadForAtLeast(millis);
             }
         };
+    }
+
+
+    // Dialog box stuff
+
+    protected ArrayList<ViewID> getClickableViewIDs() throws NoViewEnabledException {
+        ArrayList<ViewID> ids = new ArrayList();
+        if (hasDialogInFocus()) {
+            // A Dialog box is determined to be in focus. Randomly pick between known dialog default buttons.
+            // TODO: Does not work for custom dialog views. Will need to investigate how to obtain dialog box view hierarchy.
+            Log.i("Chimp@getViews", "Returning default clickable dialog views");
+
+            int[] dids = { android.R.id.button1, android.R.id.button2, android.R.id.button3 };
+            for(int did: dids) {
+                if (isMatch(did, allOf(isClickable(), isDisplayed()))) {
+                   Log.i("Chimp@getViews", "Clickable view: " + did);
+                   ids.add( ViewID.mkRID(did) );
+                }
+            }
+        } else {
+            // Default case: Revert to the standard view hierarchy
+            Log.i("Chimp@getViews", "Using view hierarchy to obtain clickable views");
+            for(View v: getAllViews( allOf(isClickable(), isEnabled(), isDisplayed()))) {
+                if (v.getId() != -1) {
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString());
+                    ids.add(ViewID.mkRID(v.getId()));
+                } else {
+                    Log.i("Chimp@getViews", "Clickable view with no RID (revert to content desc): " + v.toString());
+                    ids.add(ViewID.mkDesc(v.getContentDescription().toString()));
+                }
+            }
+        }
+        return ids;
+    }
+
+    protected <A> A pickOne(ArrayList<A> arr, String msg) throws NoViewEnabledException {
+        if (arr.size() == 0) throw new NoViewEnabledException(msg);
+        return arr.get(seed.nextInt(arr.size())) ;
+    }
+
+    protected boolean hasDialogInFocus() {
+        int titleId = getActivityInstance().getResources()
+                .getIdentifier("alertTitle", "id", "android");
+        try {
+            onView(withId(titleId)).inRoot(isDialog()).check(matches(isDisplayed()));
+            Log.i("Chimp@hasDialogInFocus", "A dialog box is determined to be in focus");
+            return true;
+        } catch (NoMatchingRootException e) {
+            Log.i("Chimp@hasDialogInFocus", "No dialog box in focus: No matching root");
+            return false;
+        } catch (NoMatchingViewException e) {
+            Log.i("Chimp@hasDialogInFocus", "No dialog box in focus: No matching view");
+            return false;
+        } catch (AssertionError e) {
+            Log.i("Chimp@hasDialogInFocus", "No dialog box in focus: Found but not displayed.");
+            return false;
+        }
+    }
+
+    protected static boolean isMatch(int viewId, Matcher<View> mt) {
+        try {
+            onView( withId(viewId) ).check(matches(mt));
+            Log.i("Chimp@isMatch",viewId + " matched.");
+            return true;
+        } catch (NoMatchingViewException e) {
+            Log.i("Chimp@isMatch", viewId + "did not match: NoMatchingViewException" );
+            return false;
+        } catch (AssertionError e) {
+            Log.i("Chimp@isMatch", viewId + "did not match: AssertionError" );
+            return false;
+        }
     }
 
 }
