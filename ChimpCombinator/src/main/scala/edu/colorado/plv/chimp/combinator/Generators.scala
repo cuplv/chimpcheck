@@ -170,7 +170,7 @@ object Gorilla extends TraceGen {
   val defaultGorillaEvents:Seq[(Int,TraceGen)] = Seq(
     (20,Path(EventTrace.trace(Click(*)))),
     (5,Path(EventTrace.trace(LongClick(*)))),
-    (5,TypeG(const(*), Arbitrary.arbitrary[String])),
+    (5,TypeG(const(*), Gen.alphaStr)),
     (1,SleepG(Gen.choose(2000,5000)))
   ).map( (f:(Int,TraceGen)) => (f._1, TryG(f._2) ) )
 
