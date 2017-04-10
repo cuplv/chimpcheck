@@ -20,6 +20,7 @@ import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 
 
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -177,18 +178,18 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         switch (uiid.getIdType()) {
             case R_ID:
                 Espresso.onView(withId(uiid.getRid()))
-                        .perform(typeText(text));
+                        .perform(typeText(text)).perform(closeSoftKeyboard());
                 return type;
             case NAME_ID:
                 Espresso.onView(withText(uiid.getNameid()))
-                        .perform(typeText(text));
+                        .perform(typeText(text)).perform(closeSoftKeyboard());
                 return type;
             case WILD_CARD:
 
                 View view = getTypeableView(); // getClickableView();
 
                 Espresso.onView(withId(view.getId()))
-                        .perform(typeText(text));
+                        .perform(typeText(text)).perform(closeSoftKeyboard());
 
                 AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
                 builder
