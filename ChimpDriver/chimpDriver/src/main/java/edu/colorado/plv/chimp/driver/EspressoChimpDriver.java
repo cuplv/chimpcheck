@@ -5,6 +5,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoActivityResumedException;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.util.HumanReadables;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -215,6 +217,25 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type
                 swipeOnCoord(Espresso.onView(isRoot()), xy, swipe.getPos());
             case WILD_CARD: // Wild card type
+                ViewInteraction vi;
+                try {
+                    View view = getSwipeableView();
+                    if(view.getId() != -1) {
+                        if(getResName(view).equals("statusBarBackground") ){
+                            return swipe;
+                        }
+                        vi = Espresso.onView(withId(view.getId()));
+                    } else if(view.getContentDescription() != null) {
+                        vi = Espresso.onView(withContentDescription(view.getContentDescription().toString()));
+                    }else{
+                        throw new NoViewEnabledException("can't find a view to swipe");
+                    }
+                    swipeOnView(uiid, vi, swipe.getPos());
+
+                } catch(NoViewEnabledException nvee){
+                    nvee.printStackTrace();
+                }
+
                 return swipe;
             default:
                 return swipe;

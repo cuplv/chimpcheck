@@ -120,6 +120,19 @@ public class ActivityManager {
         return getRandomView( getAllViews( allOf(isClickable(), isEnabled(), isDisplayed()) ), "No clickable views at current state");
     }
 
+    protected  View getSwipeableView() throws NoViewEnabledException {
+        ArrayList<View> views = getAllViews();
+        while(true){
+            View v = pickOne(views, "can't find any views to swipe");
+            if(v.getWidth() == 0 && v.getHeight() == 0){
+                views.remove(v);
+            }else{
+                return v;
+            }
+        }
+
+    }
+
     protected ArrayList<ViewID> getTypeableViewIDs() throws NoViewEnabledException {
         ArrayList<ViewID> ids = new ArrayList();
         if (hasDialogInFocus()) {
