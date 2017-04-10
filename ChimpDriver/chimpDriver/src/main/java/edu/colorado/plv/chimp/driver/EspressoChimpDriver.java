@@ -99,19 +99,6 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                         return click;
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-
-                /*
-                View view = getClickableView();
-
-                if(view.getId() != -1) {
-                    Espresso.onView(withId(view.getId()))
-                            .perform(click());
-                } else {
-                    String des = view.getContentDescription().toString();
-                    Espresso.onView(withContentDescription(des))
-                            .perform(click());
-                }*/
-
                 ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
                 Espresso.onView(vid.matcher()).perform(click());
 
@@ -151,19 +138,18 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 return longClick;
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-                View view = getClickableView();
-                if(view.getId() != -1) {
-                    Espresso.onView(withId(view.getId()))
-                            .perform(longClick());
-                } else {
-                    String des = view.getContentDescription().toString();
-                    Espresso.onView(withContentDescription(des))
-                            .perform(longClick());
-                }
+                ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
+                Espresso.onView(vid.matcher()).perform(longClick());
 
-                // Should return click token with the UIID of the exact view clicked.
                 AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
-                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()));
+                switch(vid.type()) {
+                    case RID:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                    case DISPLAY_TEXT:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                    case CONTENT_DESC:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                }
 
                 return builder.build();
         }
@@ -186,15 +172,19 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 return type;
             case WILD_CARD:
 
-                View view = getTypeableView(); // getClickableView();
-
-                Espresso.onView(withId(view.getId()))
-                        .perform(typeText(text)).perform(closeSoftKeyboard());
+                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+                ViewID vid = pickOne(getTypeableViewIDs(), "No available typeable views");
+                Espresso.onView(vid.matcher()).perform(typeText(text)).perform(closeSoftKeyboard());
 
                 AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
-                builder
-                  .setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()))
-                  .setInput(text);
+                switch(vid.type()) {
+                    case RID:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                    case DISPLAY_TEXT:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                    case CONTENT_DESC:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                }
 
                 return builder.build();
         }

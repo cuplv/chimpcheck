@@ -105,6 +105,33 @@ public class FingerGestures {
         } catch (SecurityException ignored) {System.out.println("error 3");}
     }
 
-
+    public static void pinch(float fromX1, float fromY1, float toX1, float toY1, float fromX2, float fromY2, float toX2, float toY2){
+        Instrumentation inst = InstrumentationRegistry.getInstrumentation();
+        int stepCount = 10;
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime= SystemClock.uptimeMillis();
+        float y = fromY1;
+        float x = fromX1;
+        float yStep = (toY1 - fromY1) / stepCount;
+        float xStep = (toX1 - fromX1) / stepCount;
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_DOWN, fromX1, fromY1, 0);
+        try {
+            inst.sendPointerSync(event);
+        } catch (SecurityException ignored) {System.out.println("error 1");}
+        for (int i = 0; i < stepCount; ++i){
+            y += yStep;
+            x += xStep;
+            eventTime = SystemClock.uptimeMillis();
+            event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_MOVE, x, y, 0);
+            try{
+                inst.sendPointerSync(event);
+            } catch (SecurityException ignored){System.out.println("error 2");}
+        }
+        eventTime = SystemClock.uptimeMillis();
+        event = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, toX1, toY1, 0);
+        try {
+            inst.sendPointerSync(event);
+        } catch (SecurityException ignored) {System.out.println("error 3");}
+    }
 
 }

@@ -115,12 +115,40 @@ public class ActivityManager {
         return getRandomView( getAllViews( allOf(isClickable(), isEnabled(), isDisplayed()) ), "No clickable views at current state");
     }
 
-    protected View getTypeableView() throws NoViewEnabledException {
-        return getRandomView( getAllViews( allOf(supportsInputMethods(), isEnabled(), isDisplayed()) ), "No views that supports input methods at current state" );
+    protected ArrayList<ViewID> getTypeableViewIDs() throws NoViewEnabledException {
+        ArrayList<ViewID> ids = new ArrayList();
+        if (hasDialogInFocus()) {
+            // A Dialog box is determined to be in focus. Randomly pick between known dialog default buttons.
+            // TODO: Does not work for custom dialog views. Will need to investigate how to obtain dialog box view hierarchy.
+            Log.i("Chimp@getViews", "When dialog is displaying, no typeable views should be found");
+            throw new  NoViewEnabledException("No views that supports input methods at current state");
+        } else {
+            // Default case: Revert to the standard view hierarchy
+            Log.i("Chimp@getViews", "Using view hierarchy to obtain typeable views");
+            for(View v: getAllViews( allOf(supportsInputMethods(), isEnabled(), isDisplayed()))) {
+                if (v.getId() != -1) {
+                    Log.i("Chimp@getViews", "Typeable view with RID: " + v.toString());
+                    ids.add(ViewID.mkRID(v.getId()));
+                } else {
+                    Log.i("Chimp@getViews", "Typeable view with no RID (revert to content desc): " + v.toString());
+                    ids.add(ViewID.mkDesc(v.getContentDescription().toString()));
+                }
+            }
+        }
+        return ids;
     }
 
     protected String getResName(View v){
-        return v.getResources().getResourceEntryName(v.getId());
+        if(v == null) return "";
+        if(v.getId() == -1){
+            if(v.getContentDescription() != null) {
+                return v.getContentDescription().toString();
+            } else {
+                return "";
+            }
+        }else {
+            return v.getResources().getResourceEntryName(v.getId());
+        }
     }
 
     public static ViewAction waitFor(final long millis) {
