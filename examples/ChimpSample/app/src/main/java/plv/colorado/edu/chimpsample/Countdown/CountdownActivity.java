@@ -1,8 +1,9 @@
-package plv.colorado.edu.chimpsample;
+package plv.colorado.edu.chimpsample.Countdown;
 
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import plv.colorado.edu.chimpsample.R;
 
 /**
  * Created by Pezh on 4/8/17.

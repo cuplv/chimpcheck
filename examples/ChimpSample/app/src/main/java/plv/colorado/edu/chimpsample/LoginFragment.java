@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import plv.colorado.edu.chimpsample.Intermedia.IntermediaActivity;
+
 /**
  * Created by Pezh on 4/8/17.
  */
@@ -30,7 +32,7 @@ public class LoginFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), CountdownActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), IntermediaActivity.class);
                 startActivity(intent);
             }
         });

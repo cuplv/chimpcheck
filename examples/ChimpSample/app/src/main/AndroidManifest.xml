@@ -16,7 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CountdownActivity"></activity>
+        <activity android:name=".Countdown.CountdownActivity"></activity>
+        <activity android:name=".Intermedia.IntermediaActivity"></activity>
+        <activity android:name=".Swipe.SwipeActivity"></activity>
     </application>
 
 </manifest>
