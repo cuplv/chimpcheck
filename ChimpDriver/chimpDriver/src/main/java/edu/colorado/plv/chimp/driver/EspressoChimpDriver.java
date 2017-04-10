@@ -179,8 +179,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
                 switch(vid.type()) {
                     case RID:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())).setInput(text).set;
-                        Log.d("theTYPEID", Integer.toString(vid.getID()));
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())).setInput(text);
                         break;
                     case DISPLAY_TEXT:
                         builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())).setInput(text); break;
@@ -207,10 +206,10 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         AppEventOuterClass.UIID uiid = swipe.getUiid();
         switch(uiid.getIdType()) {
             case R_ID:
-                swipeOnView(Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
+                swipeOnView(uiid, Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
                 return swipe;
             case NAME_ID:
-                swipeOnView(Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
+                swipeOnView(uiid, Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
                 return swipe;
             case XY_ID:
                 AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type

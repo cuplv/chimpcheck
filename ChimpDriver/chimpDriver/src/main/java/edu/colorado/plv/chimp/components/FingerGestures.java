@@ -13,6 +13,7 @@ import android.view.View;
 import org.hamcrest.Matcher;
 
 import chimp.protobuf.AppEventOuterClass;
+import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 
 import static android.support.test.espresso.action.ViewActions.swipeDown;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
@@ -26,13 +27,37 @@ import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 
 public class FingerGestures {
 
-    public static void swipeOnView(ViewInteraction vi, AppEventOuterClass.Orientation ori){
+    public static void swipeOnView(AppEventOuterClass.UIID uiid, ViewInteraction vi, AppEventOuterClass.Orientation ori){
         switch(ori.getOrientType()){
             case UP: vi.perform(swipeUp()); break;
             case DOWN: vi.perform(swipeDown()); break;
             case LEFT: vi.perform(swipeLeft()); break;
             case RIGHT: vi.perform(swipeRight()); break;
             case XY_TYPE:
+                ActivityManager activityManager = new ActivityManager();
+                View v = new View(activityManager.getActivityInstance().getApplicationContext());
+                switch(uiid.getIdType()){
+                    case R_ID:
+                        v = activityManager.getDecorView().findViewById(uiid.getRid());
+                        break;
+                    case NAME_ID:
+                        View decorView = activityManager.getDecorView();
+                        int resId = decorView.getResources().getIdentifier(uiid.getNameid(), "id", activityManager.getActivityInstance().getPackageName() );
+                        v = decorView.findViewById(resId);
+                        break;
+                }
+
+                if(v == null) {
+                    return;
+                }
+
+                float x = v.getX();
+                float y = v.getY();
+                float centerX = x + v.getWidth() / 2;
+                float centerY = y + v.getHeight() / 2;
+                AppEventOuterClass.XYCoordin desXY = ori.getXy();
+                vi.perform(swipeOnCoord(centerX, centerY, desXY.getX(), desXY.getY()));
+                
                 break;
         }
     }
