@@ -10,8 +10,13 @@ import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
+
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -171,6 +176,22 @@ public class ActivityManager {
     }
 
 
+    public static Matcher<View> notSupportsInputMethods() {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("not supports input methods");
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                // At first glance, it would make sense to use view.onCheckIsTextEditor, but the android
+                // javadoc is wishy-washy about whether authors are required to implement this method when
+                // implementing onCreateInputConnection.
+                return view.onCreateInputConnection(new EditorInfo()) == null;
+            }
+        };
+    }
     // Dialog box stuff
 
     protected ArrayList<ViewID> getClickableViewIDs() throws NoViewEnabledException {
@@ -190,7 +211,7 @@ public class ActivityManager {
         } else {
             // Default case: Revert to the standard view hierarchy
             Log.i("Chimp@getViews", "Using view hierarchy to obtain clickable views");
-            for(View v: getAllViews( allOf(isClickable(), isEnabled(), isDisplayed()))) {
+            for(View v: getAllViews( allOf(isClickable(), notSupportsInputMethods(), isEnabled(), isDisplayed()))) {
                 if (v.getId() != -1) {
                     Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString());
                     ids.add(ViewID.mkRID(v.getId()));
@@ -202,6 +223,8 @@ public class ActivityManager {
         }
         return ids;
     }
+
+
 
     protected <A> A pickOne(ArrayList<A> arr, String msg) throws NoViewEnabledException {
         if (arr.size() == 0) throw new NoViewEnabledException(msg);
