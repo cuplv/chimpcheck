@@ -18,6 +18,7 @@ import plv.colorado.edu.chimpsample.R;
  */
 
 public class SwipeFragment extends Fragment {
+    Button btnBack;
     SeekBar sbRed;
     SeekBar sbGreen;
     SeekBar sbBlue;
@@ -39,6 +40,7 @@ public class SwipeFragment extends Fragment {
     public void onResume(){
         super.onResume();
 
+        btnBack = (Button) view.findViewById(R.id.slider_btn_back);
         sbRed = (SeekBar) view.findViewById(R.id.seekBar);
         sbGreen = (SeekBar) view.findViewById(R.id.seekBar2);
         sbBlue= (SeekBar) view.findViewById(R.id.seekBar3);
@@ -46,6 +48,14 @@ public class SwipeFragment extends Fragment {
 
         mDrawView = view.findViewById(R.id.drawView);
         mDrawView.setBackgroundColor(Color.rgb(0, 0, 0));
+
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
 
         sbRed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
