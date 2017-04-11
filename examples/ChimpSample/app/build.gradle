@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "edu.colorado.plv.chimp.driver.ChimpJUnitRunner"
+        multiDexEnabled = true
     }
     buildTypes {
         release {
