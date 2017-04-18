@@ -4,12 +4,12 @@ package edu.colorado.plv.chimp.combinator
   * Created by edmund on 3/29/17.
   */
 
-import chimp.protobuf.BaseProp
 import chimp.{protobuf => pb}
-import edu.colorado.plv.chimp.combinator.BaseProp_Implicits.BasePropUnit
-import edu.colorado.plv.chimp.combinator.PropArg_Implicits.{IntArg, StrArg}
+import edu.colorado.plv.chimp.generator.{Path, TraceGen}
 
-object UIID_Implicits {
+object Implicits {
+
+  // UIID Implicits
 
   implicit class RId(rid: Int) extends UIID {
     override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.R_ID, Some(rid), None)
@@ -26,18 +26,36 @@ object UIID_Implicits {
     override def toString: String = s"<${xy.x},${xy.y}>"
   }
 
-}
+  implicit class WildUIID(wc: WildCard) extends UIID {
+    override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.WILD_CARD, None, None)
+    override def toString: String = "*"
+  }
 
-object Orient_Implicits {
+  // ChildIdx Implicits
+
+  implicit class CRId(rid: Int) extends ChildIdx {
+    override def toMsg(): pb.ChildIdx = pb.ChildIdx(pb.ChildIdx.IdxType.INT,Some(rid))
+    override def toString: String = s"$rid"
+  }
+
+  implicit class CWildCard(wc: WildCard) extends ChildIdx {
+    override def toMsg(): pb.ChildIdx = pb.ChildIdx(pb.ChildIdx.IdxType.WILD_CARD)
+    override def toString: String = "*"
+  }
+
+  // Orient Implicits
 
   implicit class XYOrient(xy : Coord) extends Orientation {
     override def toMsg(): pb.Orientation = pb.Orientation( pb.Orientation.OrientType.XY_TYPE, Some(xy.toMsg()) )
     override def toString: String = xy.toString
   }
 
-}
+  implicit class OWildCard(wc: WildCard) extends Orientation {
+    override def toMsg(): pb.Orientation = pb.Orientation( pb.Orientation.OrientType.WILD_CARD )
+    override def toString: String = "*"
+  }
 
-object TryEvent_Implicits {
+  // TryEvent Implicits
 
   implicit class TryAppEvent(appevent: AppEvent) extends TryEvent {
     override def event(): UIEvent = appevent
@@ -57,11 +75,7 @@ object TryEvent_Implicits {
     override def isTrace(): Boolean = true
   }
 
-}
-
-// Property Implicits
-
-object PropArg_Implicits {
+  // Property Argument Implicits
 
   implicit class StrArg(str:String) extends PropArg {
     override val argType = StrArgType
@@ -87,9 +101,8 @@ object PropArg_Implicits {
     override def toString: String = s"$b"
   }
 
-}
+  // Base Property Implicits
 
-object BaseProp_Implicits {
   implicit class BasePropUnit(b: Boolean) extends BaseProp {
     override def toMsg(): pb.BaseProp = {
       if (b) pb.BaseProp(pb.BaseProp.BasePropType.TOP_TYPE)
@@ -97,9 +110,8 @@ object BaseProp_Implicits {
     }
     override def toString: String = s"$b"
   }
-}
 
-object Prop_Implicits {
+  // Property Implicits
 
   implicit class LitProp(b: BaseProp) extends Prop {
     override def toMsg(): pb.Prop = {
@@ -115,9 +127,7 @@ object Prop_Implicits {
     override def toString: String = s"$b"
   }
 
-}
-
-object ViewID_Implicits {
+  // ViewID Implicits
 
   implicit class ViewNameID(name: String) extends ViewID {
     def toArg(): PropArg = new StrArg(name)
@@ -131,30 +141,3 @@ object ViewID_Implicits {
 
 }
 
-object Generator_Implicits {
-
-  implicit class UIEventGen(event: UIEvent) {
-    def *>> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) *>> next
-    def *>> (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) *>> trace
-    def *>> (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) *>> gen
-    def <+> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) <+> next
-    def <+> (trace: EventTrace): TraceGen = Path(EventTrace.trace(event)) <+> trace
-    def <+> (gen: TraceGen): TraceGen     = Path(EventTrace.trace(event)) <+> gen
-  }
-
-  implicit  class EventTraceGen(trace: EventTrace) {
-    def *>>(event: UIEvent): TraceGen   = Path(trace) *>> event
-    def *>>(next: EventTrace): TraceGen = Path(trace) *>> next
-    def *>>(gen: TraceGen): TraceGen    = Path(trace) *>> gen
-    def <+> (event: UIEvent): TraceGen   = Path(trace) <+> event
-    def <+> (next: EventTrace): TraceGen = Path(trace) <+> next
-    def <+> (gen: TraceGen): TraceGen    = Path(trace) <+> gen
-  }
-
-  implicit class PropertyBaseGen(prop: Prop) {
-    def survives (gen: TraceGen): TraceGen = {
-      Assert(prop) :>> gen :>> Assert(prop)
-    }
-  }
-
-}
