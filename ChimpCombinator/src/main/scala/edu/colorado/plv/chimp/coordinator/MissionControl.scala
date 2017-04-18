@@ -8,7 +8,8 @@ import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.duration._
-import edu.colorado.plv.chimp.combinator.{*, Assert, Click, Coord, EventTrace, Left, Orient_Implicits, Predicate, Prop, Swipe, TraceGen, Type, UIID_Implicits, ViewID_Implicits, isClickable, isEnabled}
+import edu.colorado.plv.chimp.combinator.{*, Assert, Click, Coord, EventTrace, Left, Prop, Swipe, Type, isClickable, isEnabled}
+import edu.colorado.plv.chimp.generator.TraceGen
 import org.scalacheck.Prop._
 import org.scalacheck.Test.Parameters
 import org.slf4j.LoggerFactory
@@ -180,13 +181,10 @@ object Trace_Implicits {
 
 }
 
-import edu.colorado.plv.chimp.combinator.Generator_Implicits._
-import UIID_Implicits._
-import Orient_Implicits._
-import ViewID_Implicits._
+import edu.colorado.plv.chimp.combinator.Implicits._
+import edu.colorado.plv.chimp.generator.Implicits._
+
 import Trace_Implicits._
-import edu.colorado.plv.chimp.combinator.Prop_Implicits._
-import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
 
 import org.scalacheck.Properties
 

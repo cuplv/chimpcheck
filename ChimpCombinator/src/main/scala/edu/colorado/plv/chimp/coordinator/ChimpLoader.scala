@@ -1,7 +1,7 @@
 package edu.colorado.plv.chimp.coordinator
 
 import com.typesafe.scalalogging.Logger
-import edu.colorado.plv.chimp.combinator.{EventTrace, Prop, Prop_Implicits, dummy}
+import edu.colorado.plv.chimp.combinator.{EventTrace, Prop, dummy}
 import edu.colorado.plv.fixr.bash.{Cmd, Fail, Lift, Succ}
 import edu.colorado.plv.fixr.bash.android.{Aapt, Adb, AmInstrument, Emulator}
 import edu.colorado.plv.fixr.bash.utils.{FailTry, SuccTry, doTry, repeat}
