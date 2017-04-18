@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
-// UIID = String | Int | * | XY      XY = (Int,Int)    Orientation = XY | Left | Right | UP | Down
+// UIID = String | Int | * | XY | UIID onChild Idx     Idx = Int | *     XY = (Int,Int)    Orientation = XY | Left | Right | UP | Down | *
 // AppEvent = Click(UIID) | LongClick(UIID) | Pinch(XY,XY,XY,XY) | Swipe(UIID,Orientation) | Type(UUID,String) | Sleep(Int) | Skip
 
 message UIID {
@@ -11,11 +11,23 @@ message UIID {
      NAME_ID   = 2;
      WILD_CARD = 3;
      XY_ID = 4;
+     ONCHILD_ID = 5;
   }
   required UIIDType idType = 1;
   optional int32 rid = 2;
   optional string nameid = 3;
   optional XYCoordin xyid = 4;
+  optional UIID parentId = 5;
+  optional ChildIdx childIdx = 6;
+}
+
+message ChildIdx {
+    enum IdxType {
+        INT = 1;
+        WILD_CARD = 2;
+    }
+    required IdxType idxType = 1;
+    optional int32 int = 2;
 }
 
 message XYCoordin {
@@ -30,6 +42,7 @@ message Orientation {
       RIGHT = 3;
       UP    = 4;
       DOWN  = 5;
+      WILD_CARD = 6;
    }
    required OrientType orientType = 1;
    optional XYCoordin xy = 2;
@@ -52,7 +65,6 @@ message AppEvent {
   optional Swipe swipe = 5;
   optional Type type = 6;
   optional Sleep sleep = 7;
-  // optional Skip skip = 7;
 }
 
 message Click {
