@@ -1,8 +1,6 @@
 package edu.colorado.plv.chimp.combinator
 
-import chimp.protobuf.BaseProp
 import chimp.{protobuf => pb}
-import edu.colorado.plv.chimp.combinator.PropArg_Implicits.{IntArg, StrArg}
 
 /**
   * Created by edmund on 3/29/17.

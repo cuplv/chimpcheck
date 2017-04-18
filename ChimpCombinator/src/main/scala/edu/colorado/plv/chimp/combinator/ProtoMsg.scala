@@ -34,4 +34,8 @@ object ProtoMsg {
   def mkUIEvent(event: pb.Assert): pb.UIEvent = {
     pb.UIEvent(pb.UIEvent.UIEventType.ASSERT, None, None, None, None, None, Some(event))
   }
+
+  def mkUIEvent(event: pb.Qualifies): pb.UIEvent = {
+    pb.UIEvent(pb.UIEvent.UIEventType.ASSERT, None, None, None, None, None, None, Some(event))
+  }
 }
