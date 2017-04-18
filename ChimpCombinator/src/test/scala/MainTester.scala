@@ -5,16 +5,10 @@
 import org.scalacheck.Prop._
 import org.scalacheck.Properties
 import org.scalacheck.Test.Parameters
-import edu.colorado.plv.chimp.combinator.{*, Assert, Click, Coord, EventTrace, Left, Not, Swipe, TraceGen, Type, isClickable}
-
-import edu.colorado.plv.chimp.combinator.Generator_Implicits._
-
-import edu.colorado.plv.chimp.combinator.UIID_Implicits._
-import edu.colorado.plv.chimp.combinator.Orient_Implicits._
-import edu.colorado.plv.chimp.combinator.PropArg_Implicits._
-import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
-import edu.colorado.plv.chimp.combinator.Prop_Implicits._
-import edu.colorado.plv.chimp.combinator.ViewID_Implicits._
+import edu.colorado.plv.chimp.combinator.{*, Assert, Click, Coord, EventTrace, Left, Not, Swipe, Type, isClickable}
+import edu.colorado.plv.chimp.combinator.Implicits._
+import edu.colorado.plv.chimp.generator.Implicits._
+import edu.colorado.plv.chimp.generator.TraceGen
 
 object MainTester extends Properties("String") {
 
