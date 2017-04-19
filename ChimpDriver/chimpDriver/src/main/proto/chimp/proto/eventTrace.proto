@@ -24,6 +24,7 @@ message UIEvent {
     DECIDE   = 4;
     DECIDEMANY = 5;
     ASSERT = 6;
+    QUALIFIES = 7;
   }
   required UIEventType eventType = 1;
   optional AppEvent appEvent = 2;
@@ -32,6 +33,7 @@ message UIEvent {
   optional Decide decide = 5;
   optional DecideMany decideMany = 6;
   optional Assert assert = 7;
+  optional Qualifies qualifies = 8;
 }
 
 message TryEvent {
@@ -75,4 +77,9 @@ message Alternatives {
 
 message Assert {
   required Prop props = 1;
+}
+
+message Qualifies {
+  required Prop condition = 1;
+  required EventTrace trace = 2;
 }
