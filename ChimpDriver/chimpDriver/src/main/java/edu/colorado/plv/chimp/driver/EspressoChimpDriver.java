@@ -1,11 +1,12 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.support.test.espresso.Espresso;
-import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.NoActivityResumedException;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.util.HumanReadables;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -13,19 +14,29 @@ import android.view.KeyEvent;
 import android.view.View;
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
+import edu.colorado.plv.chimp.components.ViewID;
+import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
+import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
+import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
+import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 
-import java.util.*;
-
-import static android.support.test.espresso.Espresso.pressBack;
 
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnCoord;
+import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnView;
+
+import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
+import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
+
+import java.util.ArrayList;
 
 /**
  * Created by edmund on 3/13/17.
@@ -35,7 +46,8 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     // Try Event Block
 
     @Override
-    protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent) {
+    protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryEvent)
+    throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTryEvent"), tryEvent.toString());
 
         try {
@@ -88,16 +100,24 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                                     .perform(click());
                         return click;
             case WILD_CARD:
-                View view = getClickableView();
-
-                Espresso.onView(withId(view.getId()))
-                        .perform(click());
+                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+                ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
+                Espresso.onView(vid.matcher()).perform(click());
 
                 // Should return click token with the UIID of the exact view clicked.
                 // That's what below is doing. However, find out if there is better way to retain human-readable information on
                 // this view (Display Text?)
                 AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
-                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()));
+
+                switch(vid.type()) {
+                  case RID:
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                  case DISPLAY_TEXT:
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                    case CONTENT_DESC:
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                }
+
 
                 return builder.build();
         }
@@ -119,15 +139,19 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                         .perform(longClick());
                 return longClick;
             case WILD_CARD:
+                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+                ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
+                Espresso.onView(vid.matcher()).perform(longClick());
 
-                View view = getClickableView();
-
-                Espresso.onView(withId(view.getId()))
-                        .perform(longClick());
-
-                // Should return click token with the UIID of the exact view clicked.
                 AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
-                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()));
+                switch(vid.type()) {
+                    case RID:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                    case DISPLAY_TEXT:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                    case CONTENT_DESC:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                }
 
                 return builder.build();
         }
@@ -142,35 +166,32 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         switch (uiid.getIdType()) {
             case R_ID:
                 Espresso.onView(withId(uiid.getRid()))
-                        .perform(typeText(text));
+                        .perform(typeText(text)).perform(closeSoftKeyboard());
                 return type;
             case NAME_ID:
                 Espresso.onView(withText(uiid.getNameid()))
-                        .perform(typeText(text));
+                        .perform(typeText(text)).perform(closeSoftKeyboard());
                 return type;
             case WILD_CARD:
 
-                View view = getTypeableView(); // getClickableView();
-
-                Espresso.onView(withId(view.getId()))
-                        .perform(typeText(text));
+                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+                ViewID vid = pickOne(getTypeableViewIDs(), "No available typeable views");
+                Espresso.onView(vid.matcher()).perform(typeText(text)).perform(closeSoftKeyboard());
 
                 AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
-                builder
-                  .setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(view.getId()))
-                  .setInput(text);
+                switch(vid.type()) {
+                    case RID:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())).setInput(text);
+                        break;
+                    case DISPLAY_TEXT:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())).setInput(text); break;
+                    case CONTENT_DESC:
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())).setInput(text); break;
+                }
 
                 return builder.build();
         }
-        // TODO
         return type;
-    }
-
-    @Override
-    protected AppEventOuterClass.Drag launchDragEvent(AppEventOuterClass.Drag drag) {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchDragEvent"), drag.toString());
-        // TODO
-        return drag;
     }
 
     @Override
@@ -183,42 +204,78 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     @Override
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
-        // TODO
-        return swipe;
+
+        AppEventOuterClass.UIID uiid = swipe.getUiid();
+        switch(uiid.getIdType()) {
+            case R_ID:
+                swipeOnView(uiid, Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
+                return swipe;
+            case NAME_ID:
+                swipeOnView(uiid, Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
+                return swipe;
+            case XY_ID:
+                AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type
+                swipeOnCoord(Espresso.onView(isRoot()), xy, swipe.getPos());
+            case WILD_CARD: // Wild card type
+                ViewInteraction vi;
+                try {
+                    View view = getSwipeableView();
+                    if(view.getId() != -1) {
+                        if(getResName(view).equals("statusBarBackground") ){
+                            return swipe;
+                        }
+                        vi = Espresso.onView(withId(view.getId()));
+                    } else if(view.getContentDescription() != null) {
+                        vi = Espresso.onView(withContentDescription(view.getContentDescription().toString()));
+                    }else{
+                        throw new NoViewEnabledException("can't find a view to swipe");
+                    }
+                    swipeOnView(uiid, vi, swipe.getPos());
+
+                } catch(NoViewEnabledException nvee){
+                    nvee.printStackTrace();
+                }
+
+                return swipe;
+            default:
+                return swipe;
+        }
     }
 
     @Override
     protected AppEventOuterClass.Sleep launchSleepEvent(AppEventOuterClass.Sleep sleep) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), sleep.toString());
-        try {
-            Thread.sleep(sleep.getTime());
-        } catch (Exception e) {
-            Log.e(runner.chimpTag("EspressoChimpDriver@launchSleepEvent"), "Chimp messed up while sleeping:" + e.toString());
-        }
+        Espresso.onView(isRoot()).perform(waitFor(sleep.getTime()));
         return sleep;
     }
 
     @Override
     protected void launchClickMenu() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
-        //adb shell input keyevent KEYCODE_MENU
-        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
-        // TODO
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_MENU));
     }
 
     @Override
     protected void launchClickHome() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
-        //adb shell input keyevent KEYCODE_HOME
-        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_MENU));
+        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
         // TODO
     }
 
     @Override
     protected void launchClickBack() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
-        //adb shell input keyevent KEYCODE_BACK
-        pressBack();
+        try {
+            Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
+        } catch(NoActivityResumedException e){
+            try{
+                Thread.sleep(100000);
+            } catch(InterruptedException ie) {
+                ie.printStackTrace();
+            }
+            e.printStackTrace();
+        }
+
         // TODO
     }
 
@@ -232,20 +289,42 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchResume() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "Resume");
         //adb shell input keyevent KEYCODE_APP_SWITCH && adb shell input keyevent KEYCODE_DPAD_DOWN && adb shell input keyevent KEYCODE_ENTER
-
-        // TODO
     }
 
     @Override
     protected void launchRotate() {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotateLeft"), "Rotate");
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchRotate"), "Rotate");
 
         Activity activity = getActivityInstance();
         int orientation = activity.getApplicationContext().getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
+        } else {
+            Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationPortrait());
+        }
+
+        /*
         activity.setRequestedOrientation(
                 (orientation == Configuration.ORIENTATION_PORTRAIT) ?
                         ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        */
 
+    }
+
+    // Handling Properties
+    @Override
+    protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
+                      throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchAssertEvent"), assertProp.toString());
+
+        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
+        PropResult res = check( assertProp.getProps() );
+        if (res.success) {
+            return assertProp;
+        } else {
+            throw new PropertyViolatedException("Assertion failed",res.violatedProp);
+        }
 
     }
 

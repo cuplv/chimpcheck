@@ -2,32 +2,36 @@ package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.util.TreeIterables;
+import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
-import android.support.test.runner.lifecycle.Stage;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 import chimp.protobuf.ExtEventOuterClass;
+import chimp.protobuf.Property;
+import edu.colorado.plv.chimp.components.PropertyActivityManager;
+import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
+import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
+import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
+import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
  * Created by edmund on 3/10/17.
  */
-abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
+abstract public class ChimpDriver<A extends Activity> extends PropertyActivityManager {
+
+    enum Outcome {
+        UNKNOWN, SUCCESS, CRASHED, ASSERTFAILED, BLOCKED, DRIVEREXCEPT
+    }
 
     protected EventTraceOuterClass.EventTrace trace = null;
     protected ChimpJUnitRunner runner = null;
@@ -41,49 +45,14 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
     protected boolean traceCompleted = false;
     protected boolean noOp = false;
+
+    protected Outcome outcome = Outcome.UNKNOWN;
+    protected Property.Prop violatedProp = null;
+    protected String exceptMsg = null;
+
     protected List<EventTraceOuterClass.UIEvent> completedEvents = null;
 
     protected boolean isReady() { return trace != null && runner != null; }
-
-    /*
-    protected Activity current;
-    protected Activity getActivityInstance(){
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            public void run(){
-                Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
-                for(Activity act : resumedActivity){
-                    current = act;
-                }
-            }
-        });
-        return current;
-    }
-
-    protected View getDecorView(){
-        return getActivityInstance().getWindow().getDecorView();
-    }
-
-    protected ArrayList<View> getAllClickableViews() {
-        View root = getDecorView();
-        ArrayList<View> clickableViews = new ArrayList<>();
-        for (View v : TreeIterables.breadthFirstViewTraversal(root)) {
-            if (v.isClickable()) {
-                clickableViews.add(v);
-            }
-        }
-        return clickableViews;
-    }
-    protected  View getClickableView() throws NoViewEnabledException {
-        ArrayList<View> clickableViews = getAllClickableViews();
-        if(clickableViews.isEmpty()) {
-            // WHY PEILUN? WHY IllegalStateException ?!
-            // throw new IllegalStateException("No clickable events at current state");
-            throw new NoViewEnabledException("No clickable events at current state");
-        } else {
-            return clickableViews.get(ThreadLocalRandom.current().nextInt(0, clickableViews.size()));
-        }
-    }
-    */
 
     @Before
     public void init() {
@@ -102,56 +71,103 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
         traceCompleted = false;
         noOp = false;
+        outcome = Outcome.UNKNOWN;
+
         completedEvents = new ArrayList<EventTraceOuterClass.UIEvent>();
 
         for(EventTraceOuterClass.UIEvent event :trace.getEventsList()) {
             try {
                 executeEvent(event);
             } catch (NoViewEnabledException e) {
+                Log.e(runner.chimpTag("@runTrace"), "ChimpDriver view exception: " + e.toString());
+                outcome = Outcome.BLOCKED;
                 noOp = true;
                 return;
+            } catch (NoMatchingViewException e) {
+                Log.e(runner.chimpTag("@runTrace"), "Espresso no matching view exception: " + e.toString());
+                outcome = Outcome.BLOCKED;
+                noOp = true;
+                return;
+            } catch (PropertyViolatedException e) {
+                Log.e(runner.chimpTag("@runTrace"), "Property assertion failed: " + "\n" + e.toString());
+                outcome = Outcome.ASSERTFAILED;
+                violatedProp = e.getProp();
+                return;
+            } catch (MalformedBuiltinPredicateException e) {
+                outcome = Outcome.DRIVEREXCEPT;
+                exceptMsg = e.toString();
+                return;
+            } catch (ReflectionPredicateException e) {
+                outcome = Outcome.DRIVEREXCEPT;
+                exceptMsg = e.toString();
+                return;
+            } catch (Exception e) {
+                // Trying to intercept all exceptions now.
+                /* TODO: My hunch is that we cannot distinguish between App or Chimp Driver crash here.
+                   TODO: Investigate more... */
+                Log.e(runner.chimpTag("@runTrace"), "Either App or Chimp Driver crashed: " + e.toString());
+                outcome = Outcome.CRASHED;
+                // Catch and release, because we want the Test Driver to recognize the exception and react accordingly.
+                throw e;
             }
-            // need to catch more stuff here as well, Espresso "I can't click this" exceptions
         }
 
+        Log.i(runner.chimpTag("@runTrace"), "Trace Completed!");
         traceCompleted = true;
-        // runner.addReport("Ran-Trace", Base64.encodeToString(trace.toByteArray(), Base64.DEFAULT));
+        outcome = Outcome.SUCCESS;
     }
 
     @After
-    public void compileTraceReport() {
-        if (traceCompleted) {
-            runner.addReport("ChimpTraceResult", "Success");
-        } else {
-            runner.addReport("ChimpTraceResult", "Failed");
-        }
-        if (noOp) {
-            runner.addReport("ChimpTraceBlocked", "Yes");
-        } else {
-            runner.addReport("ChimpTraceBlocked", "No");
-        }
+    public void processTraceReport() {
+        Log.i(runner.chimpTag("@processTraceReport"), "Processing trace report...");
 
-        // runner.addReport("ChimpTraceCompleted", Base64.encodeToString(trace.toByteArray(), Base64.DEFAULT));
-
+        // Append Executed Trace Report
         EventTraceOuterClass.EventTrace.Builder builder = EventTraceOuterClass.EventTrace.newBuilder();
         for(EventTraceOuterClass.UIEvent event: completedEvents) {
             builder.addEvents( event );
         }
 
         String base64Output = Base64.encodeToString(builder.build().toByteArray(), Base64.DEFAULT);
-        runner.addReport("ChimpTraceCompleted", base64Output);
+        runner.addReport("ChimpDriver-ExecutedTrace", base64Output);
+
+        // Append Assert failure report if applicable.
+        if (outcome == Outcome.ASSERTFAILED) {
+            String base64Prop = Base64.encodeToString(violatedProp.toByteArray(), Base64.DEFAULT);
+            runner.addReport("ChimpDriver-ViolatedProperty", base64Prop);
+        }
+
+        if (outcome == Outcome.DRIVEREXCEPT) {
+            runner.addReport("ChimpDriver-Exception", exceptMsg);
+        }
+
+        // Append Trace Outcome Report
+        String outcomeStr = "Unknown";
+        switch (outcome) {
+            case CRASHED: outcomeStr  = "Crashed"; break;
+            case BLOCKED: outcomeStr  = "Blocked"; break;
+            case ASSERTFAILED: outcomeStr = "AssertFailed"; break;
+            case UNKNOWN: outcomeStr  = "Unknown"; break;
+            case SUCCESS: outcomeStr  = "Success"; break;
+            case DRIVEREXCEPT: outcomeStr = "DriverExcept"; break;
+        }
+        runner.addReport("ChimpDriver-Outcome", outcomeStr);
+
+        Log.i(runner.chimpTag("@processTraceReport"), "Trace report completed!");
     }
 
     // Abstract Launch event methods
 
-    abstract protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryevent);
+    abstract protected EventTraceOuterClass.TryEvent launchTryEvent(EventTraceOuterClass.TryEvent tryevent)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException;
     abstract protected EventTraceOuterClass.Decide launchDecideEvent(EventTraceOuterClass.Decide decide);
     abstract protected EventTraceOuterClass.DecideMany launchDecideManyEvent(EventTraceOuterClass.DecideMany decideMany);
+
+    abstract protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException;
 
     abstract protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException;
     abstract protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException;
     abstract protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException;
-    abstract protected AppEventOuterClass.Drag launchDragEvent(AppEventOuterClass.Drag drag);
     abstract protected AppEventOuterClass.Pinch launchPinchEvent(AppEventOuterClass.Pinch pinch);
     abstract protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe);
     abstract protected AppEventOuterClass.Sleep launchSleepEvent(AppEventOuterClass.Sleep sleep);
@@ -181,11 +197,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
                 .setSleep(sleep).build();
     }
 
-    protected AppEventOuterClass.AppEvent mkAppEvent(AppEventOuterClass.Drag drag) {
-        return AppEventOuterClass.AppEvent.newBuilder().setEventType(AppEventOuterClass.AppEvent.AppEventType.DRAG)
-                .setDrag(drag).build();
-    }
-
     protected AppEventOuterClass.AppEvent mkAppEvent(AppEventOuterClass.Type type) {
         return AppEventOuterClass.AppEvent.newBuilder().setEventType(AppEventOuterClass.AppEvent.AppEventType.TYPE)
                 .setType(type).build();
@@ -212,13 +223,15 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
     }
 
 
-    protected void executeEvent(EventTraceOuterClass.UIEvent event) throws NoViewEnabledException {
+    protected void executeEvent(EventTraceOuterClass.UIEvent event)
+            throws NoViewEnabledException,MalformedBuiltinPredicateException,ReflectionPredicateException,PropertyViolatedException {
         switch (event.getEventType()) {
             case APPEVENT: executeEvent(event.getAppEvent()); break;
             case EXTEVENT: executeEvent(event.getExtEvent()); break;
             case TRYEVENT: executeEvent(event.getTryEvent()); break;
             case DECIDE: executeEvent(event.getDecide()); break;
             case DECIDEMANY: executeEvent(event.getDecideMany()); break;
+            case ASSERT: executeEvent(event.getAssert()); break;
         }
     }
 
@@ -227,7 +240,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
             case CLICK: executeEvent(appevent.getClick()); break;
             case LONGCLICK: executeEvent( appevent.getLongclick() ); break;
             case TYPE: executeEvent( appevent.getType() ); break;
-            case DRAG: executeEvent( appevent.getDrag() ); break;
             case PINCH: executeEvent( appevent.getPinch() ); break;
             case SWIPE: executeEvent( appevent.getSwipe() ); break;
             case SLEEP: executeEvent( appevent.getSleep() ); break;
@@ -248,7 +260,8 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
     // Try Event Block
 
-    protected void executeEvent(EventTraceOuterClass.TryEvent tryEvent) {
+    protected void executeEvent(EventTraceOuterClass.TryEvent tryEvent)
+                throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
         Log.i(runner.chimpTag("@executeEvent"), tryEvent.toString());
         EventTraceOuterClass.TryEvent newTryEvent = launchTryEvent(tryEvent);
 
@@ -278,6 +291,13 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
         );
     }
 
+    protected void executeEvent(EventTraceOuterClass.Assert assertProp)
+            throws MalformedBuiltinPredicateException,ReflectionPredicateException,PropertyViolatedException {
+        Log.i(runner.chimpTag("@executeEvent"), assertProp.toString());
+        launchAssertEvent(assertProp);
+        // Currently throwing away the response: For now, don't log assert P's.
+    }
+
     // User Events
 
     protected void executeEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
@@ -296,12 +316,6 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
         Log.i(runner.chimpTag("@executeEvent"), type.toString());
         AppEventOuterClass.Type launchedType = launchTypeEvent(type);
         completedEvents.add( mkUIEvent(mkAppEvent(launchedType)) );
-    }
-
-    protected void executeEvent(AppEventOuterClass.Drag drag) {
-        Log.i(runner.chimpTag("@executeEvent"), drag.toString());
-        AppEventOuterClass.Drag launchedDrag = launchDragEvent(drag);
-        completedEvents.add( mkUIEvent(mkAppEvent(launchedDrag)) );
     }
 
     protected void executeEvent(AppEventOuterClass.Pinch pinch) {
@@ -327,7 +341,7 @@ abstract public class ChimpDriver<A extends Activity> extends ActivityManager {
 
     protected void executeEvent(ExtEventOuterClass.ClickBack clickBack) {
         Log.i(runner.chimpTag("@executeEvent"), clickBack.toString());
-        launchClickHome();
+        launchClickBack();
         completedEvents.add(
                 mkUIEvent(ExtEventOuterClass.ExtEvent.newBuilder().setEventType(ExtEventOuterClass.ExtEvent.ExtEventType.CLICKBACK).build())
         );

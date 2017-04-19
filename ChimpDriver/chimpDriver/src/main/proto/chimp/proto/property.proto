@@ -2,6 +2,10 @@ syntax = "proto2";
 
 package chimp.protobuf;
 
+//  args ::=  n  |  s  |  b  | args,args
+//  B    ::=  BOT  |  TOP  |  p(args)  |  B /\ B  |  B \/ B  | ! B
+//  P    ::=  B  |  B => B  |  P /\ P  |  P \/ P
+
 message Arg {
     enum ArgType {
         INT_ARG = 1;
@@ -24,6 +28,9 @@ message BaseProp {
         PRIM_TYPE = 1;
         CONJ_BASE_TYPE = 2;
         DISJ_BASE_TYPE = 3;
+        TOP_TYPE = 4;
+        BOT_TYPE = 5;
+        NEG_TYPE = 6;
     }
     required BasePropType propType = 1;
     optional Pred pred = 2;

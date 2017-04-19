@@ -20,6 +20,7 @@ public class ChimpJUnitRunner extends AndroidJUnitRunner {
     private static final String TAG = null;
     private EventTraceOuterClass.EventTrace eventTrace;
     private String chimpName;
+    private String syncFile;
     private boolean inputIsWelformed = true;
 
     private Map<String, String> chimpReports = new HashMap<String, String>();
@@ -46,6 +47,8 @@ public class ChimpJUnitRunner extends AndroidJUnitRunner {
             }
 
             chimpName = arguments.getString("chimpName", "Caesar");
+
+            syncFile = arguments.getString("syncFile", "sync-file");
         }
     }
 
@@ -72,5 +75,7 @@ public class ChimpJUnitRunner extends AndroidJUnitRunner {
     public void printOnLogCat(String tag, String data) {
         Log.i(String.format("%s:%s",chimpName, tag), data);
     }
+
+    public String getSyncFile() { return syncFile; }
 
 }
