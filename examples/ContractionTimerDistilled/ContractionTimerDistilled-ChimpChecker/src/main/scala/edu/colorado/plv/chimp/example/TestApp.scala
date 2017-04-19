@@ -3,15 +3,13 @@ package edu.colorado.plv.chimp.example
 import com.peilunzhang.contractiontimerdistilled.R
 import com.typesafe.scalalogging.Logger
 import edu.colorado.plv.chimp.combinator.{Assert, Rotate, _}
-import edu.colorado.plv.chimp.combinator.UIID_Implicits._
+import edu.colorado.plv.chimp.combinator.Implicits._
+import edu.colorado.plv.chimp.generator.Implicits._
 import edu.colorado.plv.chimp.coordinator.ChimpLoader
+import edu.colorado.plv.chimp.generator.Gorilla
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
-import edu.colorado.plv.chimp.combinator.Prop_Implicits._
-import edu.colorado.plv.chimp.combinator.BaseProp_Implicits._
-import edu.colorado.plv.chimp.combinator.PropArg_Implicits._
-import edu.colorado.plv.chimp.combinator.ViewID_Implicits._
 
 /**
   * Created by edmund on 3/11/17.
