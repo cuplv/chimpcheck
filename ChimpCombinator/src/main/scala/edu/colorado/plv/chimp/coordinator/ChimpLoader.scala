@@ -65,30 +65,7 @@ object ChimpLoader {
     Await.result(kickBackFut, 20000 millis)
 
     instrOut match {
-      case SuccTry(o) => {
-         /*
-         var results:Option[Boolean] = None
-         var trace:Option[EventTrace] = None
-         for(seg <- o.replace("\n","").split("INSTRUMENTATION")) {
-           if(seg contains "ChimpTraceResult") {
-             extractValueWithKey("ChimpTraceResult", seg) match {
-               case "Success" => results = Some(true)
-               case "Failed"  => results = Some(false)
-               case default   =>
-             }
-           }
-           if(seg contains "ChimpTraceCompleted") {
-             // val trstr = extractValueWithKey("ChimpTraceCompleted", seg)
-             // println(s"Here it is: $trstr")
-             trace = Some( EventTrace.fromBase64( extractValueWithKey("ChimpTraceCompleted", seg) ) )
-           }
-         }
-        (trace,results) match {
-          case (Some(tr),Some(res)) => Some( ChimpTraceResults(tr,res) )
-          case default => None
-        } */
-        parseOutcome(o)
-      }
+      case SuccTry(o) => parseOutcome(o)
       case FailTry(Fail(c, ec, o, e)) => {
         ChimpLoaderFailedChimpOutcome( s"Failed while bashing with Adb. Exitcode: $ec ; ErrOut: $e" )
       }
