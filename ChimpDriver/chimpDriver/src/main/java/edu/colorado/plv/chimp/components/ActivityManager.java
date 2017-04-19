@@ -11,6 +11,7 @@ import android.support.test.runner.lifecycle.Stage;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ListView;
 
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 
@@ -225,9 +226,18 @@ public class ActivityManager {
             // Default case: Revert to the standard view hierarchy
             Log.i("Chimp@getViews", "Using view hierarchy to obtain clickable views");
             for(View v: getAllViews( allOf(isClickable(), notSupportsInputMethods(), isEnabled(), isDisplayed()))) {
+                if(v instanceof ListView){
+                    System.out.println(v.toString() + "\n" + v.getWidth() + " " + v.getHeight());
+                    ListView lv = (ListView) v;
+                    int n = lv.getChildCount();
+                    if(n != 0) {
+                        ids.add(ViewID.mkList(v.getId(), 1));
+                    }
+                }
                 if (v.getId() != -1) {
                     Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString());
                     ids.add(ViewID.mkRID(v.getId()));
+
                 } else {
                     Log.i("Chimp@getViews", "Clickable view with no RID (revert to content desc): " + v.toString());
                     ids.add(ViewID.mkDesc(v.getContentDescription().toString()));

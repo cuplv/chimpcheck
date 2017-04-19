@@ -1,7 +1,12 @@
 package edu.colorado.plv.chimp.components;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -23,7 +28,7 @@ abstract public class ViewID {
     public String getDesc() { return "<No Description>"; }
 
     public static enum ViewIDType {
-        RID, DISPLAY_TEXT, CONTENT_DESC
+        RID, DISPLAY_TEXT, CONTENT_DESC, LIST_VIEW
     }
 
     public static ViewID mkRID(final int rid) {
@@ -65,4 +70,56 @@ abstract public class ViewID {
         };
     }
 
+    public static ViewID mkList(final int rid, final int child) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return ViewID.childAtPosition(withId(rid), child); }
+            @Override
+            public ViewIDType type() { return ViewIDType.LIST_VIEW; }
+            @Override
+            public String toString() { return String.format("View(CONTENT_DESC:%s)", rid); }
+            @Override
+            public int getID() { return rid; }
+        };
+    }
+
+    public static Matcher<View> childAtPosition(
+            final Matcher<View> parentMatcher, final int position) {
+
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
+    }
+    public static Matcher<View> validXY(
+            final Matcher<View> parentMatcher) {
+
+        return new TypeSafeMatcher<View>() {
+
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("XY MATHCER");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                float x = view.getX();
+                float y = view.getY();
+                return x != 0 && y != 0;
+
+            }
+        };
+    }
 }
