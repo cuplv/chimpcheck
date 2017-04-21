@@ -54,6 +54,7 @@ object ChimpLoader {
       instTest <- Adb.target(emuID).install(chimpAPKPath) ! ;
 
       instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("syncFile",kickBackLockName)
+          .extra("coverage", "true")
         .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!! ;
 
       wait <- Lift !!! Thread.sleep(1000) ;
