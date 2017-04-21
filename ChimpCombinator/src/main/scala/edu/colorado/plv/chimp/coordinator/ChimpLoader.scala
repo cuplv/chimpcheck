@@ -57,7 +57,7 @@ object ChimpLoader {
         .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!! ;
 
       wait <- Lift !!! Thread.sleep(1000) ;
-      kill <- Adb.shell(s"am force-stop $appPackageName") !
+      kill <- Adb.target(emuID).shell(s"am force-stop $appPackageName") !
     } yield instrOut
 
     // println(s"Done! $instrOut")
