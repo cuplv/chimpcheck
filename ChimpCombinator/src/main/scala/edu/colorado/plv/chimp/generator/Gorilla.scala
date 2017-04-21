@@ -36,3 +36,10 @@ case class Gorilla(gorillaConfig: GorillaConfig) extends TraceGen {
     Repeat(gorillaConfig.steps, ChooseWithFreq(gorillaConfig.freqs)).generator()
   }
 }
+
+
+case class SubservientGorilla(gen: TraceGen) (implicit gorillaConfig: GorillaConfig) extends TraceGen {
+  override def generator(): Gen[EventTrace] = {
+    Repeat(gorillaConfig.steps, gen :>> ChooseWithFreq(gorillaConfig.freqs)).generator()
+  }
+}
