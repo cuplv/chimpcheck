@@ -33,6 +33,7 @@ import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withChild;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -128,7 +129,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         switch (uiid.getIdType()) {
             case R_ID:
                 int rid = uiid.getRid();
-                Espresso.onView(withId(rid))
+                Espresso.onView( allOf( withId(rid) , isDisplayed()) )
                         .perform(click());
 
                 return click;
@@ -141,9 +142,11 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                             .perform(click());
 
                 } catch (NoMatchingViewException e){
-                    Espresso.onView(withContentDescription(uiid.getNameid()))
+                    Espresso.onView( allOf( withContentDescription(uiid.getNameid()) , isDisplayed()) )
                             .perform(click());
                 }
+
+                return click;
 
             case ONCHILD_ID:
                 switch(uiid.getParentId().getIdType()){
@@ -168,6 +171,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
                         .perform(longClick());
 
+                return click;
 
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
@@ -281,7 +285,9 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 return type;
             case NAME_ID:
                 Espresso.onView(withText(uiid.getNameid()))
-                        .perform(typeText(text)).perform(closeSoftKeyboard());
+                        .perform(typeText(text));
+                Espresso.onView(isRoot())
+                        .perform(closeSoftKeyboard());
                 return type;
             case WILD_CARD:
 
