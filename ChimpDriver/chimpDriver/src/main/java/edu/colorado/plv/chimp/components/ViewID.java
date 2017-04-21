@@ -11,6 +11,7 @@ import org.hamcrest.TypeSafeMatcher;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Created by edmund on 4/3/17.
@@ -82,6 +83,18 @@ abstract public class ViewID {
             public int getID() { return rid; }
         };
     }
+    public static ViewID mkList(final String rid, final int child) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return ViewID.childAtPosition(withContentDescription(rid), child); }
+            @Override
+            public ViewIDType type() { return ViewIDType.LIST_VIEW; }
+            @Override
+            public String toString() { return String.format("View(CONTENT_DESC:%s)", rid); }
+            @Override
+            public String getDesc() { return rid; }
+        };
+    }
 
     public static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
@@ -101,24 +114,22 @@ abstract public class ViewID {
             }
         };
     }
-    public static Matcher<View> validXY(
-            final Matcher<View> parentMatcher) {
+    public static Matcher<View> validOptionsMenu(String text){
+        return validOptionsMenu(is(text));
 
+    }
+    public static Matcher<View> validOptionsMenu(
+            final Matcher<? extends CharSequence> charSequenceMatcher) {
         return new TypeSafeMatcher<View>() {
-
-
             @Override
             public void describeTo(Description description) {
-                description.appendText("XY MATHCER");
-                parentMatcher.describeTo(description);
+                description.appendText("with content description and XY: ");
+                charSequenceMatcher.describeTo(description);
             }
 
             @Override
             public boolean matchesSafely(View view) {
-                float x = view.getX();
-                float y = view.getY();
-                return x != 0 && y != 0;
-
+                return charSequenceMatcher.matches(view.getContentDescription()) && view.getX()!=0.0 && view.getY() !=0.0;
             }
         };
     }

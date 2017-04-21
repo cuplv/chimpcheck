@@ -6,11 +6,13 @@ import android.app.Fragment;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.*;
 import android.support.test.espresso.util.TreeIterables;
+import android.support.test.runner.intent.IntentCallback;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
@@ -231,14 +233,29 @@ public class ActivityManager {
                     ListView lv = (ListView) v;
                     int n = lv.getChildCount();
                     if(n != 0) {
-                        ids.add(ViewID.mkList(v.getId(), 1));
+                        int rand = seed.nextInt(n);
+                        Log.i("Chimp@getViews", "Clickable view with RID: " + "Random is" + Integer.toString(rand) + " n is" + Integer.toString(n));
+                        ids.add(ViewID.mkList(v.getId(), rand));
+                        continue;
                     }
+                }
+                 if(v instanceof LinearLayout){
+                    LinearLayout ll = (LinearLayout) v;
+                     int n = ll.getChildCount();
+                     if(n != 0) {
+                         int rand = seed.nextInt(n);
+                         Log.i("Chimp@getViews", "Clickable view with RID: " + "Random is" + Integer.toString(rand) + " n is" + Integer.toString(n));
+                         ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
+                         continue;
+                     }
+
                 }
                 if (v.getId() != -1) {
                     Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString());
                     ids.add(ViewID.mkRID(v.getId()));
 
                 } else {
+
                     Log.i("Chimp@getViews", "Clickable view with no RID (revert to content desc): " + v.toString());
                     ids.add(ViewID.mkDesc(v.getContentDescription().toString()));
                 }
