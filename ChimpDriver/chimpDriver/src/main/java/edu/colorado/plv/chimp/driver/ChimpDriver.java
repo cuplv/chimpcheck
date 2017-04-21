@@ -162,6 +162,9 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
     abstract protected EventTraceOuterClass.Decide launchDecideEvent(EventTraceOuterClass.Decide decide);
     abstract protected EventTraceOuterClass.DecideMany launchDecideManyEvent(EventTraceOuterClass.DecideMany decideMany);
 
+    abstract protected EventTraceOuterClass.Qualifies launchQualifiesEvent(EventTraceOuterClass.Qualifies qualifies)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException, NoViewEnabledException;
+
     abstract protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
             throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException;
 
@@ -232,6 +235,7 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
             case DECIDE: executeEvent(event.getDecide()); break;
             case DECIDEMANY: executeEvent(event.getDecideMany()); break;
             case ASSERT: executeEvent(event.getAssert()); break;
+            case QUALIFIES: executeEvent(event.getQualifies()); break;
         }
     }
 
@@ -289,6 +293,12 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
            EventTraceOuterClass.UIEvent.newBuilder().setEventType(EventTraceOuterClass.UIEvent.UIEventType.DECIDEMANY)
                 .setDecideMany(newDecideMany).build()
         );
+    }
+
+    protected void executeEvent(EventTraceOuterClass.Qualifies qualifies)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException, NoViewEnabledException {
+        Log.i(runner.chimpTag("@executeEvent"), qualifies.toString());
+        launchQualifiesEvent(qualifies);
     }
 
     protected void executeEvent(EventTraceOuterClass.Assert assertProp)

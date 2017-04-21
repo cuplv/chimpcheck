@@ -86,6 +86,26 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         return decideMany;
     }
 
+    @Override
+    protected EventTraceOuterClass.Qualifies launchQualifiesEvent(EventTraceOuterClass.Qualifies qualifies)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException, NoViewEnabledException {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchQualifiesEvent"), qualifies.toString());
+
+        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
+        PropResult res = check( qualifies.getCondition() );
+
+        if (res.success) {
+            for (EventTraceOuterClass.UIEvent uiEvent : qualifies.getTrace().getEventsList()) {
+                executeEvent( uiEvent );
+            }
+        } else {
+            Log.i(runner.chimpTag("EspressoChimpDriver@launchQualifiesEvent"),"Condition failed: " + qualifies.getCondition().toString());
+        }
+
+        return qualifies;
+    }
+
     // User Events
 
     @Override
