@@ -2,6 +2,7 @@
 Combinator Library for writing test generators and test properties for Android Apps
 
 By Edmund Lam, Peilun Zhang and Bor-Yuh Evan Chang
+
 edmund.lam@colorado.edu, peilun.zhang@colorado.edu and evan.chang@colorado.edu
 
 ## Quick Overview
