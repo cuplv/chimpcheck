@@ -10,7 +10,14 @@ import edu.colorado.plv.chimp.generator.{AlternativeG, TraceGen}
 object AppEvent {
   def fromProto(appevent: pb.AppEvent): AppEvent = {
     appevent.eventType match {
-      case pb.AppEvent.AppEventType.CLICK     => Click( UIID.fromProto(appevent.getClick.uiid) )
+      case pb.AppEvent.AppEventType.CLICK     => {
+        appevent.getClick.display match {
+          case None => Click (UIID.fromProto (appevent.getClick.uiid) )
+          case Some(disp) => {
+            Click(UIID.fromProto (appevent.getClick.uiid) ).setDisplay(disp)
+          }
+        }
+      }
       case pb.AppEvent.AppEventType.LONGCLICK => LongClick( UIID.fromProto(appevent.getLongclick.uiid) )
       case pb.AppEvent.AppEventType.TYPE      => Type( UIID.fromProto(appevent.getType.uiid), appevent.getType.input)
       case pb.AppEvent.AppEventType.PINCH     =>
@@ -31,9 +38,20 @@ abstract class AppEvent extends UIEvent {
 }
 
 case class Click(uiid: UIID) extends AppEvent {
+  var optDisp: Option[String] = None
+  def setDisplay(display: String): AppEvent = {
+    optDisp = Some(display)
+    this
+  }
   override def toMsg(): pb.UIEvent = {
     ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.CLICK,
       Some(pb.Click(uiid.toMsg()))))
+  }
+  override def toString: String = {
+    optDisp match {
+      case None => s"Click($uiid)"
+      case Some(display) => s"Click($display)"
+    }
   }
 }
 case class LongClick(uiid: UIID) extends AppEvent {
