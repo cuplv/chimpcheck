@@ -358,13 +358,21 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
             case R_ID:
                 Espresso.onView(withId(uiid.getRid()))
                         .perform(typeText(text)).perform(closeSoftKeyboard());
-                return type;
+                AppEventOuterClass.Type.Builder typeBuilder= AppEventOuterClass.Type.newBuilder();
+                typeBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                        .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                        .setRid(uiid.getRid())).setDisplay(getResName(uiid.getRid()));
+                return typeBuilder.build();
             case NAME_ID:
                 Espresso.onView(withText(uiid.getNameid()))
                         .perform(typeText(text));
                 Espresso.onView(isRoot())
                         .perform(closeSoftKeyboard());
-                return type;
+                typeBuilder= AppEventOuterClass.Type.newBuilder();
+                typeBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                        .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                        .setRid(uiid.getRid())).setDisplay(uiid.getNameid());
+                return typeBuilder.build();
             case WILD_CARD:
 
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
@@ -378,12 +386,18 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
                 switch(vid.type()) {
                     case RID:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())).setInput(text);
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                                .setRid(vid.getID())).setInput(text).setDisplay(getResName(vid.getID()));
                         break;
                     case DISPLAY_TEXT:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())).setInput(text); break;
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                                .setNameid(vid.getText())).setInput(text).setDisplay(vid.getText());
+                        break;
                     case CONTENT_DESC:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())).setInput(text); break;
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                                .setNameid(vid.getDesc())).setInput(text).setDisplay(vid.getDesc());
+                        break;
                 }
 
                 return builder.build();
