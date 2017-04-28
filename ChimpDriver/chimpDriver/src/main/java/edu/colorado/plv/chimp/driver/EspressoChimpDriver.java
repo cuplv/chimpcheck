@@ -28,6 +28,7 @@ import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
+import static android.support.test.espresso.Espresso.registerIdlingResources;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.longClick;
@@ -132,8 +133,13 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 Espresso.onView( allOf( withId(rid) , isDisplayed()) )
                         .perform(click());
 
-                return click;
 
+                AppEventOuterClass.Click.Builder clickBuilder= AppEventOuterClass.Click.newBuilder();
+                clickBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                    .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                                    .setRid(uiid.getRid())).setDisplay(getResName(rid));
+
+                return clickBuilder.build();
             case NAME_ID:
 
                 try {
@@ -146,39 +152,44 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                             .perform(click());
                 }
 
+
                 return click;
 
             case ONCHILD_ID:
                 switch(uiid.getParentId().getIdType()){
                     case R_ID:
-                        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Id is " + uiid.getRid() );
                         Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
-                                .perform(longClick());
-                        return click;
+                                .perform(click());
+                        clickBuilder = AppEventOuterClass.Click.newBuilder();
+                        clickBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.ONCHILD_ID)
+                                .setParentId(uiid.getParentId()).setChildIdx(uiid.getChildIdx()))
+                                .setDisplay("Click on child " + Integer.toString(uiid.getChildIdx().getInt())
+                                            + " of " + getResName(uiid.getParentId().getRid()));
+                        return clickBuilder.build();
                     case NAME_ID:
                         try {
                             Espresso.onView(ViewID.childAtPosition(withText(uiid.getParentId().getNameid()), uiid.getChildIdx().getInt()))
-                                    .perform(longClick());
+                                    .perform(click());
                         }catch(NoMatchingViewException ne){
                             Espresso.onView(ViewID.childAtPosition(withContentDescription(uiid.getParentId().getNameid()), uiid.getChildIdx().getInt()))
-                                    .perform(longClick());
+                                    .perform(click());
                         }
+                        clickBuilder = AppEventOuterClass.Click.newBuilder();
+                        clickBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.ONCHILD_ID)
+                                .setParentId(uiid.getParentId()).setChildIdx(uiid.getChildIdx()))
+                                .setDisplay("Click on child " + Integer.toString(uiid.getChildIdx().getInt())
+                                        + " of " + uiid.getParentId().getNameid());
+                        return clickBuilder.build();
+                    default:
                         return click;
-
-
                 }
-                Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Id is " + uiid.getRid() );
-                Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
-                        .perform(longClick());
-
-                return click;
 
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
                 ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
 
-
-                
                 try{
                     Espresso.onView(vid.matcher()).perform(click());
                 } catch(NoMatchingViewException e){
@@ -198,13 +209,24 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
 
                 switch(vid.type()) {
                   case RID:
-                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                              .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                              .setRid(vid.getID()));
+                      break;
                   case DISPLAY_TEXT:
-                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                              .setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                              .setNameid(vid.getText())).setDisplay(vid.getText());
+                      break;
                     case CONTENT_DESC:
-                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                      builder.setUiid(AppEventOuterClass.UIID.newBuilder().
+                              setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                              .setNameid(vid.getDesc())).setDisplay(vid.getDesc());
+                        break;
                     case LIST_VIEW:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                                .setRid(vid.getID())).setDisplay(vid.getDesc()); break;
                 }
 
 
@@ -215,34 +237,72 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     }
 
     @Override
-    protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
-        AppEventOuterClass.UIID uiid = longClick.getUiid();
+    protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick click) throws NoViewEnabledException {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
+        AppEventOuterClass.UIID uiid = click.getUiid();
         switch (uiid.getIdType()) {
             case R_ID:
-                Espresso.onView(withId(uiid.getRid()))
+                int rid = uiid.getRid();
+                Espresso.onView( allOf( withId(rid) , isDisplayed()) )
                         .perform(longClick());
-                return longClick;
+
+
+                AppEventOuterClass.LongClick.Builder clickBuilder= AppEventOuterClass.LongClick.newBuilder();
+                clickBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                        .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                        .setRid(uiid.getRid())).setDisplay(getResName(rid));
+
+                return clickBuilder.build();
             case NAME_ID:
+
                 try {
 
                     Espresso.onView(withText(uiid.getNameid()))
                             .perform(longClick());
-                } catch (NoMatchingViewException e){
-                    Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Cannot click with text so use content description");
-                    Espresso.onView(withContentDescription(uiid.getNameid()))
-                            .perform(longClick());
-                } finally {
-                    return longClick;
-                }
-            case ONCHILD_ID:
 
-                Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Id is " + uiid.getRid() );
-                Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
-                        .perform(longClick());
+                } catch (NoMatchingViewException e){
+                    Espresso.onView( allOf( withContentDescription(uiid.getNameid()) , isDisplayed()) )
+                            .perform(longClick());
+                }
+
+
+                return click;
+
+            case ONCHILD_ID:
+                switch(uiid.getParentId().getIdType()){
+                    case R_ID:
+                        Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
+                                .perform(click());
+                        clickBuilder = AppEventOuterClass.LongClick.newBuilder();
+                        clickBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.ONCHILD_ID)
+                                .setParentId(uiid.getParentId()).setChildIdx(uiid.getChildIdx()))
+                                .setDisplay("Click on child " + Integer.toString(uiid.getChildIdx().getInt())
+                                        + " of " + getResName(uiid.getParentId().getRid()));
+                        return clickBuilder.build();
+                    case NAME_ID:
+                        try {
+                            Espresso.onView(ViewID.childAtPosition(withText(uiid.getParentId().getNameid()), uiid.getChildIdx().getInt()))
+                                    .perform(click());
+                        }catch(NoMatchingViewException ne){
+                            Espresso.onView(ViewID.childAtPosition(withContentDescription(uiid.getParentId().getNameid()), uiid.getChildIdx().getInt()))
+                                    .perform(click());
+                        }
+                        clickBuilder = AppEventOuterClass.LongClick.newBuilder();
+                        clickBuilder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.ONCHILD_ID)
+                                .setParentId(uiid.getParentId()).setChildIdx(uiid.getChildIdx()))
+                                .setDisplay("Click on child " + Integer.toString(uiid.getChildIdx().getInt())
+                                        + " of " + uiid.getParentId().getNameid());
+                        return clickBuilder.build();
+                    default:
+                        return click;
+                }
+
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
                 ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
+
                 try{
                     Espresso.onView(vid.matcher()).perform(longClick());
                 } catch(NoMatchingViewException e){
@@ -255,22 +315,38 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                     pe.printStackTrace();
                 }
 
+                // Should return click token with the UIID of the exact view clicked.
+                // That's what below is doing. However, find out if there is better way to retain human-readable information on
+                // this view (Display Text?)
                 AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
+
                 switch(vid.type()) {
                     case RID:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                                .setRid(vid.getID()));
+                        break;
                     case DISPLAY_TEXT:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                                .setNameid(vid.getText())).setDisplay(vid.getText());
+                        break;
                     case CONTENT_DESC:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().
+                                setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                                .setNameid(vid.getDesc())).setDisplay(vid.getDesc());
+                        break;
                     case LIST_VIEW:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
-
+                        builder.setUiid(AppEventOuterClass.UIID.newBuilder()
+                                .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
+                                .setRid(vid.getID())).setDisplay(vid.getDesc()); break;
                 }
+
 
                 return builder.build();
         }
-        return longClick;
+
+        return click;
     }
 
     @Override

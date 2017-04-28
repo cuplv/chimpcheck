@@ -158,8 +158,10 @@ public class ActivityManager {
         }
         return ids;
     }
-
-    protected String getResName(View v){
+    protected String getResName(int rid){
+        return getDecorView().getResources().getResourceEntryName(rid);
+    }
+    protected static String getResName(View v){
         if(v == null) return "";
         if(v.getId() == -1){
             if(v.getContentDescription() != null) {
@@ -229,13 +231,20 @@ public class ActivityManager {
             Log.i("Chimp@getViews", "Using view hierarchy to obtain clickable views");
             for(View v: getAllViews( allOf(isClickable(), notSupportsInputMethods(), isEnabled(), isDisplayed()))) {
                 if(v instanceof ListView){
-                    System.out.println(v.toString() + "\n" + v.getWidth() + " " + v.getHeight());
                     ListView lv = (ListView) v;
                     int n = lv.getChildCount();
                     if(n != 0) {
                         int rand = seed.nextInt(n);
-                        Log.i("Chimp@getViews", "Clickable view with RID: " + "Random is" + Integer.toString(rand) + " n is" + Integer.toString(n));
-                        ids.add(ViewID.mkList(v.getId(), rand));
+                        if(v.getId() != -1) {
+                            if (getResName(v.getId()) != null) {
+                                ids.add(ViewID.mkList(getResName(v.getId()), rand));
+                            } else {
+                                ids.add(ViewID.mkList(v.getId(), rand));
+                            }
+                            continue;
+                        } else {
+                            ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
+                        }
                         continue;
                     }
                 }
@@ -244,9 +253,16 @@ public class ActivityManager {
                      int n = ll.getChildCount();
                      if(n != 0) {
                          int rand = seed.nextInt(n);
-                         Log.i("Chimp@getViews", "Clickable view with RID: " + "Random is" + Integer.toString(rand) + " n is" + Integer.toString(n));
-                         ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
-                         continue;
+                         if(v.getId() != -1) {
+                             if (getResName(v.getId()) != null) {
+                                 ids.add(ViewID.mkList(getResName(v.getId()), rand));
+                             } else {
+                                 ids.add(ViewID.mkList(v.getId(), rand));
+                             }
+                             continue;
+                         } else {
+                             ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
+                         }
                      }
 
                 }

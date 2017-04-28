@@ -78,7 +78,7 @@ abstract public class ViewID {
             @Override
             public ViewIDType type() { return ViewIDType.LIST_VIEW; }
             @Override
-            public String toString() { return String.format("View(CONTENT_DESC:%s)", rid); }
+            public String toString() { return String.format("View(child %d of %s)", child, rid); }
             @Override
             public int getID() { return rid; }
         };
