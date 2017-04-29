@@ -10,9 +10,30 @@ import edu.colorado.plv.chimp.generator.{AlternativeG, TraceGen}
 object AppEvent {
   def fromProto(appevent: pb.AppEvent): AppEvent = {
     appevent.eventType match {
-      case pb.AppEvent.AppEventType.CLICK     => Click( UIID.fromProto(appevent.getClick.uiid) )
-      case pb.AppEvent.AppEventType.LONGCLICK => LongClick( UIID.fromProto(appevent.getLongclick.uiid) )
-      case pb.AppEvent.AppEventType.TYPE      => Type( UIID.fromProto(appevent.getType.uiid), appevent.getType.input)
+      case pb.AppEvent.AppEventType.CLICK     => {
+        appevent.getClick.display match {
+          case None => Click (UIID.fromProto (appevent.getClick.uiid) )
+          case Some(disp) => {
+            Click(UIID.fromProto (appevent.getClick.uiid) ).setDisplay(disp)
+          }
+        }
+      }
+      case pb.AppEvent.AppEventType.LONGCLICK => {
+          appevent.getLongclick.display match {
+            case None => LongClick (UIID.fromProto (appevent.getLongclick.uiid) )
+            case Some(disp) => {
+              LongClick(UIID.fromProto (appevent.getLongclick.uiid) ).setDisplay(disp)
+            }
+          }
+      }
+      case pb.AppEvent.AppEventType.TYPE      => {
+        appevent.getType.display match {
+          case None => Type (UIID.fromProto (appevent.getType.uiid), appevent.getType.input)
+          case Some(disp) => {
+            Type( UIID.fromProto(appevent.getType.uiid), appevent.getType.input).setDisplay(disp)
+          }
+        }
+      }
       case pb.AppEvent.AppEventType.PINCH     =>
         Pinch( Coord.fromProto(appevent.getPinch.start1), Coord.fromProto(appevent.getPinch.start2),
           Coord.fromProto(appevent.getPinch.end1), Coord.fromProto(appevent.getPinch.end2) )
@@ -31,15 +52,37 @@ abstract class AppEvent extends UIEvent {
 }
 
 case class Click(uiid: UIID) extends AppEvent {
+  var optDisp: Option[String] = None
+  def setDisplay(display: String): AppEvent = {
+    optDisp = Some(display)
+    this
+  }
   override def toMsg(): pb.UIEvent = {
     ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.CLICK,
       Some(pb.Click(uiid.toMsg()))))
   }
+  override def toString: String = {
+    optDisp match {
+      case None => s"Click($uiid)"
+      case Some(display) => s"Click($display)"
+    }
+  }
 }
 case class LongClick(uiid: UIID) extends AppEvent {
+  var optDisp: Option[String] = None
+  def setDisplay(display: String): AppEvent = {
+    optDisp = Some(display)
+    this
+  }
   override def toMsg(): pb.UIEvent = {
     ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.LONGCLICK,
       None, Some(pb.LongClick(uiid.toMsg()))))
+  }
+  override def toString: String = {
+    optDisp match {
+      case None => s"LongClick($uiid)"
+      case Some(display) => s"LongClick($display)"
+    }
   }
 }
 
@@ -52,6 +95,11 @@ case class Pinch(start1: Coord, start2:Coord, end1: Coord, end2:Coord) extends A
 }
 
 case class Swipe(uiid: UIID, orient: Orientation) extends AppEvent {
+  var optDisp: Option[String] = None
+  def setDisplay(display: String): AppEvent = {
+    optDisp = Some(display)
+    this
+  }
   override def toMsg(): pb.UIEvent = {
     ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.SWIPE,
       None, None, None, Some(pb.Swipe(uiid.toMsg(), orient.toMsg()))))
@@ -59,9 +107,20 @@ case class Swipe(uiid: UIID, orient: Orientation) extends AppEvent {
 }
 
 case class Type(uiid:UIID, input:String) extends AppEvent {
+  var optDisp: Option[String] = None
+  def setDisplay(display: String): AppEvent = {
+    optDisp = Some(display)
+    this
+  }
   override def toMsg(): pb.UIEvent = {
     ProtoMsg.mkUIEvent (pb.AppEvent(pb.AppEvent.AppEventType.TYPE,
       None, None, None, None, Some(pb.Type(uiid.toMsg(), input))))
+  }
+  override def toString: String = {
+    optDisp match {
+      case None => s"Type($uiid)"
+      case Some(display) => s"Type($display)"
+    }
   }
 }
 case class Sleep(time: Int) extends AppEvent {

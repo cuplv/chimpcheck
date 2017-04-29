@@ -16,7 +16,7 @@ import scala.util.Random
   */
 object ChimpLoader {
 
-  def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, packageNamesOpt:Option[(String,String)])
+  def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, packageNamesOpt:Option[(String,String)], reinstall:Boolean)
                (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = {
     val b64ProtoTrace = eventTrace.toBase64()
 
@@ -40,24 +40,38 @@ object ChimpLoader {
 
     val kickBackFut:Future[Unit] = Future { kickBack(emuID, appPackageName, kickBackLockName) }
 
+    if (reinstall) {
+      val instTest = for {
+        uninstApp <- doTry(Adb.target(emuID).uninstall(appPackageName)) !;
+        uninstTest <- doTry(Adb.target(emuID).uninstall(testPackageName)) !;
+        instApp <- Adb.target(emuID).install(appAPKPath) !;
+        instTest <- Adb.target(emuID).install(chimpAPKPath) !
+      } yield instTest
+      instTest match {
+        case SuccTry(_) =>
+        case FailTry(_) =>
+      }
+    }
+
     val instrOut = for{
       /*
       appAPKout  <- Aapt.home(aaptHomePath).apkInfo(appAPKPath) !!! ;
       testAPKout <- Aapt.home(aaptHomePath).apkInfo(chimpAPKPath) !!! ;
       appInfo  <- Aapt.parse(appAPKout) ;
       testInfo <- Aapt.parse(testAPKout) ;
-      */
 
       uninstApp  <- doTry (Adb.target(emuID).uninstall(appPackageName)) ! ;
       uninstTest <- doTry (Adb.target(emuID).uninstall(testPackageName)) ! ;
       instApp  <- Adb.target(emuID).install(appAPKPath) ! ;
       instTest <- Adb.target(emuID).install(chimpAPKPath) ! ;
+      */
 
       instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("syncFile",kickBackLockName)
+          .extra("coverage", "true")
         .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!! ;
 
       wait <- Lift !!! Thread.sleep(1000) ;
-      kill <- Adb.shell(s"am force-stop $appPackageName") !
+      kill <- Adb.target(emuID).shell(s"am force-stop $appPackageName") !
     } yield instrOut
 
     // println(s"Done! $instrOut")
@@ -74,10 +88,17 @@ object ChimpLoader {
   }
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String)
-               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, true)
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, appPackageName:String, testPackageName:String)
-               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName))
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName), true)
+
+  def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, reinstall: Boolean)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, reinstall)
+
+  def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, appPackageName:String, testPackageName:String, reinstall: Boolean)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName), reinstall)
+
 
 
   def extractValueWithKey(key:String, line:String): String = line.split(key)(1).drop(1).trim()

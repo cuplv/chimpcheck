@@ -143,7 +143,7 @@ class ChimpLoaderActor extends Actor {
       implicit val ec = ExecutionContext.global
 
       val outcome = ChimpLoader.quickLoad(deviceID, event, chimpConfig.appAPKPath, chimpConfig.chimpAPKPath,
-                                        chimpConfig.testerClass, chimpConfig.aaptHomePath:String, chimpConfig.packageNamesOpt)
+                                        chimpConfig.testerClass, chimpConfig.aaptHomePath:String, chimpConfig.packageNamesOpt, true)
 
       sender() ! MissionControl.Results( deviceID, outcome )
 

@@ -169,7 +169,7 @@ object TestGen {
 
     val R_id_list = 114
 
-    val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>> Click(R_id_list onChild *) *>>
+    val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>> Click(* onChild 1) *>>
                            Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2")) *>>
                            Assert( Not(isClickable("crap")) )
 
