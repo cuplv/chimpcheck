@@ -238,7 +238,7 @@ public class ActivityManager {
                     for (int i = 0; i < lv.getChildCount(); i++) {
                         if (lv.getChildAt(i).getVisibility() == View.VISIBLE) {
                             Log.i("Chimp@getViews", "Clickable view with RID: " + lv.getChildAt(i).toString());
-                            ids.add(ViewID.mkList(v.getId(), i));
+                            ids.add(ViewID.mkList(v.getId(), i, getResName(v.getId())));
                         }
                     }
                     continue;

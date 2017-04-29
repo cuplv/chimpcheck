@@ -71,14 +71,14 @@ abstract public class ViewID {
         };
     }
 
-    public static ViewID mkList(final int rid, final int child) {
+    public static ViewID mkList(final int rid, final int child, final String resid) {
         return new ViewID() {
             @Override
             public Matcher<View> matcher() { return ViewID.childAtPosition(withId(rid), child); }
             @Override
             public ViewIDType type() { return ViewIDType.LIST_VIEW; }
             @Override
-            public String toString() { return String.format("View(child %d of %s)", child, rid); }
+            public String toString() { return String.format("View(child %d of %s)", child, resid); }
             @Override
             public int getID() { return rid; }
         };
