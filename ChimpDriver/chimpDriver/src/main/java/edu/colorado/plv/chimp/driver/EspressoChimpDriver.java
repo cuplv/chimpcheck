@@ -193,10 +193,17 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 try{
                     Espresso.onView(vid.matcher()).perform(click());
                 } catch(NoMatchingViewException e){
+                    e.printStackTrace();
+                    try {
+                        launchClickBack();
+                    } catch (NoActivityResumedException nare){
+                        nare.printStackTrace();
+                    }
                     if(e.getViewMatcherDescription().contains("More options")){
-                        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+                        launchClickMenu();
                     }
                 } catch(AmbiguousViewMatcherException avme){
+                    avme.printStackTrace();
                     launchClickBack();
                 } catch (PerformException pe){
                     pe.printStackTrace();
@@ -211,7 +218,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                   case RID:
                       builder.setUiid(AppEventOuterClass.UIID.newBuilder()
                               .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
-                              .setRid(vid.getID()));
+                              .setRid(vid.getID())).setDisplay(getResName(vid.getID()));
                       break;
                   case DISPLAY_TEXT:
                       builder.setUiid(AppEventOuterClass.UIID.newBuilder()
@@ -226,7 +233,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                     case LIST_VIEW:
                         builder.setUiid(AppEventOuterClass.UIID.newBuilder()
                                 .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
-                                .setRid(vid.getID())).setDisplay(vid.getDesc()); break;
+                                .setRid(vid.getID())).setDisplay(vid.toString()); break;
                 }
 
 

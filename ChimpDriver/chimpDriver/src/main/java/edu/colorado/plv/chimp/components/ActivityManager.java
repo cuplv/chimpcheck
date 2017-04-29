@@ -3,6 +3,7 @@ package edu.colorado.plv.chimp.components;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.os.IInterface;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.*;
 import android.support.test.espresso.util.TreeIterables;
@@ -230,48 +231,34 @@ public class ActivityManager {
             // Default case: Revert to the standard view hierarchy
             Log.i("Chimp@getViews", "Using view hierarchy to obtain clickable views");
             for(View v: getAllViews( allOf(isClickable(), notSupportsInputMethods(), isEnabled(), isDisplayed()))) {
-                if(v instanceof ListView){
+                if(v instanceof ListView) {
                     ListView lv = (ListView) v;
                     int n = lv.getChildCount();
-                    if(n != 0) {
-                        int rand = seed.nextInt(n);
-                        if(v.getId() != -1) {
-                            if (getResName(v.getId()) != null) {
-                                ids.add(ViewID.mkList(getResName(v.getId()), rand));
-                            } else {
-                                ids.add(ViewID.mkList(v.getId(), rand));
-                            }
-                            continue;
-                        } else {
-                            ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString() + " with " + Integer.toString(n) + " children");
+                    for (int i = 0; i < lv.getChildCount(); i++) {
+                        if (lv.getChildAt(i).getVisibility() == View.VISIBLE) {
+                            Log.i("Chimp@getViews", "Clickable view with RID: " + lv.getChildAt(i).toString());
+                            ids.add(ViewID.mkList(v.getId(), i));
                         }
-                        continue;
                     }
+                    continue;
                 }
                  if(v instanceof LinearLayout){
                     LinearLayout ll = (LinearLayout) v;
-                     int n = ll.getChildCount();
-                     if(n != 0) {
-                         int rand = seed.nextInt(n);
-                         if(v.getId() != -1) {
-                             if (getResName(v.getId()) != null) {
-                                 ids.add(ViewID.mkList(getResName(v.getId()), rand));
-                             } else {
-                                 ids.add(ViewID.mkList(v.getId(), rand));
-                             }
-                             continue;
-                         } else {
-                             ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
-                         }
-                     }
-
-                }
+                    int n = ll.getChildCount();
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString() + " with " + Integer.toString(n) + " children");
+                    for(int i = 0; i < n; i++){
+                        if (ll.getChildAt(i).getVisibility() == View.VISIBLE) {
+                            Log.i("Chimp@getViews", "Clickable view with RID: " + ll.getChildAt(i).toString());
+                            ids.add(ViewID.mkList(v.getContentDescription().toString(), i));
+                        }
+                    }
+                    continue;
+                 }
                 if (v.getId() != -1) {
-                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString());
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString() + " "+ v.getResources().getResourceEntryName(v.getId()) + " " + v.getVisibility());
                     ids.add(ViewID.mkRID(v.getId()));
-
                 } else {
-
                     Log.i("Chimp@getViews", "Clickable view with no RID (revert to content desc): " + v.toString());
                     ids.add(ViewID.mkDesc(v.getContentDescription().toString()));
                 }
