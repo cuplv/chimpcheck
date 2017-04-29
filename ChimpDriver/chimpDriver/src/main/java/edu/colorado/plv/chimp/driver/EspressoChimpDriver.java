@@ -331,7 +331,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                     case RID:
                         builder.setUiid(AppEventOuterClass.UIID.newBuilder()
                                 .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
-                                .setRid(vid.getID()));
+                                .setRid(vid.getID())).setDisplay(getResName(vid.getID()));
                         break;
                     case DISPLAY_TEXT:
                         builder.setUiid(AppEventOuterClass.UIID.newBuilder()
@@ -346,7 +346,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                     case LIST_VIEW:
                         builder.setUiid(AppEventOuterClass.UIID.newBuilder()
                                 .setIdType(AppEventOuterClass.UIID.UIIDType.R_ID)
-                                .setRid(vid.getID())).setDisplay(vid.getDesc()); break;
+                                .setRid(vid.getID())).setDisplay(vid.toString()); break;
                 }
 
 
