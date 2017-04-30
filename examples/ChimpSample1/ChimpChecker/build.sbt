@@ -11,6 +11,8 @@ unmanagedJars in Compile += file("lib/android_app.jar")
 resolvers += "Local Ivy2 Repository" at "file:///"+Path.userHome.absolutePath+"/.ivy2/local"
 
 
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.4.17"
+
 libraryDependencies += "edu.colorado.plv.fixr" %% "scalabashing" % "1.0-SNAPSHOT"
 
 libraryDependencies += "edu.colorado.plv.chimp.combinator" %% "chimpcombinator" % "1.0-SNAPSHOT"

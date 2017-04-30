@@ -10,7 +10,7 @@ import com.typesafe.scalalogging.Logger
 import scala.concurrent.duration._
 import edu.colorado.plv.chimp.combinator.{*, Assert, Click, Coord, EventTrace, Left, Prop, Swipe, Type, isClickable, isEnabled}
 import edu.colorado.plv.chimp.coordinator.actors.ChimpMissionController
-import edu.colorado.plv.chimp.generator.TraceGen
+import edu.colorado.plv.chimp.generator.{Gorilla, TraceGen}
 import org.scalacheck.Prop._
 import org.scalacheck.Test.Parameters
 import org.slf4j.LoggerFactory
@@ -91,6 +91,66 @@ object TestActors {
          print(result)
          true
       } */
+    }.check(myParam)
+
+    system.terminate()
+
+  }
+
+}
+
+
+object TestChimpSample1 {
+
+  def main(args: Array[String]): Unit = {
+
+    implicit val system = ActorSystem("my-system")
+    implicit val executionContext = system.dispatcher
+
+    val config = ChimpConfig.defaultConfig().withStartEmulator(false).withTestRun(false).withTimeout(360 seconds)
+      // .addDeviceInfo(DeviceInfo("emulator-5556"))
+      // .addDeviceInfo(DeviceInfo("emulator-5558"))
+      .withAPKs("/data/chimp/ChimpSample1/app-debug.apk", "/data/chimp/ChimpSample1/app-debug-androidTest.apk", "TestExpresso")
+      .withAaptHome("/usr/local/android-sdk/build-tools/24.0.3")
+
+    implicit val chimpContext = ChimpContext.initDefaultChimpContext(config)
+
+    val myParam = Parameters.default.withMinSuccessfulTests(3).withWorkers(1)
+
+    val trace = Gorilla
+
+    forAll(trace.generator()) {
+      tr => tr chimpCheck { true }
+    }.check(myParam)
+
+    system.terminate()
+
+  }
+
+}
+
+
+object TestContractionTimer {
+
+  def main(args: Array[String]): Unit = {
+
+    implicit val system = ActorSystem("my-system")
+    implicit val executionContext = system.dispatcher
+
+    val config = ChimpConfig.defaultConfig().withStartEmulator(false).withTestRun(false).withTimeout(360 seconds)
+      // .addDeviceInfo(DeviceInfo("emulator-5556"))
+      // .addDeviceInfo(DeviceInfo("emulator-5558"))
+      .withAPKs("/data/chimp/ContractionTimerRealBug/app-debug.apk", "/data/chimp/ContractionTimerRealBug/app-debug-androidTest.apk", "ChimpDriverHarness")
+      .withAaptHome("/usr/local/android-sdk/build-tools/24.0.3")
+
+    implicit val chimpContext = ChimpContext.initDefaultChimpContext(config)
+
+    val myParam = Parameters.default.withMinSuccessfulTests(3).withWorkers(1)
+
+    val trace = Gorilla
+
+    forAll(trace.generator()) {
+      tr => tr chimpCheck { true }
     }.check(myParam)
 
     system.terminate()

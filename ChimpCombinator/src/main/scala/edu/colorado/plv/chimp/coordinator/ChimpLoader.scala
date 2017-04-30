@@ -179,21 +179,21 @@ object ChimpLoader {
     } yield p
 
     Thread.sleep(5000)
-    bashLogger.info("App started, KickBack routine now active...")
+    // bashLogger.debug("App started, KickBack routine now active...")
 
     var kickBackAttemptActive = false
     while(true) {
       Adb.target(emuID).shellPsGrep(appPackageName) match {
         case SuccTry(ls) => {
           if (ls.length == 0) {
-            bashLogger.info("App has terminated, KickBack routine terminating..")
+            // bashLogger.debug("App has terminated, KickBack routine terminating..")
             return
           } else {
-            bashLogger.info("App is still active, KickBack routine proceeding..")
+            // bashLogger.debug("App is still active, KickBack routine proceeding..")
           }
         }
         case default => {
-          bashLogger.info("App has terminated, KickBack routine terminating..")
+          // bashLogger.debug("App has terminated, KickBack routine terminating..")
           return
         }
       }
@@ -201,7 +201,7 @@ object ChimpLoader {
         case SuccTry(appName) => {
           if (appName != appPackageName) {
             kickBackAttemptActive = true
-            bashLogger.info("App exited! Kicking back now!")
+            // bashLogger.debug("App exited! Kicking back now!")
             for {
               p0 <- Lift !!! Thread.sleep(2000) ;
               p1 <- Adb.target(emuID).shell("input keyevent KEYCODE_APP_SWITCH") ! ;
@@ -213,7 +213,7 @@ object ChimpLoader {
             } yield p5
           } else {
             if (kickBackAttemptActive) {
-              bashLogger.info(s"Kick back successful, unlocking Chimp driver on $syncFilePath")
+              // bashLogger.debug(s"Kick back successful, unlocking Chimp driver on $syncFilePath")
               Adb.target(emuID).shell(s"touch $syncFilePath") !;
               kickBackAttemptActive = false
             }

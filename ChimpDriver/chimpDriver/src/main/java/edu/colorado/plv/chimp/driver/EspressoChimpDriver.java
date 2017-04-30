@@ -153,15 +153,15 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                     case R_ID:
                         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Id is " + uiid.getRid() );
                         Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
-                                .perform(longClick());
+                                .perform(click());
                         return click;
                     case NAME_ID:
                         try {
                             Espresso.onView(ViewID.childAtPosition(withText(uiid.getParentId().getNameid()), uiid.getChildIdx().getInt()))
-                                    .perform(longClick());
+                                    .perform(click());
                         }catch(NoMatchingViewException ne){
                             Espresso.onView(ViewID.childAtPosition(withContentDescription(uiid.getParentId().getNameid()), uiid.getChildIdx().getInt()))
-                                    .perform(longClick());
+                                    .perform(click());
                         }
                         return click;
 
@@ -169,7 +169,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
                 }
                 Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Id is " + uiid.getRid() );
                 Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
-                        .perform(longClick());
+                        .perform(click());
 
                 return click;
 
@@ -417,13 +417,24 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
     protected void launchRotate() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchRotate"), "Rotate");
 
+        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
         Activity activity = getActivityInstance();
+
         int orientation = activity.getApplicationContext().getResources().getConfiguration().orientation;
+
+        /*
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
         } else {
             Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationPortrait());
-        }
+        } */
+
+        Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
+        // try { Thread.sleep(500); } catch(InterruptedException e) { }
+        Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationPortrait());
+        // try { Thread.sleep(1000); } catch(InterruptedException e) { }
+        Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationLandscape());
 
         /*
         activity.setRequestedOrientation(

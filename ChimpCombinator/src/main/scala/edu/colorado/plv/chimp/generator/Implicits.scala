@@ -1,12 +1,18 @@
 package edu.colorado.plv.chimp.generator
 
 import edu.colorado.plv.chimp.combinator.{Assert, EventTrace, Prop, UIEvent}
+import org.scalacheck.Gen
+import org.scalacheck.Gen._
 
 /**
   * Created by edmund on 4/18/17.
   */
 
 object Implicits {
+
+  implicit class ImpPath(trace: EventTrace) extends TraceGen {
+    override def generator(): Gen[EventTrace] = const(trace)
+  }
 
   implicit class UIEventGen(event: UIEvent) {
     def *>> (next: UIEvent): TraceGen     = Path(EventTrace.trace(event)) *>> next

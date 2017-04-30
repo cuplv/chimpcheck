@@ -32,7 +32,8 @@ class ChimpDeviceWorker extends Actor {
       log.debug(s"Loader $deviceID : $event")
 
       // TODO replace hard-coded implicits
-      implicit val logger = Logger(LoggerFactory.getLogger(s"Chimp-$deviceID"))
+      implicit val logger: Logger = Logger(LoggerFactory.getLogger("chimpLogger")) //(s"Chimp-$deviceID"))
+
       implicit val ec = ExecutionContext.global
 
       val outcome = ChimpLoader.quickLoad(deviceID, event, chimpConfig.appAPKPath, chimpConfig.chimpAPKPath,

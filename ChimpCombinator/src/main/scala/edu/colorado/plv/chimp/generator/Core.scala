@@ -24,10 +24,10 @@ import org.scalacheck.Test.Parameters
 object TraceGen {
 
   val defaultUserInterrupts: Seq[EventTrace] = Seq(
-    EventTrace.trace(Rotate),
-    ClickHome :>> Resume,
-    ClickMenu :>> Resume,
-    PullDownSettings :>> Resume
+    EventTrace.trace(Rotate) // ,
+    // ClickHome :>> Resume,
+    // ClickMenu :>> Resume,
+    // PullDownSettings :>> Resume
   )
 
   def pick(n:Int): Gen[EventTrace] =
