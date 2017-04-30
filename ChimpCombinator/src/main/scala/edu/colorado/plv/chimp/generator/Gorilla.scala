@@ -19,13 +19,13 @@ case class GorillaConfig(steps:Int, freqs:Seq[(Int,TraceGen)]) {
 object Gorilla extends TraceGen {
 
   val defaultGorillaEvents:Seq[(Int,TraceGen)] = Seq(
-    (20,Path(EventTrace.trace(Click(*)))),
-    (5,Path(EventTrace.trace(LongClick(*)))),
-    (5,TypeG(const(*), Gen.alphaStr)),
-    (1,SleepG(Gen.choose(2000,5000)))
+    (40,Path(EventTrace.trace(Click(*)))),
+    (15,Path(EventTrace.trace(LongClick(*)))),
+    (10,TypeG(const(*), Gen.alphaStr)),
+    (1,SleepG(Gen.choose(500,1000)))
   ).map( (f:(Int,TraceGen)) => (f._1, TryG(f._2) ) )
 
-  val defaultGorillaConfig:GorillaConfig = GorillaConfig(50, defaultGorillaEvents)
+  val defaultGorillaConfig:GorillaConfig = GorillaConfig(100, defaultGorillaEvents)
 
   override def generator(): Gen[EventTrace] = Gorilla(defaultGorillaConfig).generator()
 
