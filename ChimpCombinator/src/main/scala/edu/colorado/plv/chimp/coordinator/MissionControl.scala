@@ -36,6 +36,10 @@ object MissionControl {
           chimpContext.resultLogger ! s"$result"
           true
         }
+        case BlockChimpOutcome(executedTrace,error) => {
+          chimpContext.resultLogger ! s"$result"
+          true
+        }
         case default => {
           chimpContext.resultLogger ! s"$result"
           false
