@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Created by edmund on 3/10/17.
  */
-abstract public class ChimpDriver<A extends Activity> extends PropertyActivityManager {
+abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyActivityManager {
 
     enum Outcome {
         UNKNOWN, SUCCESS, CRASHED, ASSERTFAILED, BLOCKED, DRIVEREXCEPT
@@ -35,13 +35,14 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
 
     protected EventTraceOuterClass.EventTrace trace = null;
     protected ChimpJUnitRunner runner = null;
-    protected ActivityTestRule<A> chimpActivityTestRule = null;
+    // protected ActivityTestRule<A> chimpActivityTestRule = null;
 
     protected void setEventTrace(EventTraceOuterClass.EventTrace trace) { this.trace = trace; }
     protected void setRunner() { runner = (ChimpJUnitRunner) InstrumentationRegistry.getInstrumentation(); }
+    /*
     protected void setActivityTestRule(Class<A> activityClass) {
         chimpActivityTestRule = new ActivityTestRule<A>(activityClass);
-    }
+    } */
 
     protected boolean traceCompleted = false;
     protected boolean noOp = false;

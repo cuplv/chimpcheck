@@ -1,8 +1,12 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoActivityResumedException;
@@ -10,11 +14,14 @@ import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.PerformException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.util.HumanReadables;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.Until;
 import android.util.Log;
 import android.view.KeyEvent;
-
-
 import android.view.View;
+
+
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
 import edu.colorado.plv.chimp.components.ActivityManager;
@@ -53,7 +60,7 @@ import java.util.ArrayList;
 /**
  * Created by edmund on 3/13/17.
  */
-public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
+public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver /* <A> */ {
 
     // Try Event Block
 
@@ -375,6 +382,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
         onView(validOptionsMenu("More options")).perform(click());
 
+        kickBackExperiment();
     }
 
     @Override
@@ -382,6 +390,7 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
         Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
 
+        kickBackExperiment();
     }
 
     @Override
@@ -390,15 +399,43 @@ public class EspressoChimpDriver<A extends Activity> extends ChimpDriver<A> {
         try {
             Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
         } catch(NoActivityResumedException e){
+            /*
             try{
                 Thread.sleep(100000);
             } catch(InterruptedException ie) {
                 ie.printStackTrace();
             }
             e.printStackTrace();
+            */
+            kickBackExperiment();
         }
 
         // TODO
+    }
+
+    protected void kickBackExperiment() {
+
+        String packageName = runner.getAppPackageName(); // "com.ianhanniballake.contractiontimer";
+        int launchTimeout = 5000;
+
+        sleep(2000);
+
+        UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        Context context = InstrumentationRegistry.getContext();
+        final Intent intent = context.getPackageManager()
+                .getLaunchIntentForPackage(packageName);
+        context.startActivity(intent);
+
+        mDevice.wait(Until.hasObject(By.pkg(packageName).depth(0)), launchTimeout);
+
+    }
+
+    protected void sleep(int millisec) {
+        try {
+            Thread.sleep(millisec);
+        } catch (InterruptedException e) {
+            Log.e(runner.chimpTag("Sleep"), "Interrupted Exception caught while sleeping.",e);
+        }
     }
 
     @Override

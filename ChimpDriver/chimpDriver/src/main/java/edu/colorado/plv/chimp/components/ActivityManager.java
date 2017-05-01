@@ -3,6 +3,7 @@ package edu.colorado.plv.chimp.components;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.os.IInterface;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.*;
 import android.support.test.espresso.util.TreeIterables;
@@ -158,8 +159,10 @@ public class ActivityManager {
         }
         return ids;
     }
-
-    protected String getResName(View v){
+    protected String getResName(int rid){
+        return getDecorView().getResources().getResourceEntryName(rid);
+    }
+    protected static String getResName(View v){
         if(v == null) return "";
         if(v.getId() == -1){
             if(v.getContentDescription() != null) {
@@ -228,30 +231,32 @@ public class ActivityManager {
             // Default case: Revert to the standard view hierarchy
             Log.i("Chimp@getViews", "Using view hierarchy to obtain clickable views");
             for(View v: getAllViews( allOf(isClickable(), notSupportsInputMethods(), isEnabled(), isDisplayed()))) {
-                if(v instanceof ListView){
-                    System.out.println(v.toString() + "\n" + v.getWidth() + " " + v.getHeight());
+                if(v instanceof ListView) {
                     ListView lv = (ListView) v;
                     int n = lv.getChildCount();
-                    if(n != 0) {
-                        int rand = seed.nextInt(n);
-                        Log.i("Chimp@getViews", "Clickable view with RID: " + "Random is" + Integer.toString(rand) + " n is" + Integer.toString(n));
-                        ids.add(ViewID.mkList(v.getId(), rand));
-                        continue;
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString() + " with " + Integer.toString(n) + " children");
+                    for (int i = 0; i < lv.getChildCount(); i++) {
+                        if (lv.getChildAt(i).getVisibility() == View.VISIBLE) {
+                            Log.i("Chimp@getViews", "Clickable view with RID: " + lv.getChildAt(i).toString());
+                            ids.add(ViewID.mkList(v.getId(), i, getResName(v.getId())));
+                        }
                     }
+                    continue;
                 }
                  if(v instanceof LinearLayout){
                     LinearLayout ll = (LinearLayout) v;
-                     int n = ll.getChildCount();
-                     if(n != 0) {
-                         int rand = seed.nextInt(n);
-                         Log.i("Chimp@getViews", "Clickable view with RID: " + "Random is" + Integer.toString(rand) + " n is" + Integer.toString(n));
-                         ids.add(ViewID.mkList(v.getContentDescription().toString(), rand));
-                         continue;
-                     }
-
-                }
+                    int n = ll.getChildCount();
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString() + " with " + Integer.toString(n) + " children");
+                    for(int i = 0; i < n; i++){
+                        if (ll.getChildAt(i).getVisibility() == View.VISIBLE) {
+                            Log.i("Chimp@getViews", "Clickable view with RID: " + ll.getChildAt(i).toString());
+                            ids.add(ViewID.mkList(v.getContentDescription().toString(), i));
+                        }
+                    }
+                    continue;
+                 }
                 if (v.getId() != -1) {
-                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString());
+                    Log.i("Chimp@getViews", "Clickable view with RID: " + v.toString() + " "+ v.getResources().getResourceEntryName(v.getId()) + " " + v.getVisibility());
                     ids.add(ViewID.mkRID(v.getId()));
 
                 } else {
