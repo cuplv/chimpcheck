@@ -1,5 +1,8 @@
 package edu.colorado.plv.chimp.coordinator
 
+import akka.util.Timeout
+import scala.concurrent.duration._
+
 /**
   * Created by edmund on 3/28/17.
   */
@@ -33,6 +36,9 @@ abstract class ChimpConfig {
   /** Custom package names (Optional) */
   val packageNamesOpt: Option[(String,String)]
 
+  /** Time limit for each chimp run */
+  val timeout: Timeout
+
   def withTestRun(isTest: Boolean): ChimpConfig = chimpConfig( testRun=isTest )
 
   def withStartEmulator(start: Boolean): ChimpConfig = chimpConfig( startEmulators=start )
@@ -47,6 +53,9 @@ abstract class ChimpConfig {
   def withCustomPackageNames(appPackageName: String, chimpPackageName: String): ChimpConfig =
     chimpConfig( packageNamesOpt=Some(appPackageName,chimpPackageName) )
 
+  def withTimeout(timeout: Timeout): ChimpConfig =
+    chimpConfig( timeout=timeout )
+
   case class chimpConfig(
      testRun: Boolean         = testRun,
      startEmulators : Boolean = startEmulators,
@@ -55,7 +64,8 @@ abstract class ChimpConfig {
      chimpAPKPath: String = chimpAPKPath,
      testerClass: String  = testerClass,
      aaptHomePath: String = aaptHomePath,
-     packageNamesOpt: Option[(String,String)] = packageNamesOpt
+     packageNamesOpt: Option[(String,String)] = packageNamesOpt,
+     timeout: Timeout = timeout
   ) extends ChimpConfig
 
 }
@@ -71,6 +81,7 @@ object ChimpConfig {
     override val testerClass  = "DefaultTester"
     override val aaptHomePath: String = "default/aapt/home"
     override val packageNamesOpt = None
+    override val timeout = Timeout(60 seconds)
   }
 
 }

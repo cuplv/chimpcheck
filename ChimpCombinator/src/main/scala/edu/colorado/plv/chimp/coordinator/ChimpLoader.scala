@@ -38,7 +38,7 @@ object ChimpLoader {
 
     val kickBackLockName = genLockName()
 
-    val kickBackFut:Future[Unit] = Future { kickBack(emuID, appPackageName, kickBackLockName) }
+    // val kickBackFut:Future[Unit] = Future { kickBack(emuID, appPackageName, kickBackLockName) }
 
     if (reinstall) {
       val instTest = for {
@@ -66,7 +66,7 @@ object ChimpLoader {
       instTest <- Adb.target(emuID).install(chimpAPKPath) ! ;
       */
 
-      instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("syncFile",kickBackLockName)
+      instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("appPackageName",appPackageName).extra("syncFile",kickBackLockName)
           .extra("coverage", "true")
         .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!! ;
 
@@ -76,7 +76,7 @@ object ChimpLoader {
 
     // println(s"Done! $instrOut")
 
-    Await.result(kickBackFut, 20000 millis)
+    // Await.result(kickBackFut, 20000 millis)
 
     instrOut match {
       case SuccTry(o) => parseOutcome(o)
