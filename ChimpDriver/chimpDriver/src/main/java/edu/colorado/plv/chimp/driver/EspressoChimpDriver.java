@@ -380,22 +380,36 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected void launchClickMenu() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickMenu"), "ClickMenu");
-        onView(validOptionsMenu("More options")).perform(click());
 
-        kickBackExperiment();
+        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
+        UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        mDevice.pressMenu();
+
+        // onView(validOptionsMenu("More options")).perform(click());
+        // kickBackExperiment();
     }
 
     @Override
     protected void launchClickHome() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickHome"), "ClickHome");
-        Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
 
-        kickBackExperiment();
+        // Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
+        UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        mDevice.pressHome();
+
+        // Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
+        // kickBackExperiment();
     }
 
     @Override
     protected void launchClickBack() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
+        // Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
+
+        // Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
         try {
             Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
         } catch(NoActivityResumedException e){
@@ -407,18 +421,21 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
             }
             e.printStackTrace();
             */
-            kickBackExperiment();
+            Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "App Exited. ChimpDriver Remaining calm.");
         }
 
-        // TODO
     }
 
-    protected void kickBackExperiment() {
+    @Override
+    protected void launchResume() {
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "Resume");
 
         String packageName = runner.getAppPackageName(); // "com.ianhanniballake.contractiontimer";
         int launchTimeout = 5000;
 
-        sleep(2000);
+        // Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
+        sleep(500);
 
         UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         Context context = InstrumentationRegistry.getContext();
@@ -444,11 +461,6 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
         // TODO
     }
 
-    @Override
-    protected void launchResume() {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "Resume");
-        //adb shell input keyevent KEYCODE_APP_SWITCH && adb shell input keyevent KEYCODE_DPAD_DOWN && adb shell input keyevent KEYCODE_ENTER
-    }
 
     @Override
     protected void launchRotate() {

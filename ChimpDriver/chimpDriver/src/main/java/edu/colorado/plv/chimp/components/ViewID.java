@@ -8,6 +8,8 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+import chimp.protobuf.AppEventOuterClass;
+
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -71,6 +73,19 @@ abstract public class ViewID {
         };
     }
 
+    public static ViewID mkList(final int rid, final int child) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return ViewID.childAtPosition(withId(rid), child); }
+            @Override
+            public ViewIDType type() { return ViewIDType.LIST_VIEW; }
+            @Override
+            public String toString() { return String.format("View(child %d of %s)", child, rid); }
+            @Override
+            public int getID() { return rid; }
+        };
+    }
+
     public static ViewID mkList(final int rid, final int child, final String resid) {
         return new ViewID() {
             @Override
@@ -83,6 +98,8 @@ abstract public class ViewID {
             public int getID() { return rid; }
         };
     }
+
+
     public static ViewID mkList(final String rid, final int child) {
         return new ViewID() {
             @Override
