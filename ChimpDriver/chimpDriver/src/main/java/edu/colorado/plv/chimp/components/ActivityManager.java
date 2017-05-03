@@ -213,7 +213,7 @@ public class ActivityManager {
     }
     // Dialog box stuff
 
-    protected ArrayList<ViewID> getClickableViewIDs() throws NoViewEnabledException {
+    protected ArrayList<ViewID> getClickableViewIDsOLD() throws NoViewEnabledException {
         ArrayList<ViewID> ids = new ArrayList();
         if (hasDialogInFocus()) {
             // A Dialog box is determined to be in focus. Randomly pick between known dialog default buttons.
@@ -269,11 +269,76 @@ public class ActivityManager {
         return ids;
     }
 
+    protected ArrayList<ViewID> getViewIDs(Matcher<View> mt) throws NoViewEnabledException {
+        ArrayList<ViewID> ids = new ArrayList();
+        if (hasDialogInFocus()) {
+            // A Dialog box is determined to be in focus. Randomly pick between known dialog default buttons.
+            // TODO: Does not work for custom dialog views. Will need to investigate how to obtain dialog box view hierarchy.
+            Log.i("Chimp@getViews", "Returning default dialog views");
 
+            int[] dids = { android.R.id.button1, android.R.id.button2, android.R.id.button3 };
+            for(int did: dids) {
+                if (isMatch(did, mt)) {
+                    Log.i("Chimp@getViews", "Clickable view: " + did);
+                    ids.add( ViewID.mkRID(did, mt) );
+                }
+            }
+        } else {
+            // Default case: Revert to the standard view hierarchy
+            Log.i("Chimp@getViews", "Using view hierarchy to obtain matching views");
+            for(View v: getAllViews( mt )) {
+                if(v instanceof ListView) {
+                    ListView lv = (ListView) v;
+                    int n = lv.getChildCount();
+                    Log.i("Chimp@getViews", "Matching view with RID: " + v.toString() + " with " + Integer.toString(n) + " children");
+                    for (int i = 0; i < lv.getChildCount(); i++) {
+                        if (mt.matches(lv.getChildAt(i))) {
+                            Log.i("Chimp@getViews", "Matching view with RID: " + lv.getChildAt(i).toString());
+                            ids.add(ViewID.mkList(v.getId(), i, mt));
+                        }
+                    }
+                    continue;
+                }
+                if(v instanceof LinearLayout){
+                    LinearLayout ll = (LinearLayout) v;
+                    int n = ll.getChildCount();
+                    Log.i("Chimp@getViews", "Matching view with RID: " + v.toString() + " with " + Integer.toString(n) + " children");
+                    for(int i = 0; i < n; i++){
+                        if (mt.matches(ll.getChildAt(i))) {
+                            Log.i("Chimp@getViews", "Matching view with RID: " + ll.getChildAt(i).toString());
+                            ids.add(ViewID.mkList(v.getContentDescription().toString(), i, mt));
+                        }
+                    }
+                    continue;
+                }
+                if (v.getId() != -1) {
+                    Log.i("Chimp@getViews", "Matching view with RID: " + v.toString() + " "+ v.getResources().getResourceEntryName(v.getId()) + " " + v.getVisibility());
+                    ids.add(ViewID.mkRID(v.getId(), mt));
+
+                } else {
+                    Log.i("Chimp@getViews", "Matching view with no RID (revert to content desc): " + v.toString());
+                    ids.add(ViewID.mkDesc( v.getContentDescription().toString(), mt));
+                }
+            }
+        }
+        return ids;
+    }
+
+    protected ArrayList<ViewID> getClickableViewIDs() throws NoViewEnabledException {
+        return getViewIDs( allOf(isClickable(), notSupportsInputMethods(), isEnabled(), isDisplayed()) );
+    }
 
     protected <A> A pickOne(ArrayList<A> arr, String msg) throws NoViewEnabledException {
         if (arr.size() == 0) throw new NoViewEnabledException(msg);
         return arr.get(seed.nextInt(arr.size())) ;
+    }
+
+    protected <A> A popOne(ArrayList<A> arr, String msg) throws NoViewEnabledException {
+        if (arr.size() == 0) throw new NoViewEnabledException(msg);
+        int randIdx = seed.nextInt(arr.size());
+        A candidate = arr.get(randIdx);
+        arr.remove(randIdx);
+        return candidate;
     }
 
     protected boolean hasDialogInFocus() {

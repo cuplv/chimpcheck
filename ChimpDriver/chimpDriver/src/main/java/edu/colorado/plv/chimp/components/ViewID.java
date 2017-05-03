@@ -13,6 +13,7 @@ import chimp.protobuf.AppEventOuterClass;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -35,9 +36,21 @@ abstract public class ViewID {
     }
 
     public static ViewID mkRID(final int rid) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return withId(rid); }
+            @Override
+            public ViewIDType type() { return ViewIDType.RID; }
+            @Override
+            public String toString() { return String.format("View(RID:%s)", rid); }
+            @Override
+            public int getID() { return rid; }
+        };
+    }
+    public static ViewID mkRID(final int rid, final Matcher<View> mt) {
       return new ViewID() {
           @Override
-          public Matcher<View> matcher() { return withId(rid); }
+          public Matcher<View> matcher() { return allOf( withId(rid) , mt); }
           @Override
           public ViewIDType type() { return ViewIDType.RID; }
           @Override
@@ -59,6 +72,18 @@ abstract public class ViewID {
             public String getText() { return text; }
         };
     }
+    public static ViewID mkText(final String text, final Matcher<View> mt) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return allOf( withText(text) , mt); }
+            @Override
+            public ViewIDType type() { return ViewIDType.DISPLAY_TEXT; }
+            @Override
+            public String toString() { return String.format("View(TEXT:%s)", text); }
+            @Override
+            public String getText() { return text; }
+        };
+    }
 
     public static ViewID mkDesc(final String description) {
         return new ViewID() {
@@ -72,11 +97,35 @@ abstract public class ViewID {
             public String getDesc() { return description; }
         };
     }
+    public static ViewID mkDesc(final String description, final Matcher<View> mt) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return allOf( withContentDescription(description) , mt); }
+            @Override
+            public ViewIDType type() { return ViewIDType.CONTENT_DESC; }
+            @Override
+            public String toString() { return String.format("View(CONTENT_DESC:%s)", description); }
+            @Override
+            public String getDesc() { return description; }
+        };
+    }
 
     public static ViewID mkList(final int rid, final int child) {
         return new ViewID() {
             @Override
             public Matcher<View> matcher() { return ViewID.childAtPosition(withId(rid), child); }
+            @Override
+            public ViewIDType type() { return ViewIDType.LIST_VIEW; }
+            @Override
+            public String toString() { return String.format("View(child %d of %s)", child, rid); }
+            @Override
+            public int getID() { return rid; }
+        };
+    }
+    public static ViewID mkList(final int rid, final int child, final Matcher<View> mt) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return allOf( ViewID.childAtPosition(withId(rid), child) , mt); }
             @Override
             public ViewIDType type() { return ViewIDType.LIST_VIEW; }
             @Override
@@ -104,6 +153,18 @@ abstract public class ViewID {
         return new ViewID() {
             @Override
             public Matcher<View> matcher() { return ViewID.childAtPosition(withContentDescription(rid), child); }
+            @Override
+            public ViewIDType type() { return ViewIDType.LIST_VIEW; }
+            @Override
+            public String toString() { return String.format("View(child %d of CONTENT_DESC: %s)", child, rid); }
+            @Override
+            public String getDesc() { return rid; }
+        };
+    }
+    public static ViewID mkList(final String rid, final int child, final Matcher<View> mt) {
+        return new ViewID() {
+            @Override
+            public Matcher<View> matcher() { return allOf( ViewID.childAtPosition(withContentDescription(rid), child), mt ); }
             @Override
             public ViewIDType type() { return ViewIDType.LIST_VIEW; }
             @Override
