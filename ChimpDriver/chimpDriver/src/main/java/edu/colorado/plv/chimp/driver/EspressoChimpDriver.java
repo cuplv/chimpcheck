@@ -16,6 +16,9 @@ import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.util.HumanReadables;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -192,6 +195,36 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                     pe.printStackTrace();
                 } */
 
+                try {
+                    ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(new UiSelector().clickable(true), new UiSelector().enabled(true));
+
+                    while(uiObjects.size() > 0) {
+                        UiObject uiObject = wildCardManager.popOne(uiObjects);
+                        boolean succ = false;
+                        String display = "";
+                        try {
+                            display = wildCardManager.getUiObjectDisplay(uiObject);
+                            uiObject.click();
+                            succ = true;
+                        } catch (UiObjectNotFoundException e) {
+                            Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
+                        }
+                        if (succ) {
+                            AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
+                            builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display));
+                            return builder.build();
+                        }
+                    }
+
+                } catch (UiObjectNotFoundException e) {
+                    Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Error occurred at wild card top-level", e);
+                }
+
+                Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Exhausted all wild card options. Throwing exception.");
+                throw new NoViewEnabledException("Exhausted all wild card options.");
+
+
+                /*
                 ArrayList<ViewID> options = getClickableViewIDs();
                 ViewID vid = null;
                 while (options.size() > 0) {
@@ -225,6 +258,9 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                 Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Exhausted all wild card options. Throwing exception.");
 
                 throw new NoViewEnabledException("Exhausted all wild card options.");
+
+                */
+
             default:
                 Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Unsupported Click option chosen.");
                 return click;
@@ -259,6 +295,8 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                         .perform(longClick());
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
+
+                /*
                 ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
                 try{
                     Espresso.onView(vid.matcher()).perform(longClick());
@@ -285,7 +323,36 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
                 }
 
-                return builder.build();
+                return builder.build(); */
+
+                try {
+                    ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(new UiSelector().longClickable(true), new UiSelector().enabled(true));
+
+                    while(uiObjects.size() > 0) {
+                        UiObject uiObject = wildCardManager.popOne(uiObjects);
+                        boolean succ = false;
+                        String display = "";
+                        try {
+                            display = wildCardManager.getUiObjectDisplay(uiObject);
+                            uiObject.longClick();
+                            succ = true;
+                        } catch (UiObjectNotFoundException e) {
+                            Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
+                        }
+                        if (succ) {
+                            AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
+                            builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display));
+                            return builder.build();
+                        }
+                    }
+
+                } catch (UiObjectNotFoundException e) {
+                    Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Error occurred at wild card top-level", e);
+                }
+
+                Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Exhausted all wild card options. Throwing exception.");
+                throw new NoViewEnabledException("Exhausted all wild card options.");
+
         }
         return longClick;
     }
