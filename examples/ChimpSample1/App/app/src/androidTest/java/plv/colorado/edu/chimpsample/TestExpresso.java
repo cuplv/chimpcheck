@@ -15,7 +15,7 @@ import edu.colorado.plv.chimp.driver.EspressoChimpDriver;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class TestExpresso extends EspressoChimpDriver<MainActivity> {
+public class TestExpresso extends EspressoChimpDriver {
 
     @Rule
     public ActivityTestRule<MainActivity> activityTestRule =

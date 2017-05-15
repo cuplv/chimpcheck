@@ -19,6 +19,7 @@ public class ChimpJUnitRunner extends AndroidJUnitRunner {
 
     private static final String TAG = null;
     private EventTraceOuterClass.EventTrace eventTrace;
+    private String appPackageName;
     private String chimpName;
     private String syncFile;
     private boolean inputIsWelformed = true;
@@ -46,6 +47,8 @@ public class ChimpJUnitRunner extends AndroidJUnitRunner {
                 Log.e("ChimpDriver",String.format("Unknown Exception during eventTrace extraction: %s", e.toString()));
             }
 
+            appPackageName = arguments.getString("appPackageName");
+
             chimpName = arguments.getString("chimpName", "Caesar");
 
             syncFile = arguments.getString("syncFile", "sync-file");
@@ -67,6 +70,8 @@ public class ChimpJUnitRunner extends AndroidJUnitRunner {
     public EventTraceOuterClass.EventTrace getEventTrace() {
         return eventTrace;
     }
+
+    public String getAppPackageName() { return appPackageName; }
 
     public void addReport(String key, String data) { chimpReports.put(key, data); }
 

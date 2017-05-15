@@ -19,6 +19,7 @@ message UIID {
   optional XYCoordin xyid = 4;
   optional UIID parentId = 5;
   optional ChildIdx childIdx = 6;
+  optional string display = 7;
 }
 
 message ChildIdx {
@@ -69,12 +70,10 @@ message AppEvent {
 
 message Click {
   required UIID uiid = 1;
-  optional string display = 2;
 }
 
 message LongClick {
   required UIID uiid = 1;
-  optional string display = 2;
 }
 
 message Pinch {
@@ -82,19 +81,16 @@ message Pinch {
   required XYCoordin start2 = 2;
   required XYCoordin end1 = 3;
   required XYCoordin end2 = 4;
-  optional string display = 5;
 }
 
 message Swipe {
   required UIID uiid = 1;
   required Orientation pos = 2;
-  optional string display = 3;
 }
 
 message Type {
    required UIID uiid = 1;
    required string input = 2;
-   optional string display = 3;
 }
 
 message Sleep {

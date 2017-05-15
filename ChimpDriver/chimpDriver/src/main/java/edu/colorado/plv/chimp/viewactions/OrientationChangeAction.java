@@ -10,6 +10,7 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
+import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
@@ -42,13 +43,18 @@ public class OrientationChangeAction implements ViewAction {
     public void perform(UiController uiController, View view) {
         uiController.loopMainThreadUntilIdle();
 
-        final Activity activity = (Activity) view.getContext();
-        activity.setRequestedOrientation(orientation);
+        try {
+            final Activity activity = (Activity) view.getContext();
+            activity.setRequestedOrientation(orientation);
+        } catch (ClassCastException e) {
+            Log.e("ChimpDriver-Rotate","Cannot cast Context into activity",e);
+        }
 
+        /*
         Collection<Activity> resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
         if (resumedActivities.isEmpty()) {
             throw new RuntimeException("Could not change orientation");
-        }
+        } */
     }
 
     public static ViewAction orientationLandscape() {

@@ -16,6 +16,8 @@ import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
 import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
+import edu.colorado.plv.chimp.managers.WildCardManager;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +29,7 @@ import java.util.List;
 /**
  * Created by edmund on 3/10/17.
  */
-abstract public class ChimpDriver<A extends Activity> extends PropertyActivityManager {
+abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyActivityManager {
 
     enum Outcome {
         UNKNOWN, SUCCESS, CRASHED, ASSERTFAILED, BLOCKED, DRIVEREXCEPT
@@ -35,13 +37,17 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
 
     protected EventTraceOuterClass.EventTrace trace = null;
     protected ChimpJUnitRunner runner = null;
-    protected ActivityTestRule<A> chimpActivityTestRule = null;
+
+    protected WildCardManager wildCardManager = null;
+
+    // protected ActivityTestRule<A> chimpActivityTestRule = null;
 
     protected void setEventTrace(EventTraceOuterClass.EventTrace trace) { this.trace = trace; }
     protected void setRunner() { runner = (ChimpJUnitRunner) InstrumentationRegistry.getInstrumentation(); }
+    /*
     protected void setActivityTestRule(Class<A> activityClass) {
         chimpActivityTestRule = new ActivityTestRule<A>(activityClass);
-    }
+    } */
 
     protected boolean traceCompleted = false;
     protected boolean noOp = false;
@@ -64,6 +70,10 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
     public void runChimpTrace() {
         if (runner == null) setRunner();
         if (runner != null && trace == null) setEventTrace(runner.getEventTrace());
+        if (wildCardManager == null) {
+            wildCardManager = new WildCardManager();
+            wildCardManager.initUiDevice();;
+        }
         if (!isReady()) {
             Log.e(runner.chimpTag("@runTrace"), "Chimp driver not ready.");
             return;
@@ -162,6 +172,9 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
     abstract protected EventTraceOuterClass.Decide launchDecideEvent(EventTraceOuterClass.Decide decide);
     abstract protected EventTraceOuterClass.DecideMany launchDecideManyEvent(EventTraceOuterClass.DecideMany decideMany);
 
+    abstract protected EventTraceOuterClass.Qualifies launchQualifiesEvent(EventTraceOuterClass.Qualifies qualifies)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException, NoViewEnabledException;
+
     abstract protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
             throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException;
 
@@ -232,6 +245,7 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
             case DECIDE: executeEvent(event.getDecide()); break;
             case DECIDEMANY: executeEvent(event.getDecideMany()); break;
             case ASSERT: executeEvent(event.getAssert()); break;
+            case QUALIFIES: executeEvent(event.getQualifies()); break;
         }
     }
 
@@ -289,6 +303,12 @@ abstract public class ChimpDriver<A extends Activity> extends PropertyActivityMa
            EventTraceOuterClass.UIEvent.newBuilder().setEventType(EventTraceOuterClass.UIEvent.UIEventType.DECIDEMANY)
                 .setDecideMany(newDecideMany).build()
         );
+    }
+
+    protected void executeEvent(EventTraceOuterClass.Qualifies qualifies)
+            throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException, NoViewEnabledException {
+        Log.i(runner.chimpTag("@executeEvent"), qualifies.toString());
+        launchQualifiesEvent(qualifies);
     }
 
     protected void executeEvent(EventTraceOuterClass.Assert assertProp)
