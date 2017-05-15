@@ -16,7 +16,8 @@ import scala.util.Random
   */
 object ChimpLoader {
 
-  def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, packageNamesOpt:Option[(String,String)], reinstall:Boolean)
+  def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, packageNamesOpt:Option[(String,String)],
+                reinstall:Boolean, optTraceName: Option[String])
                (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = {
     val b64ProtoTrace = eventTrace.toBase64()
 
@@ -40,6 +41,12 @@ object ChimpLoader {
 
     // val kickBackFut:Future[Unit] = Future { kickBack(emuID, appPackageName, kickBackLockName) }
 
+    val optNetCatProc : Option[Future[Unit]] = optTraceName match {
+      case Some(traceName) => Some(Future { watchNetCatBridge(5050, traceName) })
+      case None            => None
+    }
+
+
     if (reinstall) {
       val instTest = for {
         uninstApp <- doTry(Adb.target(emuID).uninstall(appPackageName)) !;
@@ -53,7 +60,7 @@ object ChimpLoader {
       }
     }
 
-    val instrOut = for{
+    val instrOut = for {
       /*
       appAPKout  <- Aapt.home(aaptHomePath).apkInfo(appAPKPath) !!! ;
       testAPKout <- Aapt.home(aaptHomePath).apkInfo(chimpAPKPath) !!! ;
@@ -66,8 +73,9 @@ object ChimpLoader {
       instTest <- Adb.target(emuID).install(chimpAPKPath) ! ;
       */
 
-      instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("appPackageName",appPackageName).extra("syncFile",kickBackLockName)
-          .extra("coverage", "true")
+      instrOut <- AmInstrument.target(emuID).raw().sync().debug(false).extra("eventTrace",b64ProtoTrace).extra("appPackageName",appPackageName)
+          // .extra("syncFile",kickBackLockName)
+          // .extra("coverage", "true")
         .components( appPackageName, testerClass, testPackageName,"edu.colorado.plv.chimp.driver.ChimpJUnitRunner") !!! ;
 
       wait <- Lift !!! Thread.sleep(1000) ;
@@ -75,6 +83,11 @@ object ChimpLoader {
     } yield instrOut
 
     // println(s"Done! $instrOut")
+
+    optNetCatProc match {
+      case Some(netCatProc) => Await.result(netCatProc, 360 seconds)
+      case None =>
+    }
 
     // Await.result(kickBackFut, 20000 millis)
 
@@ -88,18 +101,20 @@ object ChimpLoader {
   }
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String)
-               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, true)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, true, None)
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, appPackageName:String, testPackageName:String)
-               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName), true)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName), true, None)
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, reinstall: Boolean)
-               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, reinstall)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, reinstall, None)
 
   def quickLoad(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, appPackageName:String, testPackageName:String, reinstall: Boolean)
-               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName), reinstall)
+               (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome = quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, Some(appPackageName,testPackageName), reinstall, None)
 
-
+  def runWithTrace(emuID:String, eventTrace: EventTrace, appAPKPath:String, chimpAPKPath:String, testerClass:String, aaptHomePath:String, traceName: String)
+                  (implicit bashLogger: Logger, ec: ExecutionContext): ChimpOutcome =
+                      quickLoad(emuID, eventTrace, appAPKPath, chimpAPKPath, testerClass, aaptHomePath, None, true, Some(traceName))
 
   def extractValueWithKey(key:String, line:String): String = line.split(key)(1).drop(1).trim()
 
@@ -167,6 +182,12 @@ object ChimpLoader {
       }
     }
 
+  }
+
+  def watchNetCatBridge(port: Int, traceName: String) (implicit bashLogger: Logger): Unit = {
+      val output = for {
+        x <- Cmd(s"nc -l $port") #> traceName !
+      } yield x
   }
 
   def kickBack(emuID:String, appPackageName:String, syncFilePath:String) (implicit bashLogger:Logger): Unit = {
