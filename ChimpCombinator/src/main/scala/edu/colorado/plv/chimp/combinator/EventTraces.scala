@@ -69,6 +69,11 @@ object UIEvent {
          case pb.UIEvent.UIEventType.ASSERT => {
              Assert( Prop.fromProto(event.getAssert.props) )
          }
+
+         case pb.UIEvent.UIEventType.QUALIFIES => {
+             val qualifies = event.getQualifies
+             Qualifies( Prop.fromProto(qualifies.condition), EventTrace.fromProto(qualifies.trace) )
+         }
       }
    }
 }
