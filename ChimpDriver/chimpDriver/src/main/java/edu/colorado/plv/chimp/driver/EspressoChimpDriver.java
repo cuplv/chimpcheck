@@ -38,6 +38,7 @@ import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.longClick;
@@ -365,16 +366,19 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
         switch (uiid.getIdType()) {
             case R_ID:
                 Espresso.onView(withId(uiid.getRid()))
+                        .perform(clearText())
                         .perform(typeText(text)).perform(closeSoftKeyboard());
                 return type;
             case NAME_ID:
                 Espresso.onView(withText(uiid.getNameid()))
+                        .perform(clearText())
                         .perform(typeText(text));
                 Espresso.onView(isRoot())
                         .perform(closeSoftKeyboard());
                 return type;
             case WILD_CARD:
 
+                /*
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
                 ViewID vid = pickOne(getTypeableViewIDs(), "No available typeable views");
                 try{
@@ -395,6 +399,47 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                 }
 
                 return builder.build();
+                */
+
+                try {
+                    ArrayList<UiObject> editableObjects = new ArrayList<>();
+
+                    ArrayList<UiObject> editTextObjects = wildCardManager.retrieveUiObjects(new UiSelector().className("android.widget.EditText")
+                                                                                           ,new UiSelector().enabled(true));
+                    editableObjects.addAll( editTextObjects );
+                    // ArrayList<UiObject> imageViewObjects = wildCardManager.retrieveUiObjects(new UiSelector().className("android.widget..ImageView").enabled(true)
+                    //                                                                         ,new UiSelector().enabled(true));
+
+
+                    // TODO find other Android classes with editable text fields
+
+                    while(editableObjects.size() > 0) {
+                        UiObject uiObject = wildCardManager.popOne(editableObjects);
+                        boolean succ = false;
+                        String display = "";
+                        try {
+                            display = wildCardManager.getUiObjectDisplay(uiObject);
+                            uiObject.setText(text);
+                            succ = true;
+                        } catch (UiObjectNotFoundException e) {
+                            Log.e(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), "Failed typing on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
+                        }
+                        if (succ) {
+                            AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
+                            builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display))
+                                   .setInput(text);
+                            return builder.build();
+                        }
+                    }
+
+                } catch (UiObjectNotFoundException e) {
+                    Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Error occurred at wild card top-level", e);
+                }
+
+                Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Exhausted all wild card options. Throwing exception.");
+                throw new NoViewEnabledException("Exhausted all wild card options.");
+
+
         }
         return type;
     }
@@ -563,7 +608,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected EventTraceOuterClass.Assert launchAssertEvent(EventTraceOuterClass.Assert assertProp)
                       throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException {
-        Log.i(runner.chimpTag("EspressoChimpDriver@launchAssertEvent"), assertProp.toString());
+        Log.i(runner.chimpTag("EspressoChimpDriver@launchAssertEvent"), assertProp.getProps().toString());
 
         Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
