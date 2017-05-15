@@ -6,8 +6,10 @@ package edu.colorado.plv.chimp.combinator
 
 import chimp.{protobuf => pb}
 import edu.colorado.plv.chimp.utils.Base64
-
 import edu.colorado.plv.chimp.combinator.Implicits._
+import edu.colorado.plv.chimp.generator.TraceGen
+
+import edu.colorado.plv.chimp.generator.QualifiesG
 
 object PropArg {
   def fromProto(arg: pb.Arg): PropArg = {
@@ -115,6 +117,7 @@ object Prop {
 abstract class Prop extends ProtoMsg[pb.Prop] {
   def /\ (prop: Prop): Prop = Conjunct(this, prop)
   def \/ (prop: Prop): Prop = Disjunct(this, prop)
+  def Then (gen:TraceGen): TraceGen = QualifiesG(this, gen)
 }
 
 
