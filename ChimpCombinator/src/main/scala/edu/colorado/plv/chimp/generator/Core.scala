@@ -151,6 +151,12 @@ case class Repeat(n:Int, gen:TraceGen) extends TraceGen {
     }
 }
 
+case class QualifiesG(cond:Prop, gen:TraceGen) extends TraceGen {
+  override def generator(): Gen[EventTrace] = for {
+    tr <- gen.generator()
+  } yield Qualifies(cond, tr) :>> Skip
+}
+
 // Derivable Generators
 
 case class TypeG(idGen:Gen[UIID], strGen:Gen[String]) extends TraceGen {
@@ -169,9 +175,11 @@ object TestGen {
 
     val R_id_list = 114
 
-    val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>> Click(* onChild 1) *>>
-                           Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2")) *>>
-                           Assert( Not(isClickable("crap")) )
+    // val traces: TraceGen = Click("login") :>> Click(*) *>> Type("userbox","test") *>> Type("pwdbox","1234") *>> Click("Go") *>> Click(* onChild 1) *>>
+    //                       Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2")) *>>
+    //                        Assert( Not(isClickable("crap")) )
+
+    val traces: TraceGen = isDisplayed(345) Then (Skip :>> Skip )
 
 
     val myParam = Parameters.default.withMinSuccessfulTests(10)
