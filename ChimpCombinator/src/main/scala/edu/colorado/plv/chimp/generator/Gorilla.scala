@@ -1,8 +1,8 @@
 package edu.colorado.plv.chimp.generator
 
-import edu.colorado.plv.chimp.combinator.{*, Click, EventTrace, LongClick}
+import edu.colorado.plv.chimp.combinator._
 import edu.colorado.plv.chimp.combinator.Implicits._
-
+import edu.colorado.plv.chimp.generator.Implicits._
 import org.scalacheck.Gen
 import org.scalacheck.Gen._
 
@@ -19,10 +19,12 @@ case class GorillaConfig(steps:Int, freqs:Seq[(Int,TraceGen)]) {
 object Gorilla extends TraceGen {
 
   val defaultGorillaEvents:Seq[(Int,TraceGen)] = Seq(
-    (20,Path(EventTrace.trace(Click(*)))),
-    (5,Path(EventTrace.trace(LongClick(*)))),
-    (5,TypeG(const(*), Gen.alphaStr)),
-    (1,SleepG(Gen.choose(2000,5000)))
+    (40,Path(EventTrace.trace(Click(*)))),
+    (15,Path(EventTrace.trace(LongClick(*)))),
+    (8,TypeG(const(*), Gen.alphaStr)),
+    (20,Path(EventTrace.trace(Rotate))),
+    (10,Path(ClickBack :>> Resume)),
+    (1,SleepG(Gen.choose(500,2000)))
   ).map( (f:(Int,TraceGen)) => (f._1, TryG(f._2) ) )
 
   val defaultGorillaConfig:GorillaConfig = GorillaConfig(50, defaultGorillaEvents)
