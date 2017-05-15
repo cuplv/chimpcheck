@@ -37,7 +37,7 @@ class ChimpDeviceWorker extends Actor {
       implicit val ec = ExecutionContext.global
 
       val outcome = ChimpLoader.quickLoad(deviceID, event, chimpConfig.appAPKPath, chimpConfig.chimpAPKPath,
-        chimpConfig.testerClass, chimpConfig.aaptHomePath:String, chimpConfig.packageNamesOpt, true)
+        chimpConfig.testerClass, chimpConfig.aaptHomePath:String, chimpConfig.packageNamesOpt, true, None)
 
       sender() ! ChimpMissionController.Results( deviceID, outcome )
 
