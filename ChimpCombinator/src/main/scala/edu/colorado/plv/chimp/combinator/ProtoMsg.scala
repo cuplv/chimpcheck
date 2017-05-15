@@ -36,6 +36,6 @@ object ProtoMsg {
   }
 
   def mkUIEvent(event: pb.Qualifies): pb.UIEvent = {
-    pb.UIEvent(pb.UIEvent.UIEventType.ASSERT, None, None, None, None, None, None, Some(event))
+    pb.UIEvent(pb.UIEvent.UIEventType.QUALIFIES, None, None, None, None, None, None, Some(event))
   }
 }
