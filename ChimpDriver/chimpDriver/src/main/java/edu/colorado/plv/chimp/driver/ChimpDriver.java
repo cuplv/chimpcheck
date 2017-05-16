@@ -119,6 +119,8 @@ abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyAct
                 outcome = Outcome.CRASHED;
                 // Catch and release, because we want the Test Driver to recognize the exception and react accordingly.
                 throw e;
+                // exceptMsg = e.toString();
+                // return;
             }
         }
 

@@ -106,7 +106,7 @@ public class WildCardManager {
 
         String str = "/***** Inferred Actionable UI Objects *****/\n";
         for(UiObject candidate: new HashSet<UiObject>(baseUiObjects)) {
-            str += "Found candidate: " + candidate.getClassName() + " " + candidate.getText() + " " + candidate.getContentDescription() + "\n";
+            str += "Found candidate: " + candidate.getClassName() + " " + candidate.getText() + " " + candidate.getContentDescription() + " UI Selector: " + candidate.getSelector().toString() + "\n";
         }
         str += "/******************************************/";
         Log.i("Chimp-wildCardManager",str);

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
@@ -56,6 +57,7 @@ import static edu.colorado.plv.chimp.components.ViewID.ViewIDType.RID;
 import static edu.colorado.plv.chimp.components.ViewID.validOptionsMenu;
 import static org.hamcrest.Matchers.allOf;
 
+import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
 
@@ -196,6 +198,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                     pe.printStackTrace();
                 } */
 
+                Log.i(runner.chimpTag("launchClick-WildCard"), "Beginning retrieval...");
                 try {
                     ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(new UiSelector().clickable(true), new UiSelector().enabled(true));
 
@@ -205,23 +208,30 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                         String display = "";
                         try {
                             display = wildCardManager.getUiObjectDisplay(uiObject);
-                            uiObject.click();
+                            // uiObject.click();
+
+                            Rect rect = uiObject.getBounds();
+                            Espresso.onView(isRoot()).perform(ChimpActionFactory.clickXY(rect.centerX(),rect.centerY()));
+
                             succ = true;
                         } catch (UiObjectNotFoundException e) {
-                            Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
+                            Log.e(runner.chimpTag("launchClick-WildCard"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
                         }
                         if (succ) {
                             AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
                             builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display));
+
+                            Log.i(runner.chimpTag("launchClick-WildCard"), "Completed retrieval and execute.");
                             return builder.build();
                         }
                     }
 
                 } catch (UiObjectNotFoundException e) {
-                    Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Error occurred at wild card top-level", e);
+                    Log.e(runner.chimpTag("launchClick-WildCard"), "Error occurred at wild card top-level", e);
                 }
 
-                Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Exhausted all wild card options. Throwing exception.");
+
+                Log.e(runner.chimpTag("launchClick-WildCard"), "Exhausted all wild card options. Throwing exception.");
                 throw new NoViewEnabledException("Exhausted all wild card options.");
 
 
