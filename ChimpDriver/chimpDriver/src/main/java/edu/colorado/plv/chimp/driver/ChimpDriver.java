@@ -129,9 +129,33 @@ abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyAct
         outcome = Outcome.SUCCESS;
     }
 
+    public void preemptiveTraceReport() {
+        Log.i(runner.chimpTag("@preemptiveTraceReport"), "Begin loading preemptive trace report...");
+
+        // Flush out any previously formatted preemptive reports
+        runner.flushReports();
+
+        // Append Executed Trace Report
+        EventTraceOuterClass.EventTrace.Builder builder = EventTraceOuterClass.EventTrace.newBuilder();
+        for(EventTraceOuterClass.UIEvent event: completedEvents) {
+            builder.addEvents( event );
+        }
+
+        String base64Output = Base64.encodeToString(builder.build().toByteArray(), Base64.DEFAULT);
+        runner.addReport("ChimpDriver-ExecutedTrace", base64Output);
+
+        runner.addReport("ChimpDriver-Outcome", "Crashed");
+
+        Log.i(runner.chimpTag("@preemptiveTraceReport"), "Preemptive Trace report completed!");
+
+    }
+
     @After
     public void processTraceReport() {
         Log.i(runner.chimpTag("@processTraceReport"), "Processing trace report...");
+
+        // Flush out any previously formatted preemptive reports
+        runner.flushReports();
 
         // Append Executed Trace Report
         EventTraceOuterClass.EventTrace.Builder builder = EventTraceOuterClass.EventTrace.newBuilder();

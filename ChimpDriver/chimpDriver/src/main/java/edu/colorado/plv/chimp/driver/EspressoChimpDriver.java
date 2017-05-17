@@ -199,6 +199,12 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                 } */
 
                 Log.i(runner.chimpTag("launchClick-WildCard"), "Beginning retrieval...");
+
+                // Before handling over control to the UI automator, we format a preemptive report:
+                //  If crash in app happens during the critical section below, UI automator suppresses all exceptions and prevents all
+                //  @After routines from even running at all.
+                preemptiveTraceReport();
+
                 try {
                     ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(new UiSelector().clickable(true), new UiSelector().enabled(true));
 
@@ -207,10 +213,12 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                         boolean succ = false;
                         String display = "";
                         try {
+                            Log.i(runner.chimpTag("launchClick-WildCard"), "Retrieving display information from UIObject");
                             display = wildCardManager.getUiObjectDisplay(uiObject);
                             // uiObject.click();
-
+                            Log.i(runner.chimpTag("launchClick-WildCard"), "Retrieving display bounds from UIObject");
                             Rect rect = uiObject.getBounds();
+                            Log.i(runner.chimpTag("launchClick-WildCard"), "Executing espresso action");
                             Espresso.onView(isRoot()).perform(ChimpActionFactory.clickXY(rect.centerX(),rect.centerY()));
 
                             succ = true;

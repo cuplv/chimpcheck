@@ -121,7 +121,7 @@ object RunTestit {
 
     val custom = Click(R.id.button_begin) :>> Click(R.id.btn_login) :>> Click(R.id.interm_btn_cdt) :>> Click(R.id.btn_count10) :>> Click(R.id.btn_back) :>> Repeat(30, Click(*) :>> Skip)
 
-    forAll(Gorilla.generator) {
+    forAll(custom.generator) {
       tr => tr chimpCheck { true }
     }.check(myParam)
 
