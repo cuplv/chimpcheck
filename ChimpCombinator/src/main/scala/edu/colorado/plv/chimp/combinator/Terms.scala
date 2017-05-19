@@ -10,6 +10,7 @@ import Implicits._
 
 abstract class UIID extends ProtoMsg[pb.UIID] {
   def onChild(child: ChildIdx): UIID = ChildAtPosition(this,child)
+  def /\ (other: UIID): UIID = UIIDConjunct(this,other)
 }
 
 
@@ -35,6 +36,11 @@ object UIID {
         val child  = ChildIdx.fromProto( pd_uiid.getChildIdx )
         ChildAtPosition(parent, child)
       }
+      case pb.UIID.UIIDType.CONJUNCT_ID => {
+        val uiid1 = UIID.fromProto( pd_uiid.getUiid1 )
+        val uiid2 = UIID.fromProto( pd_uiid.getUiid2 )
+        UIIDConjunct(uiid1, uiid2)
+      }
     }
   }
 }
@@ -55,6 +61,11 @@ abstract class ChildIdx {
 case class ChildAtPosition(parent: UIID, child: ChildIdx) extends UIID {
   override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.ONCHILD_ID, None, None, None, Some(parent.toMsg), Some(child.toMsg))
   override def toString: String = s"$parent onChild $child"
+}
+
+case class UIIDConjunct(uiid1: UIID, uiid2: UIID) extends UIID {
+  override def toMsg(): pb.UIID = pb.UIID(pb.UIID.UIIDType.CONJUNCT_ID, None, None, None, None, None, None, Some(uiid1.toMsg), Some(uiid2.toMsg))
+  override def toString: String = s"$uiid1 /\\ $uiid2"
 }
 
 object Coord {

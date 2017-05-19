@@ -179,7 +179,7 @@ object TestGen {
     //                       Swipe("nuts",Left) *>> Swipe("crap",Coord(1,2)) *>> (Click("button1") <+> Click("button2")) *>>
     //                        Assert( Not(isClickable("crap")) )
 
-    val traces: TraceGen = isDisplayed(345) Then (Skip :>> Skip )
+    val traces: TraceGen = isDisplayed(345) Then (Click( R_id_list /\ "happy" ) :>> Skip )
 
 
     val myParam = Parameters.default.withMinSuccessfulTests(10)
