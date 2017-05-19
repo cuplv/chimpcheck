@@ -57,6 +57,7 @@ import static edu.colorado.plv.chimp.components.ViewID.ViewIDType.RID;
 import static edu.colorado.plv.chimp.components.ViewID.validOptionsMenu;
 import static org.hamcrest.Matchers.allOf;
 
+import edu.colorado.plv.chimp.performers.ClickPerformer;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
@@ -138,7 +139,13 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
-        AppEventOuterClass.UIID uiid = click.getUiid();
+        // AppEventOuterClass.UIID uiid = click.getUiid();
+
+        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, new UiSelector().clickable(true), new UiSelector().enabled(true));
+        return performer.performAction(click);
+
+
+        /*
         switch (uiid.getIdType()) {
             case R_ID:
                 int rid = uiid.getRid();
@@ -182,21 +189,6 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                 }
             case WILD_CARD:
                 Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-
-                // ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
-
-                /*
-                try{
-                    Espresso.onView(vid.matcher()).perform(click());
-                } catch(NoMatchingViewException e){
-                    if(e.getViewMatcherDescription().contains("More options")){
-                        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-                    }
-                } catch(AmbiguousViewMatcherException avme){
-                    launchClickBack();
-                } catch (PerformException pe){
-                    pe.printStackTrace();
-                } */
 
                 Log.i(runner.chimpTag("launchClick-WildCard"), "Beginning retrieval...");
 
@@ -242,48 +234,11 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
                 Log.e(runner.chimpTag("launchClick-WildCard"), "Exhausted all wild card options. Throwing exception.");
                 throw new NoViewEnabledException("Exhausted all wild card options.");
 
-
-                /*
-                ArrayList<ViewID> options = getClickableViewIDs();
-                ViewID vid = null;
-                while (options.size() > 0) {
-                    vid = popOne(options, "No available clickable views");
-                    Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "");
-                    try{
-                        Espresso.onView(vid.matcher()).perform(click());
-
-                        // Should return click token with the UIID of the exact view clicked.
-                        // That's what below is doing. However, find out if there is better way to retain human-readable information on
-                        // this view (Display Text?)
-                        AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
-
-                        switch(vid.type()) {
-                            case RID:
-                                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
-                            case DISPLAY_TEXT:
-                                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
-                            case CONTENT_DESC:
-                                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
-                            case LIST_VIEW:
-                                builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
-                        }
-
-                        return builder.build();
-                    } catch(NoMatchingViewException e){
-                        Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Failed while clicking inferred view " + vid.toString(), e);
-                    }
-                }
-
-                Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Exhausted all wild card options. Throwing exception.");
-
-                throw new NoViewEnabledException("Exhausted all wild card options.");
-
-                */
-
             default:
                 Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Unsupported Click option chosen.");
                 return click;
         }
+        */
     }
 
     @Override
