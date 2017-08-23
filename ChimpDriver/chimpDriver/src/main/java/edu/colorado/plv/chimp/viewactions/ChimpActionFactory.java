@@ -13,24 +13,33 @@ import android.view.View;
 
 public class ChimpActionFactory {
 
+
+    private static CoordinatesProvider getCoordinatesProvider(final int x, final int y){
+        return new CoordinatesProvider(){
+            @Override
+            public float[] calculateCoordinates(View view) {
+
+                final int[] screenPos = new int[2];
+                view.getLocationOnScreen(screenPos);
+
+                final float screenX = screenPos[0] + x;
+                final float screenY = screenPos[1] + y;
+                float[] coordinates = {screenX, screenY};
+
+                return coordinates;
+            }
+        };
+    }
     public static ViewAction clickXY(final int x, final int y){
         return new GeneralClickAction(
                 Tap.SINGLE,
-                new CoordinatesProvider() {
-                    @Override
-                    public float[] calculateCoordinates(View view) {
-
-                        final int[] screenPos = new int[2];
-                        view.getLocationOnScreen(screenPos);
-
-                        final float screenX = screenPos[0] + x;
-                        final float screenY = screenPos[1] + y;
-                        float[] coordinates = {screenX, screenY};
-
-                        return coordinates;
-                    }
-                },
+                getCoordinatesProvider(x, y),
                 Press.FINGER);
     }
-
+    public static ViewAction longClickXY(final int x, final int y){
+        return new GeneralClickAction(
+                Tap.LONG,
+                getCoordinatesProvider(x, y),
+                Press.FINGER);
+    }
 }

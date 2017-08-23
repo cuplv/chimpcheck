@@ -58,6 +58,7 @@ import static edu.colorado.plv.chimp.components.ViewID.validOptionsMenu;
 import static org.hamcrest.Matchers.allOf;
 
 import edu.colorado.plv.chimp.performers.ClickPerformer;
+import edu.colorado.plv.chimp.performers.LongClickPerformer;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
@@ -139,196 +140,15 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
-        // AppEventOuterClass.UIID uiid = click.getUiid();
-
         ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, new UiSelector().clickable(true), new UiSelector().enabled(true));
         return performer.performAction(click);
-
-
-        /*
-        switch (uiid.getIdType()) {
-            case R_ID:
-                int rid = uiid.getRid();
-                Espresso.onView( allOf( withId(rid) , isDisplayed()) )
-                        .perform(click());
-
-                return click;
-
-            case NAME_ID:
-
-                try {
-                    Espresso.onView( allOf( withText(uiid.getNameid()) , isDisplayed()) )
-                            .perform(click());
-                } catch (NoMatchingViewException e){
-                    Espresso.onView( allOf( withContentDescription(uiid.getNameid()) , isDisplayed()) )
-                            .perform(click());
-                }
-
-                return click;
-
-            case ONCHILD_ID:
-                int childIdx = uiid.getChildIdx().getInt();
-                switch(uiid.getParentId().getIdType()){
-                    case R_ID:
-                        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Id is " + uiid.getRid() );
-                        Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), childIdx))
-                                .perform(click());
-                        return click;
-                    case NAME_ID:
-                        try {
-                            Espresso.onView(ViewID.childAtPosition(withText(uiid.getParentId().getNameid()), childIdx))
-                                    .perform(click());
-                        }catch(NoMatchingViewException ne){
-                            Espresso.onView(ViewID.childAtPosition(withContentDescription(uiid.getParentId().getNameid()), childIdx))
-                                    .perform(click());
-                        }
-                        return click;
-                    default:
-                        Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Unsupported parent reference. Aborted click action");
-                        return click;
-                }
-            case WILD_CARD:
-                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-
-                Log.i(runner.chimpTag("launchClick-WildCard"), "Beginning retrieval...");
-
-                // Before handling over control to the UI automator, we format a preemptive report:
-                //  If crash in app happens during the critical section below, UI automator suppresses all exceptions and prevents all
-                //  @After routines from even running at all.
-                preemptiveTraceReport();
-
-                try {
-                    ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(new UiSelector().clickable(true), new UiSelector().enabled(true));
-
-                    while(uiObjects.size() > 0) {
-                        UiObject uiObject = wildCardManager.popOne(uiObjects);
-                        boolean succ = false;
-                        String display = "";
-                        try {
-                            Log.i(runner.chimpTag("launchClick-WildCard"), "Retrieving display information from UIObject");
-                            display = wildCardManager.getUiObjectDisplay(uiObject);
-                            // uiObject.click();
-                            Log.i(runner.chimpTag("launchClick-WildCard"), "Retrieving display bounds from UIObject");
-                            Rect rect = uiObject.getBounds();
-                            Log.i(runner.chimpTag("launchClick-WildCard"), "Executing espresso action");
-                            Espresso.onView(isRoot()).perform(ChimpActionFactory.clickXY(rect.centerX(),rect.centerY()));
-
-                            succ = true;
-                        } catch (UiObjectNotFoundException e) {
-                            Log.e(runner.chimpTag("launchClick-WildCard"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
-                        }
-                        if (succ) {
-                            AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
-                            builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display));
-
-                            Log.i(runner.chimpTag("launchClick-WildCard"), "Completed retrieval and execute.");
-                            return builder.build();
-                        }
-                    }
-
-                } catch (UiObjectNotFoundException e) {
-                    Log.e(runner.chimpTag("launchClick-WildCard"), "Error occurred at wild card top-level", e);
-                }
-
-
-                Log.e(runner.chimpTag("launchClick-WildCard"), "Exhausted all wild card options. Throwing exception.");
-                throw new NoViewEnabledException("Exhausted all wild card options.");
-
-            default:
-                Log.e(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), "Unsupported Click option chosen.");
-                return click;
-        }
-        */
     }
 
     @Override
     protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
-        AppEventOuterClass.UIID uiid = longClick.getUiid();
-        switch (uiid.getIdType()) {
-            case R_ID:
-                Espresso.onView(withId(uiid.getRid()))
-                        .perform(longClick());
-                return longClick;
-            case NAME_ID:
-                try {
-
-                    Espresso.onView(withText(uiid.getNameid()))
-                            .perform(longClick());
-                } catch (NoMatchingViewException e){
-                    Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Cannot click with text so use content description");
-                    Espresso.onView(withContentDescription(uiid.getNameid()))
-                            .perform(longClick());
-                } finally {
-                    return longClick;
-                }
-            case ONCHILD_ID:
-
-                Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Id is " + uiid.getRid() );
-                Espresso.onView(ViewID.childAtPosition(withId(uiid.getParentId().getRid()), uiid.getChildIdx().getInt()))
-                        .perform(longClick());
-            case WILD_CARD:
-                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-
-                /*
-                ViewID vid = pickOne(getClickableViewIDs(), "No available clickable views");
-                try{
-                    Espresso.onView(vid.matcher()).perform(longClick());
-                } catch(NoMatchingViewException e){
-                    if(e.getViewMatcherDescription().contains("More options")){
-                        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-                    }
-                } catch(AmbiguousViewMatcherException avme){
-                    launchClickBack();
-                } catch (PerformException pe){
-                    pe.printStackTrace();
-                }
-
-                AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
-                switch(vid.type()) {
-                    case RID:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
-                    case DISPLAY_TEXT:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())); break;
-                    case CONTENT_DESC:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())); break;
-                    case LIST_VIEW:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())); break;
-
-                }
-
-                return builder.build(); */
-
-                try {
-                    ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(new UiSelector().longClickable(true), new UiSelector().enabled(true));
-
-                    while(uiObjects.size() > 0) {
-                        UiObject uiObject = wildCardManager.popOne(uiObjects);
-                        boolean succ = false;
-                        String display = "";
-                        try {
-                            display = wildCardManager.getUiObjectDisplay(uiObject);
-                            uiObject.longClick();
-                            succ = true;
-                        } catch (UiObjectNotFoundException e) {
-                            Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
-                        }
-                        if (succ) {
-                            AppEventOuterClass.LongClick.Builder builder = AppEventOuterClass.LongClick.newBuilder();
-                            builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display));
-                            return builder.build();
-                        }
-                    }
-
-                } catch (UiObjectNotFoundException e) {
-                    Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Error occurred at wild card top-level", e);
-                }
-
-                Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Exhausted all wild card options. Throwing exception.");
-                throw new NoViewEnabledException("Exhausted all wild card options.");
-
-        }
-        return longClick;
+        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, new UiSelector().longClickable(true), new UiSelector().enabled(true));
+        return performer.performAction(longClick);
     }
 
     @Override
