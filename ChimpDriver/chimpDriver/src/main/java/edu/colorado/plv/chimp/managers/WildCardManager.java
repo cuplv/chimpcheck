@@ -1,14 +1,17 @@
 package edu.colorado.plv.chimp.managers;
 
 import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -179,6 +182,11 @@ public class WildCardManager {
             }
         }
         return list;
+    }
+
+
+    public ArrayList<UiObject2> retrieveTopLevelUIObjects2(BySelector top){
+        return (ArrayList<UiObject2>)mDevice.findObjects(top);
     }
 
 }

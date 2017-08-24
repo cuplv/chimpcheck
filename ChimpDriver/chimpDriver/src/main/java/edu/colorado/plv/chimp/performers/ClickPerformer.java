@@ -51,11 +51,13 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
     @Override
     public AppEventOuterClass.Click performUiObjectAction(AppEventOuterClass.Click origin, UiObject uiObject) throws UiObjectNotFoundException {
         String display = wildCardManager.getUiObjectDisplay(uiObject);
-        // uiObject.click();
+         uiObject.click();
+        /**
         Log.i(tag("UiObjectAction"), "Retrieving display bounds from UIObject");
         Rect rect = uiObject.getBounds();
         Log.i(tag("UiObjectAction"), "Executing espresso action");
         Espresso.onView(isRoot()).perform(ChimpActionFactory.clickXY(rect.centerX(),rect.centerY()));
+         **/
 
         AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
         builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display));

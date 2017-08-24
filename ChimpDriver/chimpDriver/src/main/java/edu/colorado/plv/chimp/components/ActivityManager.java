@@ -3,6 +3,7 @@ package edu.colorado.plv.chimp.components;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.res.Resources;
 import android.os.IInterface;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.*;
@@ -39,10 +40,10 @@ import static org.hamcrest.Matchers.allOf;
  */
 public class ActivityManager {
 
-    protected Activity current;
+    protected static Activity current;
     protected Random seed = new Random();
 
-    protected Activity getActivityInstance(){
+    protected static Activity getActivityInstance(){
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             public void run(){
                 Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
@@ -55,7 +56,7 @@ public class ActivityManager {
         return current;
     }
 
-    protected View getDecorView(){
+    protected static View getDecorView(){
         return getActivityInstance().getWindow().getDecorView();
     }
 
@@ -159,7 +160,7 @@ public class ActivityManager {
         }
         return ids;
     }
-    protected String getResName(int rid){
+    protected static String getResName(int rid){
         return getDecorView().getResources().getResourceEntryName(rid);
     }
     protected static String getResName(View v){
@@ -374,4 +375,18 @@ public class ActivityManager {
         }
     }
 
+
+    public static int  getResIdFromResName(String res){
+        String[] strs = res.split(":");
+        String[] strs2 = strs[1].split("\\/");
+        String defPackage = strs[0];
+        String defType = strs2[0];
+        String name = strs2[1];
+        Resources r = getActivityInstance().getResources();
+        return r.getIdentifier(name, defType, defPackage);
+    }
+    public static String getResEntryName(String res){
+        int rid = getResIdFromResName(res);
+        return getDecorView().getResources().getResourceEntryName(rid);
+    }
 }

@@ -59,6 +59,7 @@ import static org.hamcrest.Matchers.allOf;
 
 import edu.colorado.plv.chimp.performers.ClickPerformer;
 import edu.colorado.plv.chimp.performers.LongClickPerformer;
+import edu.colorado.plv.chimp.performers.TypePerformer;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
@@ -154,87 +155,8 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), type.toString());
-        AppEventOuterClass.UIID uiid = type.getUiid();
-        String text = type.getInput();
-        switch (uiid.getIdType()) {
-            case R_ID:
-                Espresso.onView(withId(uiid.getRid()))
-                        .perform(clearText())
-                        .perform(typeText(text)).perform(closeSoftKeyboard());
-                return type;
-            case NAME_ID:
-                Espresso.onView(withText(uiid.getNameid()))
-                        .perform(clearText())
-                        .perform(typeText(text));
-                Espresso.onView(isRoot())
-                        .perform(closeSoftKeyboard());
-                return type;
-            case WILD_CARD:
-
-                /*
-                Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-                ViewID vid = pickOne(getTypeableViewIDs(), "No available typeable views");
-                try{
-                    Espresso.onView(vid.matcher()).perform(typeText(text)).perform(closeSoftKeyboard());
-                } catch(NoMatchingViewException nmve){
-                    launchClickBack();
-                }
-
-                AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
-                switch(vid.type()) {
-                    case RID:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.R_ID).setRid(vid.getID())).setInput(text);
-                        break;
-                    case DISPLAY_TEXT:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getText())).setInput(text); break;
-                    case CONTENT_DESC:
-                        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(vid.getDesc())).setInput(text); break;
-                }
-
-                return builder.build();
-                */
-
-                try {
-                    ArrayList<UiObject> editableObjects = new ArrayList<>();
-
-                    ArrayList<UiObject> editTextObjects = wildCardManager.retrieveUiObjects(new UiSelector().className("android.widget.EditText")
-                                                                                           ,new UiSelector().enabled(true));
-                    editableObjects.addAll( editTextObjects );
-                    // ArrayList<UiObject> imageViewObjects = wildCardManager.retrieveUiObjects(new UiSelector().className("android.widget..ImageView").enabled(true)
-                    //                                                                         ,new UiSelector().enabled(true));
-
-
-                    // TODO find other Android classes with editable text fields
-
-                    while(editableObjects.size() > 0) {
-                        UiObject uiObject = wildCardManager.popOne(editableObjects);
-                        boolean succ = false;
-                        String display = "";
-                        try {
-                            display = wildCardManager.getUiObjectDisplay(uiObject);
-                            uiObject.setText(text);
-                            succ = true;
-                        } catch (UiObjectNotFoundException e) {
-                            Log.e(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), "Failed typing on UIObject: " + wildCardManager.uiObjectInfo(uiObject), e);
-                        }
-                        if (succ) {
-                            AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
-                            builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display))
-                                   .setInput(text);
-                            return builder.build();
-                        }
-                    }
-
-                } catch (UiObjectNotFoundException e) {
-                    Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Error occurred at wild card top-level", e);
-                }
-
-                Log.e(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), "Exhausted all wild card options. Throwing exception.");
-                throw new NoViewEnabledException("Exhausted all wild card options.");
-
-
-        }
-        return type;
+        TypePerformer performer = new TypePerformer(this, viewManager, wildCardManager, new UiSelector().clickable(true), new UiSelector().enabled(true));
+        return performer.performAction(type);
     }
 
     @Override
