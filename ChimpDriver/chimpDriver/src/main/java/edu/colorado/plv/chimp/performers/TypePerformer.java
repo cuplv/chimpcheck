@@ -134,8 +134,11 @@ public class TypePerformer extends Performer<AppEventOuterClass.Type> {
             vi = Espresso.onView(isRoot());
             vi.perform(closeSoftKeyboard());
         } catch (NoMatchingViewException nmve){
+            // This probably means we are matching some view that does not "support input method".
+            // Throws our own exception.
             nmve.printStackTrace();
         } catch (AmbiguousViewMatcherException avme){
+            // Throw out our own Exception
             avme.printStackTrace();
         }
 
