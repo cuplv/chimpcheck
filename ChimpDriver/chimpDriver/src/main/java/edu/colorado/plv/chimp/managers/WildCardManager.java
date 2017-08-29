@@ -56,6 +56,18 @@ public class WildCardManager {
         return null;
     }
 
+    public UiObject2 popOneUiObject2(ArrayList<UiObject2> uiObjects) {
+        Random seed = new Random();
+        if (uiObjects.size() > 0) {
+            int randIdx = seed.nextInt(uiObjects.size());
+            UiObject2 cand = uiObjects.get(randIdx);
+
+            uiObjects.remove(randIdx);
+            return cand;
+        }
+        return null;
+    }
+
     public ArrayList<UiObject> retrieveTopLevelUiObjects(UiSelector uiSelector) throws UiObjectNotFoundException {
         int i = 0;
         ArrayList<UiObject> uiObjects = new ArrayList<>();
