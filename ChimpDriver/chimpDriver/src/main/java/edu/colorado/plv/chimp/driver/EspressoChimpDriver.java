@@ -169,7 +169,6 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
-        swipe.getPos().
 
         AppEventOuterClass.UIID uiid = swipe.getUiid();
         switch(uiid.getIdType()) {
