@@ -387,6 +387,12 @@ public class ActivityManager {
     }
     public static String getResEntryName(String res){
         int rid = getResIdFromResName(res);
-        return getDecorView().getResources().getResourceEntryName(rid);
+        String resName = "";
+        try {
+            resName = getDecorView().getResources().getResourceEntryName(rid);
+        } catch (Resources.NotFoundException e){
+            resName = null;
+        }
+        return resName;
     }
 }
