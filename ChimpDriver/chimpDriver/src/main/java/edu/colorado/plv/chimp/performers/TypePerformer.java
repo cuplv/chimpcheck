@@ -64,11 +64,20 @@ public class TypePerformer extends Performer<AppEventOuterClass.Type> {
         return viewManager.retrieveTargets(type.getUiid());
     }
 
-    public AppEventOuterClass.Type performMatcherAction(AppEventOuterClass.Type origin, Matcher<View> matcher)
-            throws AmbiguousViewMatcherException, NoMatchingViewException {
-
+    @Override
+    public AppEventOuterClass.Type performMatcherAction(AppEventOuterClass.Type origin, Matcher<View> matcher) {
         Espresso.onView(matcher).perform(clearText(), typeText(origin.getInput()), closeSoftKeyboard());
         return origin;
+    }
+    @Override
+    public AppEventOuterClass.Type performWildCardTargetAction(AppEventOuterClass.Type origin, WildCardTarget target) {
+        Espresso.onView(target.uiMatcher).perform(clearText(), typeText(origin.getInput()), closeSoftKeyboard());
+
+
+        AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
+        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                .setNameid(MatcherManager.describeMatcherAsDisplay(target.uiObj))).setInput(origin.getInput());
+        return builder.build();
     }
 
     @Override

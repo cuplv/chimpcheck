@@ -1,32 +1,23 @@
 package edu.colorado.plv.chimp.performers;
 
-import android.graphics.Rect;
 import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.PerformException;
-import android.support.test.espresso.matcher.ViewMatchers;
-import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.BySelector;
-import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObject2;
-import android.support.test.uiautomator.UiObjectNotFoundException;
-import android.support.test.uiautomator.UiSelector;
 import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import chimp.protobuf.AppEventOuterClass;
 import edu.colorado.plv.chimp.driver.ChimpDriver;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
-import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
@@ -40,6 +31,8 @@ public abstract class Performer<Act> {
     public abstract ArrayList<ViewManager.ViewTarget> getTargets(Act origin);
 
     public abstract Act performMatcherAction(Act origin, Matcher<View> matcher);
+
+    public abstract Act performWildCardTargetAction(Act origin, WildCardTarget target);
 
     public abstract Act performXYAction(Act origin, int x, int y);
 
@@ -115,14 +108,15 @@ public abstract class Performer<Act> {
 
         try {
             ArrayList<UiObject2> uiObject2s = wildCardManager.retrieveUiObject2s(wildCardSelector);
-            ArrayList<Matcher<View>> matchers = MatcherManager.getViewMatchers(uiObject2s, userDefinedMatcher);
+            ArrayList<WildCardTarget> matchers = MatcherManager.getViewMatchers(uiObject2s, userDefinedMatcher);
 
             while(matchers.size() > 0) {
                 Log.i(tag("wildcard"), Integer.toString(matchers.size()));
-                Matcher<View> matcher = wildCardManager.popOne(matchers);
+                WildCardTarget target = wildCardManager.popOne(matchers);
                 try {
                     Log.i(tag("wildcard"), "Attempting to perform action on UiObject");
-                    return performMatcherAction(origin, matcher);
+                    Act result = performWildCardTargetAction(origin, target);
+                    return result;
                 } catch (AmbiguousViewMatcherException avme){
                     Log.e(tag("wildcard"), avme.getStackTrace()[0].toString());
                 } catch (NoMatchingViewException nmve){
@@ -142,6 +136,7 @@ public abstract class Performer<Act> {
         return null;
 
     }
+
 
 
 }

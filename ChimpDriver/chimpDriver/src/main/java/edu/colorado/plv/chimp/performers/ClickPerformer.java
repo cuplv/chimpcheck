@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import chimp.protobuf.AppEventOuterClass;
 import edu.colorado.plv.chimp.driver.ChimpDriver;
+import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
@@ -39,6 +40,7 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
         return viewManager.retrieveTargets(click.getUiid());
     }
 
+    @Override
     public AppEventOuterClass.Click performMatcherAction(AppEventOuterClass.Click origin, Matcher<View> matcher) {
         Espresso.onView(matcher).perform(click());
         return origin;
@@ -48,6 +50,17 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
     public AppEventOuterClass.Click performXYAction(AppEventOuterClass.Click origin, int x, int y) {
         Espresso.onView(isRoot()).perform(ChimpActionFactory.clickXY(x, y));
         return origin;
+    }
+
+    @Override
+    public AppEventOuterClass.Click performWildCardTargetAction(AppEventOuterClass.Click origin, WildCardTarget target) {
+        Espresso.onView(target.uiMatcher).perform(click());
+
+        AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
+        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
+                .setNameid(MatcherManager.describeMatcherAsDisplay(target.uiObj)));
+        return builder.build();
+
     }
 
 
