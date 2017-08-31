@@ -1,24 +1,17 @@
 package edu.colorado.plv.chimp.driver;
 
 import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoActivityResumedException;
 import android.support.test.espresso.NoMatchingViewException;
-import android.support.test.espresso.PerformException;
 import android.support.test.espresso.ViewInteraction;
-import android.support.test.espresso.util.HumanReadables;
 import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiDevice;
-import android.support.test.uiautomator.UiObject;
-import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
 import android.util.Log;
@@ -28,43 +21,30 @@ import android.view.View;
 
 import chimp.protobuf.AppEventOuterClass;
 import chimp.protobuf.EventTraceOuterClass;
-import edu.colorado.plv.chimp.components.ActivityManager;
-import edu.colorado.plv.chimp.components.ViewID;
 import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
 import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 
 
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
-import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.action.ViewActions.pressKey;
-import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
-import static android.support.test.espresso.matcher.ViewMatchers.withChild;
+import static android.support.test.espresso.matcher.ViewMatchers.supportsInputMethods;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnCoord;
 import static edu.colorado.plv.chimp.components.FingerGestures.swipeOnView;
-import static edu.colorado.plv.chimp.components.ViewID.ViewIDType.RID;
 import static edu.colorado.plv.chimp.components.ViewID.validOptionsMenu;
 import static org.hamcrest.Matchers.allOf;
 
 import edu.colorado.plv.chimp.performers.ClickPerformer;
-import edu.colorado.plv.chimp.performers.LongClickPerformer;
 import edu.colorado.plv.chimp.performers.TypePerformer;
-import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
-
-import java.util.ArrayList;
 
 /**
  * Created by edmund on 3/13/17.
@@ -141,21 +121,21 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
-        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, new UiSelector().clickable(true), new UiSelector().enabled(true));
+        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods(), isClickable()));
         return performer.performAction(click);
     }
 
     @Override
     protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
-        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, new UiSelector().longClickable(true), new UiSelector().enabled(true));
-        return performer.performAction(longClick);
+        //LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, new UiSelector().longClickable(true), new UiSelector().enabled(true));
+        return longClick;//performer.performAction(longClick);
     }
 
     @Override
     protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), type.toString());
-        TypePerformer performer = new TypePerformer(this, viewManager, wildCardManager, new UiSelector().clickable(true), new UiSelector().enabled(true));
+        TypePerformer performer = new TypePerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(supportsInputMethods()));
         return performer.performAction(type);
     }
 

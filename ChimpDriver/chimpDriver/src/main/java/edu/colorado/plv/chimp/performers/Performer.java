@@ -1,9 +1,15 @@
 package edu.colorado.plv.chimp.performers;
 
 import android.graphics.Rect;
+import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.PerformException;
+import android.support.test.espresso.matcher.ViewMatchers;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 import android.util.Log;
@@ -12,10 +18,12 @@ import android.view.View;
 import org.hamcrest.Matcher;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import chimp.protobuf.AppEventOuterClass;
 import edu.colorado.plv.chimp.driver.ChimpDriver;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
+import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
@@ -35,22 +43,27 @@ public abstract class Performer<Act> {
 
     public abstract Act performXYAction(Act origin, int x, int y);
 
-    public abstract Act performUiObjectAction(Act origin, UiObject uiObject) throws UiObjectNotFoundException;
+    //public abstract Act performUiObjectAction(Act origin, UiObject uiObject) throws UiObjectNotFoundException;
 
     protected String displayAction;
     protected ChimpDriver chimpDriver;
     protected ViewManager viewManager;
     protected WildCardManager wildCardManager;
-    protected UiSelector wildCardTopSelector, wildCardChildSelector;
+    protected BySelector wildCardSelector;
+    protected Matcher<View> userDefinedMatcher;
 
-    public Performer(String displayAction, ChimpDriver chimpDriver, ViewManager viewManager, WildCardManager wildCardManager, UiSelector wildCardTopSelector, UiSelector wildCardChildSelector) {
+
+    public Performer(String displayAction, ChimpDriver chimpDriver, ViewManager viewManager,
+                     WildCardManager wildCardManager, BySelector wildCardSelector,
+                     Matcher<View> userDefinedMatcher){
         this.displayAction = displayAction;
         this.chimpDriver = chimpDriver;
         this.viewManager = viewManager;
         this.wildCardManager = wildCardManager;
-        this.wildCardTopSelector = wildCardTopSelector;
-        this.wildCardChildSelector = wildCardChildSelector;
+        this.wildCardSelector = wildCardSelector;
+        this.userDefinedMatcher = userDefinedMatcher;
     }
+
 
     public String tag(String loc) {
         return displayAction + "-Performer@" + loc;
@@ -101,20 +114,28 @@ public abstract class Performer<Act> {
         chimpDriver.preemptiveTraceReport();
 
         try {
-            ArrayList<UiObject> uiObjects = wildCardManager.retrieveUiObjects(wildCardTopSelector, wildCardChildSelector);
+            ArrayList<UiObject2> uiObject2s = wildCardManager.retrieveUiObject2s(wildCardSelector);
+            ArrayList<Matcher<View>> matchers = MatcherManager.getViewMatchers(uiObject2s, userDefinedMatcher);
 
-            while(uiObjects.size() > 0) {
-                UiObject uiObject = wildCardManager.popOne(uiObjects);
+            while(matchers.size() > 0) {
+                Log.i(tag("wildcard"), Integer.toString(matchers.size()));
+                Matcher<View> matcher = wildCardManager.popOne(matchers);
                 try {
                     Log.i(tag("wildcard"), "Attempting to perform action on UiObject");
-                    return performUiObjectAction(origin, uiObject);
-                } catch (UiObjectNotFoundException e) {
-                    Log.i(tag("wildcard"), "Failed clicking on UIObject: " + wildCardManager.uiObjectInfo(uiObject) + " " + e.toString());
+                    return performMatcherAction(origin, matcher);
+                } catch (AmbiguousViewMatcherException avme){
+                    Log.e(tag("wildcard"), avme.getStackTrace()[0].toString());
+                } catch (NoMatchingViewException nmve){
+                    Log.e(tag("wildcard"), nmve.getStackTrace()[0].toString());
+                } catch (PerformException pe){
+                    Log.e(tag("wildcard"), pe.getStackTrace()[0].toString());
+
                 }
             }
 
-        } catch (UiObjectNotFoundException e) {
+        } catch (Exception ee) {
             Log.e(tag("wildcard"), "Error occurred at wild card top-level");
+            ee.printStackTrace();
         }
 
         Log.e(tag("wildcard"), "Exhausted all wild card options.");

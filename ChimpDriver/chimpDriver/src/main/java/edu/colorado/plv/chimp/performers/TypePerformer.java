@@ -6,6 +6,7 @@ import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.core.deps.guava.collect.Iterables;
 import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiObjectNotFoundException;
@@ -52,9 +53,10 @@ import static org.hamcrest.Matchers.describedAs;
  */
 
 public class TypePerformer extends Performer<AppEventOuterClass.Type> {
-
-    public TypePerformer(ChimpDriver chimpDriver, ViewManager viewManager, WildCardManager wildCardManager, UiSelector wildCardTopSelector, UiSelector wildCardChildSelector) {
-        super("Click", chimpDriver, viewManager, wildCardManager, wildCardTopSelector, wildCardChildSelector);
+    public TypePerformer(ChimpDriver chimpDriver, ViewManager viewManager,
+                          WildCardManager wildCardManager, BySelector wildCardSelector,
+                          Matcher<View> userDefinedMatcher) {
+        super("Type", chimpDriver, viewManager, wildCardManager, wildCardSelector, userDefinedMatcher);
     }
 
     @Override
@@ -62,8 +64,8 @@ public class TypePerformer extends Performer<AppEventOuterClass.Type> {
         return viewManager.retrieveTargets(type.getUiid());
     }
 
-    @Override
-    public AppEventOuterClass.Type performMatcherAction(AppEventOuterClass.Type origin, Matcher<View> matcher) {
+    public AppEventOuterClass.Type performMatcherAction(AppEventOuterClass.Type origin, Matcher<View> matcher)
+            throws AmbiguousViewMatcherException, NoMatchingViewException {
 
         Espresso.onView(matcher).perform(clearText(), typeText(origin.getInput()), closeSoftKeyboard());
         return origin;
@@ -76,79 +78,7 @@ public class TypePerformer extends Performer<AppEventOuterClass.Type> {
     }
 
 
-    @Override
-    public AppEventOuterClass.Type performWildCardAction(AppEventOuterClass.Type origin) {
 
-        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-
-        chimpDriver.preemptiveTraceReport();
-
-        try {
-            ArrayList<UiObject2> uiObjects = wildCardManager.retrieveTopLevelUIObjects2(By.clickable(true));
-
-            while (uiObjects.size() > 0) {
-                Log.i(tag("wildcard counting"), Integer.toString(uiObjects.size()));
-                UiObject2 uiObject = wildCardManager.popOneUiObject2(uiObjects);
-                try {
-                    Log.i(tag("wildcard"), "Attempting to perform action on UiObject");
-                    return performUiObjectAction(origin, uiObject);
-                } catch (UiObjectNotFoundException e) {
-                    Log.i(tag("wildcard"), "Failed clicking on UIObject: " + " " + e.toString());
-                }
-            }
-        } catch (Exception other){
-            other.printStackTrace();
-        }
-
-
-        Log.e(tag("wildcard"), "Exhausted all wild card options.");
-        return null;
-
-    }
-
-    @Override
-    public AppEventOuterClass.Type performUiObjectAction(AppEventOuterClass.Type origin, UiObject uiObject) throws UiObjectNotFoundException {
-        return origin;
-    }
-
-    public AppEventOuterClass.Type performUiObjectAction(AppEventOuterClass.Type origin, UiObject2 uiObject) throws UiObjectNotFoundException {
-        Log.d("Wildcard TypePerformer", uiObject.getResourceName());
-        Log.d("Wildcard TypePerformer", uiObject.getClassName());
-
-        Iterable<Matcher<? super View>> its = null;
-        ViewInteraction vi;
-
-        String display = MatcherManager.describeMatcherAsDisplay(uiObject);
-        try {
-            // clear text first
-            its = MatcherManager.getTypeableViewMatchers(uiObject);
-            vi = Espresso.onView(allOf(its));
-            vi.perform(clearText());
-
-            // fill with the target text
-            its = MatcherManager.getTypeableViewMatchers(uiObject);
-            vi = Espresso.onView(allOf(its));
-            vi.perform(typeText(origin.getInput()));
-
-            // close the soft keyboard
-            vi = Espresso.onView(isRoot());
-            vi.perform(closeSoftKeyboard());
-        } catch (NoMatchingViewException nmve){
-            // This probably means we are matching some view that does not "support input method".
-            // Throws our own exception.
-            nmve.printStackTrace();
-        } catch (AmbiguousViewMatcherException avme){
-            // Throw out our own Exception
-            avme.printStackTrace();
-        }
-
-
-
-        AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
-        builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID).setNameid(display)).setInput(origin.getInput());
-        Log.i(tag("UiObjectAction"), "Completed retrieval and execute.");
-        return builder.build();
-    }
 
 }
 

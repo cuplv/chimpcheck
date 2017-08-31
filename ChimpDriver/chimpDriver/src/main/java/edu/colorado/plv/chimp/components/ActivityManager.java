@@ -377,6 +377,7 @@ public class ActivityManager {
 
 
     public static int  getResIdFromResName(String res){
+        if(res == null) return 0;
         String[] strs = res.split(":");
         String[] strs2 = strs[1].split("\\/");
         String defPackage = strs[0];
