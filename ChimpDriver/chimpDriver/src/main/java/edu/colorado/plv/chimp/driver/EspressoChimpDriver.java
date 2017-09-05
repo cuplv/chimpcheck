@@ -42,6 +42,7 @@ import static edu.colorado.plv.chimp.components.ViewID.validOptionsMenu;
 import static org.hamcrest.Matchers.allOf;
 
 import edu.colorado.plv.chimp.performers.ClickPerformer;
+import edu.colorado.plv.chimp.performers.LongClickPerformer;
 import edu.colorado.plv.chimp.performers.TypePerformer;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
@@ -128,8 +129,8 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
-        //LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, new UiSelector().longClickable(true), new UiSelector().enabled(true));
-        return longClick;//performer.performAction(longClick);
+        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods(), isClickable()));
+        return performer.performAction(longClick);
     }
 
     @Override
