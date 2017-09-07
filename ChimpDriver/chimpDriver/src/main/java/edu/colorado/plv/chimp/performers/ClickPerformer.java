@@ -30,9 +30,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
 
     public ClickPerformer(ChimpDriver chimpDriver, ViewManager viewManager,
-                          WildCardManager wildCardManager, BySelector wildCardSelector,
+                          WildCardManager wildCardManager, BySelector wildCardSelector, BySelector wildCardChildSelector,
                           Matcher<View> userDefinedMatcher) {
-        super("Click", chimpDriver, viewManager, wildCardManager, wildCardSelector, userDefinedMatcher);
+        super("Click", chimpDriver, viewManager, wildCardManager, wildCardSelector, wildCardChildSelector, userDefinedMatcher);
     }
 
     @Override

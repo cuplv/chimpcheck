@@ -63,43 +63,50 @@ public class WildCardManager {
 
 
 
-
-    public ArrayList<UiObject2> retrieveUiObject2s(BySelector selector){
-        selector.depth(0, 10);
-        ArrayList<UiObject2> uiObjects =(ArrayList<UiObject2>) mDevice.findObjects(selector);
-        ArrayList<UiObject2> childList = new ArrayList<>();
-        for(UiObject2 obj : uiObjects){
-            if(obj.getChildCount() != 0){
-                childList.addAll(obj.getChildren());
-            }
-        }
-        uiObjects.addAll(childList);
-        for(UiObject2 obj : uiObjects) {
-            try {
-                Log.d("WildCardManager", uiObject2Info(obj));
-            } catch (UiObjectNotFoundException e) {
-                Log.d("WildCardManager", e.getStackTrace()[0].toString());
-
-            }
-        }
+    public ArrayList<UiObject2> retrieveTopLevelUiObjects(BySelector uiSelector) throws UiObjectNotFoundException {
+        int i = 0;
+        ArrayList<UiObject2> uiObjects = (ArrayList<UiObject2>) mDevice.findObjects(uiSelector);
         return uiObjects;
     }
-
-
-    public void randomRun(int step) throws UiObjectNotFoundException {
-        if (step == 0) { return; }
-
-        UiObject2 chosen = popOne( retrieveUiObject2s(By.enabled(true)) );
-        if (chosen == null) {
-            Log.i("RandomRun", "Dead end");
-            return;
+    public ArrayList<UiObject2> retrieveChildUiObjects(UiObject2 uiObject, BySelector uiSelector) throws UiObjectNotFoundException {
+        ArrayList<UiObject2> list = new ArrayList<>();
+        if (uiObject.getChildCount() == 0) {
+            Log.i("Chimp-wildCardManager","Leaf UIObject: " + uiObject2Info(uiObject));
+            list.add(uiObject);
+        } else {
+            Log.i("retrieveUIObjects","Non-Leaf UIObject: " + uiObject2Info(uiObject));
+            int i = 0;
+            list.addAll(uiObject.getChildren());
+        }
+        return list;
+    }
+    public ArrayList<UiObject2> retrieveUiObject2s(BySelector topLevelSelector, BySelector childSelector, int depth) throws UiObjectNotFoundException {
+        if (depth == 0) { return new ArrayList<>(); }
+        ArrayList<UiObject2> currUiObjects = retrieveTopLevelUiObjects(topLevelSelector);
+        ArrayList<UiObject2> baseUiObjects = new ArrayList<>();
+        while (depth > 0 && currUiObjects.size() > 0) {
+            ArrayList<UiObject2> tempUiObjects = new ArrayList<>();
+            for(UiObject2 currUiObject: currUiObjects) {
+                if (currUiObject.getChildCount() != 0) {
+                    tempUiObjects.addAll( retrieveChildUiObjects(currUiObject, childSelector) );
+                } else {
+                    baseUiObjects.add( currUiObject );
+                }
+            }
+            currUiObjects = tempUiObjects;
+            depth--;
         }
 
-        Log.i("RandomRun", "Chosen step: " + uiObject2Info(chosen) );
-        chosen.click();
+        String str = "/***** Inferred Actionable UI Objects *****/\n";
+        for(UiObject2 candidate: new HashSet<UiObject2>(baseUiObjects)) {
+            str += "Found candidate: " + candidate.getClassName() + " " + candidate.getText() + " " + candidate.getContentDescription() + "\n";
+        }
+        str += "/******************************************/";
+        Log.i("Chimp-wildCardManager",str);
 
-        randomRun(step - 1);
+        return baseUiObjects;
     }
+
 
     public ArrayList<UiObject> retrieveExistingLeafUIObjects(UiSelector rootSelector, UiSelector childSelector)
             throws UiObjectNotFoundException {

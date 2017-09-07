@@ -124,21 +124,21 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
-        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods()));
+        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, By.clickable(true), By.enabled(true), allOf(notSupportsInputMethods()));
         return performer.performAction(click);
     }
 
     @Override
     protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
-        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods()));
+        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, By.clickable(true), By.enabled(true), allOf(notSupportsInputMethods()));
         return performer.performAction(longClick);
     }
 
     @Override
     protected AppEventOuterClass.Type launchTypeEvent(AppEventOuterClass.Type type) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchTypeEvent"), type.toString());
-        TypePerformer performer = new TypePerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(supportsInputMethods()));
+        TypePerformer performer = new TypePerformer(this, viewManager, wildCardManager, By.clickable(true), By.enabled(true), allOf(supportsInputMethods()));
         return performer.performAction(type);
     }
 
@@ -152,7 +152,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
         Espresso.onView(isRoot()).perform(closeSoftKeyboard());
-        SwipePerformer performer = new SwipePerformer(this, viewManager, wildCardManager, By.enabled(true), isDisplayed());
+        SwipePerformer performer = new SwipePerformer(this, viewManager, wildCardManager, By.enabled(true), By.enabled(true), isDisplayed());
         AppEventOuterClass.Swipe result = swipe;
         try {
              result = performer.performAction(swipe);

@@ -33,9 +33,9 @@ import static android.support.test.espresso.action.ViewActions.typeText;
 public class SwipePerformer extends Performer<AppEventOuterClass.Swipe> {
 
     public SwipePerformer(ChimpDriver chimpDriver, ViewManager viewManager,
-                         WildCardManager wildCardManager, BySelector wildCardSelector,
+                         WildCardManager wildCardManager, BySelector wildCardSelector, BySelector wildCardChildSelector,
                          Matcher<View> userDefinedMatcher) {
-        super("Swipe", chimpDriver, viewManager, wildCardManager, wildCardSelector, userDefinedMatcher);
+        super("Swipe", chimpDriver, viewManager, wildCardManager, wildCardSelector, wildCardChildSelector,userDefinedMatcher);
     }
 
     Map<AppEventOuterClass.Orientation.OrientType, ViewAction> swipeActions = ImmutableMap.of(

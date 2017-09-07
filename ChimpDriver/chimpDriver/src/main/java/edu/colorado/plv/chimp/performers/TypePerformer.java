@@ -54,9 +54,9 @@ import static org.hamcrest.Matchers.describedAs;
 
 public class TypePerformer extends Performer<AppEventOuterClass.Type> {
     public TypePerformer(ChimpDriver chimpDriver, ViewManager viewManager,
-                          WildCardManager wildCardManager, BySelector wildCardSelector,
+                          WildCardManager wildCardManager, BySelector wildCardSelector, BySelector wildCardChildSelector,
                           Matcher<View> userDefinedMatcher) {
-        super("Type", chimpDriver, viewManager, wildCardManager, wildCardSelector, userDefinedMatcher);
+        super("Type", chimpDriver, viewManager, wildCardManager, wildCardSelector, wildCardChildSelector,userDefinedMatcher);
     }
 
     @Override

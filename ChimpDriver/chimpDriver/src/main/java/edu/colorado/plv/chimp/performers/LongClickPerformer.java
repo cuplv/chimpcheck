@@ -26,9 +26,9 @@ import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 public class LongClickPerformer extends Performer<AppEventOuterClass.LongClick> {
 
     public LongClickPerformer(ChimpDriver chimpDriver, ViewManager viewManager,
-                              WildCardManager wildCardManager, BySelector wildCardSelector,
+                              WildCardManager wildCardManager, BySelector wildCardSelector, BySelector wildCardChildSelector,
                               Matcher<View> userDefinedMatcher) {
-        super("Click", chimpDriver, viewManager, wildCardManager, wildCardSelector, userDefinedMatcher);
+        super("Click", chimpDriver, viewManager, wildCardManager, wildCardSelector, wildCardChildSelector, userDefinedMatcher);
     }
 
     @Override

@@ -43,17 +43,19 @@ public abstract class Performer<Act> {
     protected ViewManager viewManager;
     protected WildCardManager wildCardManager;
     protected BySelector wildCardSelector;
+    protected BySelector wildCardChildSelector;
     protected Matcher<View> userDefinedMatcher;
 
 
     public Performer(String displayAction, ChimpDriver chimpDriver, ViewManager viewManager,
-                     WildCardManager wildCardManager, BySelector wildCardSelector,
+                     WildCardManager wildCardManager, BySelector wildCardSelector, BySelector wildCardChildSelector,
                      Matcher<View> userDefinedMatcher){
         this.displayAction = displayAction;
         this.chimpDriver = chimpDriver;
         this.viewManager = viewManager;
         this.wildCardManager = wildCardManager;
         this.wildCardSelector = wildCardSelector;
+        this.wildCardChildSelector = wildCardChildSelector;
         this.userDefinedMatcher = userDefinedMatcher;
     }
 
@@ -107,7 +109,7 @@ public abstract class Performer<Act> {
         chimpDriver.preemptiveTraceReport();
 
         try {
-            ArrayList<UiObject2> uiObject2s = wildCardManager.retrieveUiObject2s(wildCardSelector);
+            ArrayList<UiObject2> uiObject2s = wildCardManager.retrieveUiObject2s(wildCardSelector, wildCardChildSelector, 10);
             ArrayList<WildCardTarget> matchers = MatcherManager.getViewMatchers(uiObject2s, userDefinedMatcher);
 
             while(matchers.size() > 0) {
