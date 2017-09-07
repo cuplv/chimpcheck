@@ -1,5 +1,6 @@
 package edu.colorado.plv.chimp.managers;
 
+import android.support.test.uiautomator.StaleObjectException;
 import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.util.Log;
@@ -70,22 +71,26 @@ public class MatcherManager {
     }
 
     public static String describeMatcherAsDisplay(UiObject2 uiObject){
-        String display = edu.colorado.plv.chimp.components.ActivityManager.getResEntryName(uiObject.getResourceName());
-        if(display != null) {
-            display = "R.id." +  display;
-            return display;
-        } else {
-            String contentDescription = uiObject.getContentDescription();
-            if (contentDescription != null) {
-                display = "Content Desc: " + contentDescription;
+        try {
+            String display = edu.colorado.plv.chimp.components.ActivityManager.getResEntryName(uiObject.getResourceName());
+            if (display != null) {
+                display = "R.id." + display;
                 return display;
-            } else{
-                String text = uiObject.getText();
-                if(text != null){
-                    display = "Text: " + text;
+            } else {
+                String contentDescription = uiObject.getContentDescription();
+                if (contentDescription != null) {
+                    display = "Content Desc: " + contentDescription;
                     return display;
+                } else {
+                    String text = uiObject.getText();
+                    if (text != null) {
+                        display = "Text: " + text;
+                        return display;
+                    }
                 }
             }
+        } catch (StaleObjectException soe){
+            Log.e("MatchManager", "Cannot Describe UiObject2");
         }
         return "No Display";
     }
