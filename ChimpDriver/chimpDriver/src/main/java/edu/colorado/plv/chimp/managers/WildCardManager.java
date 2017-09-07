@@ -67,10 +67,17 @@ public class WildCardManager {
     public ArrayList<UiObject2> retrieveUiObject2s(BySelector selector){
         selector.depth(0, 10);
         ArrayList<UiObject2> uiObjects =(ArrayList<UiObject2>) mDevice.findObjects(selector);
+        ArrayList<UiObject2> childList = new ArrayList<>();
         for(UiObject2 obj : uiObjects){
+            if(obj.getChildCount() != 0){
+                childList.addAll(obj.getChildren());
+            }
+        }
+        uiObjects.addAll(childList);
+        for(UiObject2 obj : uiObjects) {
             try {
                 Log.d("WildCardManager", uiObject2Info(obj));
-            } catch (UiObjectNotFoundException e){
+            } catch (UiObjectNotFoundException e) {
                 Log.d("WildCardManager", e.getStackTrace()[0].toString());
 
             }

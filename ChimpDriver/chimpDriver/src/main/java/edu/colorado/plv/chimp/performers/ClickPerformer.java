@@ -54,11 +54,11 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
 
     @Override
     public AppEventOuterClass.Click performWildCardTargetAction(AppEventOuterClass.Click origin, WildCardTarget target) {
-        Espresso.onView(target.uiMatcher).perform(click());
 
         AppEventOuterClass.Click.Builder builder = AppEventOuterClass.Click.newBuilder();
         builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
                 .setNameid(MatcherManager.describeMatcherAsDisplay(target.uiObj)));
+        Espresso.onView(target.uiMatcher).perform(click());
         return builder.build();
 
     }

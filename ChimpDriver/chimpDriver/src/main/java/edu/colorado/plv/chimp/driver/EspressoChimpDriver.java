@@ -28,6 +28,7 @@ import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 
 
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.pressKey;
 import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -43,6 +44,7 @@ import static org.hamcrest.Matchers.allOf;
 
 import edu.colorado.plv.chimp.performers.ClickPerformer;
 import edu.colorado.plv.chimp.performers.LongClickPerformer;
+import edu.colorado.plv.chimp.performers.SwipePerformer;
 import edu.colorado.plv.chimp.performers.TypePerformer;
 import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import edu.colorado.plv.chimp.viewactions.OrientationChangeAction;
@@ -122,14 +124,14 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
-        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods(), isClickable()));
+        ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods()));
         return performer.performAction(click);
     }
 
     @Override
     protected AppEventOuterClass.LongClick launchLongClickEvent(AppEventOuterClass.LongClick longClick) throws NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchLongClickEvent"), longClick.toString());
-        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods(), isClickable()));
+        LongClickPerformer performer = new LongClickPerformer(this, viewManager, wildCardManager, By.enabled(true), allOf(notSupportsInputMethods()));
         return performer.performAction(longClick);
     }
 
@@ -147,45 +149,17 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
         return pinch;
     }
 
-    @Override
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
-
-        AppEventOuterClass.UIID uiid = swipe.getUiid();
-        switch(uiid.getIdType()) {
-            case R_ID:
-                swipeOnView(uiid, Espresso.onView( withId(uiid.getRid()) ), swipe.getPos());
-                return swipe;
-            case NAME_ID:
-                swipeOnView(uiid, Espresso.onView( withText(uiid.getNameid()) ), swipe.getPos()); // Display name type
-                return swipe;
-            case XY_ID:
-                AppEventOuterClass.XYCoordin xy = uiid.getXyid(); // XY coordinate type
-                swipeOnCoord(Espresso.onView(isRoot()), xy, swipe.getPos());
-            case WILD_CARD: // Wild card type
-                ViewInteraction vi;
-                try {
-                    View view = getSwipeableView();
-                    if(view.getId() != -1) {
-                        if(getResName(view).equals("statusBarBackground") ){
-                            return swipe;
-                        }
-                        vi = Espresso.onView(withId(view.getId()));
-                    } else if(view.getContentDescription() != null) {
-                        vi = Espresso.onView(withContentDescription(view.getContentDescription().toString()));
-                    }else{
-                        throw new NoViewEnabledException("can't find a view to swipe");
-                    }
-                    swipeOnView(uiid, vi, swipe.getPos());
-
-                } catch(NoViewEnabledException nvee){
-                    nvee.printStackTrace();
-                }
-
-                return swipe;
-            default:
-                return swipe;
+        Espresso.onView(isRoot()).perform(closeSoftKeyboard());
+        SwipePerformer performer = new SwipePerformer(this, viewManager, wildCardManager, By.enabled(true), isDisplayed());
+        AppEventOuterClass.Swipe result = swipe;
+        try {
+             result = performer.performAction(swipe);
+        } catch(Exception e){
+            e.printStackTrace();
         }
+        return result;
     }
 
     @Override

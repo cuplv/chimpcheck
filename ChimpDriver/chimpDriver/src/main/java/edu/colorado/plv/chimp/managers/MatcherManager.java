@@ -54,6 +54,7 @@ public class MatcherManager {
         Matcher<View> matchers = null;
         for(UiObject2 obj : objs) {
             matchers = MatcherManager.getViewMatchers(getResIdFromResName(obj.getResourceName()), obj.getText(), obj.getContentDescription(), matcher);
+            //TODO: Refactor this
             if(matchers == null){
                 continue;
             }
@@ -69,7 +70,6 @@ public class MatcherManager {
     }
 
     public static String describeMatcherAsDisplay(UiObject2 uiObject){
-        Log.d("describer, ", uiObject2Info(uiObject));
         String display = edu.colorado.plv.chimp.components.ActivityManager.getResEntryName(uiObject.getResourceName());
         if(display != null) {
             display = "R.id." +  display;
