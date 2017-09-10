@@ -27,6 +27,8 @@ import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
 import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
+import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.pressKey;
@@ -175,8 +177,10 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
         Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
-        UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        mDevice.pressMenu();
+        //UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        //mDevice.pressMenu();
+
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         // onView(validOptionsMenu("More options")).perform(click());
         // kickBackExperiment();
@@ -188,7 +192,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
         // Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
-        UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiDevice mDevice = UiDevice.getInstance(getInstrumentation());
         mDevice.pressHome();
 
         // Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_HOME));
@@ -204,7 +208,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
         try {
             Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
-        } catch(NoActivityResumedException e){
+        } catch(Exception e){
             /*
             try{
                 Thread.sleep(100000);
@@ -229,7 +233,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
         sleep(500);
 
-        UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        UiDevice mDevice = UiDevice.getInstance(getInstrumentation());
         Context context = InstrumentationRegistry.getContext();
         final Intent intent = context.getPackageManager()
                 .getLaunchIntentForPackage(packageName);
