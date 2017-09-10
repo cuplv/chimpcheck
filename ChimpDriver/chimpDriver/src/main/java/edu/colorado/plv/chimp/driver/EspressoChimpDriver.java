@@ -179,11 +179,11 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
         //UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         //mDevice.pressMenu();
+        Espresso.onView(
+                            allOf(withContentDescription("More options"),
+                                            validPosition()))
+                            .perform(click());
 
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-
-        // onView(validOptionsMenu("More options")).perform(click());
-        // kickBackExperiment();
     }
 
     @Override

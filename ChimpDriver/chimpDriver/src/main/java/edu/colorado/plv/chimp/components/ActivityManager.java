@@ -212,6 +212,22 @@ public class ActivityManager {
             }
         };
     }
+    public static Matcher<View> validPosition() {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("not supports input methods");
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                // At first glance, it would make sense to use view.onCheckIsTextEditor, but the android
+                // javadoc is wishy-washy about whether authors are required to implement this method when
+                // implementing onCreateInputConnection.
+                return view.getX() != 0 && view.getY() != 0;
+            }
+        };
+    }
     // Dialog box stuff
 
     protected ArrayList<ViewID> getClickableViewIDsOLD() throws NoViewEnabledException {
