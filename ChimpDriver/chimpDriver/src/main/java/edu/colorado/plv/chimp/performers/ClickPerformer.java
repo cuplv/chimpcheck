@@ -46,15 +46,13 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
         //Espresso.onView(matcher).perform(click());
         try{
             Espresso.onView(new AmbiguousCounter(matcher)).perform(click());
-        } catch (AmbiguousViewMatcherException avme){
+        } catch (AmbiguousViewMatcherException avme) {
             int counter = AmbiguousCounter.getCounter();
             AmbiguousCounter.resetCounter();
-            Log.d(tag("Click Perform Ambi"), Integer.toString(counter));
+            
             Random seed = new Random(System.currentTimeMillis());
             int randIdx = seed.nextInt(counter);
             Espresso.onView(MatchWithIndex.withIndex(matcher, randIdx)).perform(click());
-        } catch (NoMatchingViewException e){
-            throw e;
         }
 
         return origin;
