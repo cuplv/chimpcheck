@@ -37,6 +37,7 @@ import edu.colorado.plv.chimp.viewactions.ChimpStagingAction;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.replaceText;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
@@ -66,14 +67,14 @@ public class TypePerformer extends Performer<AppEventOuterClass.Type> {
 
     @Override
     public AppEventOuterClass.Type performMatcherAction(AppEventOuterClass.Type origin, Matcher<View> matcher) {
-        Espresso.onView(matcher).perform(clearText(), typeText(origin.getInput()));
+        Espresso.onView(matcher).perform(replaceText(origin.getInput()));
         Espresso.onView(isRoot()).perform(closeSoftKeyboard());
         return origin;
     }
     @Override
     public AppEventOuterClass.Type performWildCardTargetAction(AppEventOuterClass.Type origin, WildCardTarget target) {
-        Espresso.onView(target.uiMatcher).perform(clearText(), typeText(origin.getInput()), closeSoftKeyboard());
-
+        Espresso.onView(target.uiMatcher).perform(replaceText(origin.getInput()));
+        Espresso.onView(isRoot()).perform(closeSoftKeyboard());
 
         AppEventOuterClass.Type.Builder builder = AppEventOuterClass.Type.newBuilder();
         builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)

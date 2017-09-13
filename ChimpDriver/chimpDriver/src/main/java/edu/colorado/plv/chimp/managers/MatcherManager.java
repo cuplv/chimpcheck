@@ -49,17 +49,15 @@ public class MatcherManager {
     }
 
 
-
+    // TODO: make @getViewMatchers a @getViewMatcher function
     public static ArrayList<WildCardTarget> getViewMatchers(List<UiObject2> objs, Matcher<? super View> ...matcher){
         ArrayList<WildCardTarget> list = new ArrayList<>();
         Matcher<View> matchers = null;
         for(UiObject2 obj : objs) {
             matchers = MatcherManager.getViewMatchers(getResIdFromResName(obj.getResourceName()), obj.getText(), obj.getContentDescription(), matcher);
-            //TODO: Refactor this
-            if(matchers == null){
-                continue;
+            if(matchers != null) {
+                list.add(new WildCardTarget(matchers, obj));
             }
-            list.add(new WildCardTarget(matchers, obj));
 
         }
         return list;

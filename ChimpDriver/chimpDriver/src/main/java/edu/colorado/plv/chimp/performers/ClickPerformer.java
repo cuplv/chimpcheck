@@ -1,17 +1,16 @@
 package edu.colorado.plv.chimp.performers;
 
-import android.graphics.Rect;
+import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.uiautomator.BySelector;
-import android.support.test.uiautomator.UiObject;
-import android.support.test.uiautomator.UiObjectNotFoundException;
-import android.support.test.uiautomator.UiSelector;
 import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import chimp.protobuf.AppEventOuterClass;
 import edu.colorado.plv.chimp.driver.ChimpDriver;
@@ -19,6 +18,8 @@ import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
+import edu.colorado.plv.chimp.viewmatchers.AmbiguousCounter;
+import edu.colorado.plv.chimp.viewmatchers.MatchWithIndex;
 
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
@@ -42,7 +43,20 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
 
     @Override
     public AppEventOuterClass.Click performMatcherAction(AppEventOuterClass.Click origin, Matcher<View> matcher) {
-        Espresso.onView(matcher).perform(click());
+        //Espresso.onView(matcher).perform(click());
+        try{
+            Espresso.onView(new AmbiguousCounter(matcher)).perform(click());
+        } catch (AmbiguousViewMatcherException avme){
+            int counter = AmbiguousCounter.getCounter();
+            AmbiguousCounter.resetCounter();
+            Log.d(tag("Click Perform Ambi"), Integer.toString(counter));
+            Random seed = new Random(System.currentTimeMillis());
+            int randIdx = seed.nextInt(counter);
+            Espresso.onView(MatchWithIndex.withIndex(matcher, randIdx)).perform(click());
+        } catch (NoMatchingViewException e){
+            throw e;
+        }
+
         return origin;
     }
 

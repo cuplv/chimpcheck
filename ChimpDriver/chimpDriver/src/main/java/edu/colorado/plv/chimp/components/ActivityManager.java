@@ -41,7 +41,7 @@ import static org.hamcrest.Matchers.allOf;
 public class ActivityManager {
 
     protected static Activity current;
-    protected Random seed = new Random();
+    protected Random seed = new Random(System.currentTimeMillis());
 
     protected static Activity getActivityInstance(){
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {

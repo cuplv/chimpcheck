@@ -120,11 +120,11 @@ public abstract class Performer<Act> {
                     Act result = performWildCardTargetAction(origin, target);
                     return result;
                 } catch (AmbiguousViewMatcherException avme){
-                    Log.e(tag("wildcard"), avme.getStackTrace()[0].toString());
+                    Log.e(tag("wildcard"), avme.toString());
                 } catch (NoMatchingViewException nmve){
-                    Log.e(tag("wildcard"), nmve.getStackTrace()[0].toString());
+                    Log.e(tag("wildcard"), nmve.toString());
                 } catch (PerformException pe){
-                    Log.e(tag("wildcard"), pe.getStackTrace()[0].toString());
+                    Log.e(tag("wildcard"), pe.toString());
 
                 }
             }
