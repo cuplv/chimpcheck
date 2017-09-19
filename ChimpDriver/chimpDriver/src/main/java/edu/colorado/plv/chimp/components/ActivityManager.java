@@ -224,7 +224,7 @@ public class ActivityManager {
                 // At first glance, it would make sense to use view.onCheckIsTextEditor, but the android
                 // javadoc is wishy-washy about whether authors are required to implement this method when
                 // implementing onCreateInputConnection.
-                return view.getX() != 0 && view.getY() != 0;
+                return view.getX() != 0 || view.getY() != 0;
             }
         };
     }

@@ -90,6 +90,9 @@ dependencies {
 
     // compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.google.protobuf:protobuf-lite:3.0.1'
+
+    compile 'com.android.support:support-compat:25.1.0'
+
 }
 
 protobuf {

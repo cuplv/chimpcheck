@@ -20,6 +20,7 @@ import edu.colorado.plv.chimp.managers.WildCardManager;
 
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.action.ViewActions.swipeDown;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
@@ -54,7 +55,7 @@ public class SwipePerformer extends Performer<AppEventOuterClass.Swipe> {
     @Override
     public AppEventOuterClass.Swipe performMatcherAction(AppEventOuterClass.Swipe origin, Matcher<View> matcher) {
         ViewAction swipe = swipeActions.get(origin.getPos().getOrientType());
-        Espresso.onView(matcher).perform(swipe);
+        Espresso.onView(matcher).perform(scrollTo());
         return origin;
     }
     @Override

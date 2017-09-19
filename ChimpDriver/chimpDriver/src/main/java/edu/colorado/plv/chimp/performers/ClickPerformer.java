@@ -18,11 +18,14 @@ import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
+import edu.colorado.plv.chimp.viewactions.PermissionGranter;
 import edu.colorado.plv.chimp.viewmatchers.AmbiguousCounter;
 import edu.colorado.plv.chimp.viewmatchers.MatchWithIndex;
 
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
+import static org.hamcrest.Matchers.allOf;
 
 /**
  * Created by edmundlam on 5/19/17.
@@ -43,13 +46,17 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
 
     @Override
     public AppEventOuterClass.Click performMatcherAction(AppEventOuterClass.Click origin, Matcher<View> matcher) {
-        //Espresso.onView(matcher).perform(click());
+        if(origin.getUiid().getNameid().equals("ALLOW PERMISSION")){
+            PermissionGranter.allowPermissionsIfNeeded();
+            return origin;
+        }
         try{
-            Espresso.onView(new AmbiguousCounter(matcher)).perform(click());
+            AmbiguousCounter.resetCounter();
+            Espresso.onView(new AmbiguousCounter(allOf(matcher, isDisplayed()))).perform(click());
         } catch (AmbiguousViewMatcherException avme) {
+            avme.printStackTrace();
             int counter = AmbiguousCounter.getCounter();
             AmbiguousCounter.resetCounter();
-            
             Random seed = new Random(System.currentTimeMillis());
             int randIdx = seed.nextInt(counter);
             Espresso.onView(MatchWithIndex.withIndex(matcher, randIdx)).perform(click());

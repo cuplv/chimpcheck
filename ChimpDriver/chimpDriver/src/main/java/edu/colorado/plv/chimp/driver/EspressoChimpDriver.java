@@ -125,6 +125,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
     @Override
     protected AppEventOuterClass.Click launchClickEvent(AppEventOuterClass.Click click) throws NoViewEnabledException {
+
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickEvent"), click.toString());
         ClickPerformer performer = new ClickPerformer(this, viewManager, wildCardManager, By.clickable(true), By.enabled(true), allOf(notSupportsInputMethods()));
         return performer.performAction(click);
@@ -154,7 +155,7 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     protected AppEventOuterClass.Swipe launchSwipeEvent(AppEventOuterClass.Swipe swipe) {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchSwipeEvent"), swipe.toString());
         Espresso.onView(isRoot()).perform(closeSoftKeyboard());
-        SwipePerformer performer = new SwipePerformer(this, viewManager, wildCardManager, By.enabled(true), By.enabled(true), isDisplayed());
+        SwipePerformer performer = new SwipePerformer(this, viewManager, wildCardManager, By.enabled(true), By.enabled(true), null);
         AppEventOuterClass.Swipe result = swipe;
         try {
              result = performer.performAction(swipe);
@@ -177,12 +178,10 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
 
         Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
-        //UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-        //mDevice.pressMenu();
         Espresso.onView(
-                            allOf(withContentDescription("More options"),
-                                            validPosition()))
-                            .perform(click());
+                allOf(withContentDescription("More options"),
+                        validPosition()))
+                .perform(click());
 
     }
 
@@ -202,23 +201,9 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     @Override
     protected void launchClickBack() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "ClickBack");
-        // Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
+        UiDevice mDevice = UiDevice.getInstance(getInstrumentation());
+        mDevice.pressBack();
 
-        // Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
-
-        try {
-            Espresso.onView(isRoot()).perform(pressKey(KeyEvent.KEYCODE_BACK));
-        } catch(Exception e){
-            /*
-            try{
-                Thread.sleep(100000);
-            } catch(InterruptedException ie) {
-                ie.printStackTrace();
-            }
-            e.printStackTrace();
-            */
-            Log.i(runner.chimpTag("EspressoChimpDriver@launchClickBack"), "App Exited. ChimpDriver Remaining calm.");
-        }
 
     }
 
@@ -226,10 +211,9 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
     protected void launchResume() {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchReturnToApp"), "Resume");
 
-        String packageName = runner.getAppPackageName(); // "com.ianhanniballake.contractiontimer";
+        String packageName = runner.getAppPackageName();
         int launchTimeout = 5000;
 
-        // Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
         sleep(500);
 
@@ -270,11 +254,6 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
             Espresso.onView(isRoot()).perform(OrientationChangeAction.orientationPortrait());
         }
 
-        /*
-        activity.setRequestedOrientation(
-                (orientation == Configuration.ORIENTATION_PORTRAIT) ?
-                        ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        */
 
     }
 

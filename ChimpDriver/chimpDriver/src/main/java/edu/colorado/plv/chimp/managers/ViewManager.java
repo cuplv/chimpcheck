@@ -101,11 +101,11 @@ public class ViewManager {
 
         switch(uiid.getIdType()) {
             case R_ID:
-                targets.add( mkMatcherTarget( allOf(withId(uiid.getRid()),isDisplayed()) ) );
+                targets.add( mkMatcherTarget( allOf(withId(uiid.getRid())) ) );
                 break;
             case NAME_ID:
-                targets.add( mkMatcherTarget( allOf(withText(uiid.getNameid()),isDisplayed()) ) );
-                targets.add( mkMatcherTarget( allOf(withContentDescription(uiid.getNameid()),isDisplayed()) ) );
+                targets.add( mkMatcherTarget( allOf(withText(uiid.getNameid())) ) );
+                targets.add( mkMatcherTarget( allOf(withContentDescription(uiid.getNameid())) ) );
                 break;
             case XY_ID:
                 targets.add( mkXYTarget( uiid.getXyid().getX(), uiid.getXyid().getY() ) );

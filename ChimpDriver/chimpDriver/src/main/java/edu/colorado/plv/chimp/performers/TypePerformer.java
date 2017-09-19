@@ -67,7 +67,7 @@ public class TypePerformer extends Performer<AppEventOuterClass.Type> {
 
     @Override
     public AppEventOuterClass.Type performMatcherAction(AppEventOuterClass.Type origin, Matcher<View> matcher) {
-        Espresso.onView(matcher).perform(replaceText(origin.getInput()));
+        Espresso.onView(matcher).perform(typeText(origin.getInput()));
         Espresso.onView(isRoot()).perform(closeSoftKeyboard());
         return origin;
     }

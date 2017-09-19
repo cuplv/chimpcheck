@@ -13,7 +13,6 @@ import java.util.List;
 
 import edu.colorado.plv.chimp.performers.WildCardTarget;
 
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -40,7 +39,6 @@ public class MatcherManager {
             list.add(withContentDescription(content));
         }
 
-        list.add(isDisplayed());
 
         for (int i = 0; i < matcher.length; ++i) {
             list.add(matcher[i]);
