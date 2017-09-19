@@ -3,6 +3,7 @@ package edu.colorado.plv.chimp.components;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.res.Resources;
 import android.os.IInterface;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.*;
@@ -39,10 +40,10 @@ import static org.hamcrest.Matchers.allOf;
  */
 public class ActivityManager {
 
-    protected Activity current;
-    protected Random seed = new Random();
+    protected static Activity current;
+    protected Random seed = new Random(System.currentTimeMillis());
 
-    protected Activity getActivityInstance(){
+    protected static Activity getActivityInstance(){
         InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
             public void run(){
                 Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
@@ -55,7 +56,7 @@ public class ActivityManager {
         return current;
     }
 
-    protected View getDecorView(){
+    protected static View getDecorView(){
         return getActivityInstance().getWindow().getDecorView();
     }
 
@@ -159,7 +160,7 @@ public class ActivityManager {
         }
         return ids;
     }
-    protected String getResName(int rid){
+    protected static String getResName(int rid){
         return getDecorView().getResources().getResourceEntryName(rid);
     }
     protected static String getResName(View v){
@@ -208,6 +209,22 @@ public class ActivityManager {
                 // javadoc is wishy-washy about whether authors are required to implement this method when
                 // implementing onCreateInputConnection.
                 return view.onCreateInputConnection(new EditorInfo()) == null;
+            }
+        };
+    }
+    public static Matcher<View> validPosition() {
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("not supports input methods");
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                // At first glance, it would make sense to use view.onCheckIsTextEditor, but the android
+                // javadoc is wishy-washy about whether authors are required to implement this method when
+                // implementing onCreateInputConnection.
+                return view.getX() != 0 || view.getY() != 0;
             }
         };
     }
@@ -374,4 +391,25 @@ public class ActivityManager {
         }
     }
 
+
+    public static int  getResIdFromResName(String res){
+        if(res == null) return 0;
+        String[] strs = res.split(":");
+        String[] strs2 = strs[1].split("\\/");
+        String defPackage = strs[0];
+        String defType = strs2[0];
+        String name = strs2[1];
+        Resources r = getActivityInstance().getResources();
+        return r.getIdentifier(name, defType, defPackage);
+    }
+    public static String getResEntryName(String res){
+        int rid = getResIdFromResName(res);
+        String resName = "";
+        try {
+            resName = getDecorView().getResources().getResourceEntryName(rid);
+        } catch (Resources.NotFoundException e){
+            resName = null;
+        }
+        return resName;
+    }
 }

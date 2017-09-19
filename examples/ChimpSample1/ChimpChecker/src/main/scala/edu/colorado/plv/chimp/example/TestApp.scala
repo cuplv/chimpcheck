@@ -119,7 +119,7 @@ object RunTestit {
 
     val loginSeq = Type(R.id.input_username,"testuser") :>> Type(R.id.input_password,"1234") :>> Click(R.id.btn_login)
 
-    val custom = Click(R.id.button_begin) :>> Click(R.id.btn_login) :>> Click(R.id.interm_btn_cdt) :>> Click(R.id.btn_count10) :>> Click(R.id.btn_back) :>> Repeat(30, Click(*) :>> Skip)
+    val custom = Click(R.id.button_begin) :>> Click(R.id.btn_login) :>> Click(R.id.interm_btn_cdt) :>> Click(R.id.btn_count10) :>> Click(R.id.btn_back) :>> Sleep(10000) :>> Repeat(30, Click(*) :>> Skip)
 
     forAll(custom.generator) {
       tr => tr chimpCheck { true }

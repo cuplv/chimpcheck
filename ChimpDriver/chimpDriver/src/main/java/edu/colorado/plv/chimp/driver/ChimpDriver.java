@@ -16,6 +16,7 @@ import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 import edu.colorado.plv.chimp.exceptions.PropertyViolatedException;
 import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
+import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 
 import org.junit.After;
@@ -39,6 +40,7 @@ abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyAct
     protected ChimpJUnitRunner runner = null;
 
     protected WildCardManager wildCardManager = null;
+    protected ViewManager viewManager = null;
 
     // protected ActivityTestRule<A> chimpActivityTestRule = null;
 
@@ -73,6 +75,9 @@ abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyAct
         if (wildCardManager == null) {
             wildCardManager = new WildCardManager();
             wildCardManager.initUiDevice();;
+        }
+        if (viewManager == null) {
+            viewManager = new ViewManager();
         }
         if (!isReady()) {
             Log.e(runner.chimpTag("@runTrace"), "Chimp driver not ready.");

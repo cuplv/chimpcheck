@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_item_text_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:lineSpacingExtra="10sp"
+    android:text="TextView"
+    android:textAlignment="center"
+    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionMode.Title" />

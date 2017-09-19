@@ -12,6 +12,8 @@ message UIID {
      WILD_CARD = 3;
      XY_ID = 4;
      ONCHILD_ID = 5;
+     CONJUNCT_ID = 6;
+     TOP_ID = 7;
   }
   required UIIDType idType = 1;
   optional int32 rid = 2;
@@ -20,6 +22,8 @@ message UIID {
   optional UIID parentId = 5;
   optional ChildIdx childIdx = 6;
   optional string display = 7;
+  optional UIID uiid1 = 8;
+  optional UIID uiid2 = 9;
 }
 
 message ChildIdx {
