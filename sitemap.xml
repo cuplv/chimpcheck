@@ -3,34 +3,45 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://plv.colorado.edu/chimpchecksite/getting-started/</loc>
-    <lastmod>2016-03-09T00:11:02+01:00</lastmod>
+    <loc>https://plv.colorado.edu/chimpchecksite/getting-started/</loc>
+    <lastmod>2017-12-14T15:07:13+01:00</lastmod>
   </url>
   
   <url>
-    <loc>http://plv.colorado.edu/chimpchecksite/</loc>
-    <lastmod>2017-12-14T21:07:13+01:00</lastmod>
+    <loc>https://plv.colorado.edu/chimpchecksite/</loc>
+    <lastmod>2017-12-14T10:07:13+01:00</lastmod>
   </url>
   
   <url>
-    <loc>http://plv.colorado.edu/chimpchecksite/categories/</loc>
+    <loc>https://plv.colorado.edu/chimpchecksite/license/</loc>
+    <lastmod>2017-12-14T16:07:13+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://plv.colorado.edu/chimpchecksite/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://plv.colorado.edu/chimpchecksite/</loc>
-    <lastmod>2016-03-09T00:11:02+01:00</lastmod>
+    <loc>https://plv.colorado.edu/chimpchecksite/</loc>
+    <lastmod>2017-12-14T15:07:13+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://plv.colorado.edu/chimpchecksite/getting-started/</loc>
-    <lastmod>2016-03-09T00:11:02+01:00</lastmod>
+    <loc>https://plv.colorado.edu/chimpchecksite/getting-started/</loc>
+    <lastmod>2017-12-14T15:07:13+01:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://plv.colorado.edu/chimpchecksite/tags/</loc>
+    <loc>https://plv.colorado.edu/chimpchecksite/license/</loc>
+    <lastmod>2017-12-14T16:07:13+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://plv.colorado.edu/chimpchecksite/tags/</loc>
     <priority>0</priority>
   </url>
   

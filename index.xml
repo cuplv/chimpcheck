@@ -1,40 +1,54 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>ChimpCheck: Concise and Effective Android Testing Library</title>
-    <link>http://plv.colorado.edu/chimpchecksite/</link>
-    <description>Recent content on ChimpCheck: Concise and Effective Android Testing Library</description>
+    <title>ChimpCheck: Concise and Effective Android Testing</title>
+    <link>https://plv.colorado.edu/chimpchecksite/</link>
+    <description>Recent content on ChimpCheck: Concise and Effective Android Testing</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 09 Mar 2016 00:11:02 +0100</lastBuildDate>
+    <copyright>The content in the website is released under the CC license</copyright>
+    <lastBuildDate>Thu, 14 Dec 2017 15:07:13 +0100</lastBuildDate>
     
-	<atom:link href="http://plv.colorado.edu/chimpchecksite/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://plv.colorado.edu/chimpchecksite/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>ChimpCheck: Concise and Effective Android Testing Library</title>
-      <link>http://plv.colorado.edu/chimpchecksite/getting-started/</link>
-      <pubDate>Wed, 09 Mar 2016 00:11:02 +0100</pubDate>
+      <link>https://plv.colorado.edu/chimpchecksite/getting-started/</link>
+      <pubDate>Thu, 14 Dec 2017 15:07:13 +0100</pubDate>
       
-      <guid>http://plv.colorado.edu/chimpchecksite/getting-started/</guid>
+      <guid>https://plv.colorado.edu/chimpchecksite/getting-started/</guid>
       <description>Build Instructions Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
 First step: Clone and locally publish ScalaBashing at https://github.com/cuplv/ScalaBashing
 $ git clone https://github.com/cuplv/ScalaBashing.git &amp;lt;ScalaBashing Root&amp;gt;$ sbt publishLocal  This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</description>
     </item>
     
     <item>
-      <title>A combinator library to write test generators and test properties for Android Apps</title>
-      <link>http://plv.colorado.edu/chimpchecksite/</link>
-      <pubDate>Thu, 14 Dec 2017 21:07:13 +0100</pubDate>
+      <title>ChimpCheck</title>
+      <link>https://plv.colorado.edu/chimpchecksite/</link>
+      <pubDate>Thu, 14 Dec 2017 10:07:13 +0100</pubDate>
       
-      <guid>http://plv.colorado.edu/chimpchecksite/</guid>
-      <description> Introduction Combinator Library for writing test generators and test properties for Android Apps
+      <guid>https://plv.colorado.edu/chimpchecksite/</guid>
+      <description>Introduction Combinator Library for writing test generators and test properties for Android Apps
 By Edmund Lam, Peilun Zhang and Bor-Yuh Evan Chang
 edmund.lam@colorado.edu, peilun.zhang@colorado.edu and evan.chang@colorado.edu
 ChimpCheck on Github: https://github.com/cuplv/ChimpCheck
 Notes ChimpCheck paper can be found here: arxiv
-It is offically accepted to appear in the Onward! 2017
-In Progress </description>
+It is offically accepted to appear in the Onward! 2017</description>
+    </item>
+    
+    <item>
+      <title>ChimpCheck</title>
+      <link>https://plv.colorado.edu/chimpchecksite/license/</link>
+      <pubDate>Thu, 14 Dec 2017 16:07:13 +0100</pubDate>
+      
+      <guid>https://plv.colorado.edu/chimpchecksite/license/</guid>
+      <description>Apache License Version 2.0, January 2004 http://www.apache.org/licenses/
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+ Definitions.
+&amp;ldquo;License&amp;rdquo; shall mean the terms and conditions for use, reproduction, and distribution as defined by Sections 1 through 9 of this document.
+&amp;ldquo;Licensor&amp;rdquo; shall mean the copyright owner or entity authorized by the copyright owner that is granting the License.
+&amp;ldquo;Legal Entity&amp;rdquo; shall mean the union of the acting entity and all other entities that control, are controlled by, or are under common control with that entity.</description>
     </item>
     
   </channel>
