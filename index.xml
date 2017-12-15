@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ChimpCheck: Concise and Effective Android Testing Library</title>
-    <link>https://example.org/</link>
+    <link>https://pezhin.github.io/</link>
     <description>Recent content on ChimpCheck: Concise and Effective Android Testing Library</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 09 Mar 2016 00:11:02 +0100</lastBuildDate>
     
-	<atom:link href="https://example.org/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://pezhin.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>ChimpCheck: Concise and Effective Android Testing Library</title>
-      <link>https://example.org/getting-started/</link>
+      <link>https://pezhin.github.io/getting-started/</link>
       <pubDate>Wed, 09 Mar 2016 00:11:02 +0100</pubDate>
       
-      <guid>https://example.org/getting-started/</guid>
+      <guid>https://pezhin.github.io/getting-started/</guid>
       <description>Build Instructions Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
 First step: Clone and locally publish ScalaBashing at https://github.com/cuplv/ScalaBashing
 $ git clone https://github.com/cuplv/ScalaBashing.git &amp;lt;ScalaBashing Root&amp;gt;$ sbt publishLocal  This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</description>
@@ -24,10 +24,10 @@ $ git clone https://github.com/cuplv/ScalaBashing.git &amp;lt;ScalaBashing Root&
     
     <item>
       <title>A combinator library to write test generators and test properties for Android Apps</title>
-      <link>https://example.org/</link>
+      <link>https://pezhin.github.io/</link>
       <pubDate>Thu, 14 Dec 2017 21:07:13 +0100</pubDate>
       
-      <guid>https://example.org/</guid>
+      <guid>https://pezhin.github.io/</guid>
       <description> Introduction Combinator Library for writing test generators and test properties for Android Apps
 By Edmund Lam, Peilun Zhang and Bor-Yuh Evan Chang
 edmund.lam@colorado.edu, peilun.zhang@colorado.edu and evan.chang@colorado.edu
