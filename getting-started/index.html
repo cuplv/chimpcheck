@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="en-us">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <title>ChimpCheck: Concise and Effective Android Testing Library - ChimpCheck: Concise and Effective Android Testing Library</title>
+    <meta name="generator" content="Hugo 0.31.1" />
+
+    
+    <link rel="canonical" href="https://example.org/getting-started/">
+    
+
+    <meta property="og:url" content="https://example.org/getting-started/">
+    <meta property="og:title" content="ChimpCheck: Concise and Effective Android Testing Library">
+    
+    <meta name="apple-mobile-web-app-title" content="ChimpCheck: Concise and Effective Android Testing Library">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="https://example.org/images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="https://example.org/images/favicon.ico">
+
+    <style>
+      @font-face {
+        font-family: 'Icon';
+        src: url('https://example.org/fonts/icon.eot');
+        src: url('https://example.org/fonts/icon.eot')
+               format('embedded-opentype'),
+             url('https://example.org/fonts/icon.woff')
+               format('woff'),
+             url('https://example.org/fonts/icon.ttf')
+               format('truetype'),
+             url('https://example.org/fonts/icon.svg')
+               format('svg');
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://example.org/stylesheets/application.css">
+    <link rel="stylesheet" href="https://example.org/stylesheets/temporary.css">
+    <link rel="stylesheet" href="https://example.org/stylesheets/palettes.css">
+    <link rel="stylesheet" href="https://example.org/stylesheets/highlight/highlight.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,700|Roboto&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Roboto', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Roboto Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <script src="https://example.org/javascripts/modernizr.js"></script>
+
+    
+
+  </head>
+  <body class=" ">
+
+
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        ChimpCheck: Concise and Effective Android Testing Library
+      </div>
+    </div>
+
+    
+
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="https://example.org/" class="project">
+    <div class="banner">
+      
+      <div class="name">
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="ChimpCheck" href="https://example.org/">
+	
+	ChimpCheck
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a class="current" title="Getting started" href="https://example.org/getting-started/">
+	
+	Getting started
+</a>
+
+
+<ul id="scrollspy">
+</ul>
+
+
+  
+</li>
+
+
+        </ul>
+         
+      </div>
+    </div>
+  </div>
+</nav>
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>ChimpCheck: Concise and Effective Android Testing Library </h1>
+
+			
+
+<h2 id="build-instructions">Build Instructions</h2>
+
+<p>Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.</p>
+
+<p>First step: Clone and locally publish ScalaBashing at <a href="https://github.com/cuplv/ScalaBashing">https://github.com/cuplv/ScalaBashing</a></p>
+
+<pre><code>$ git clone https://github.com/cuplv/ScalaBashing.git
+&lt;ScalaBashing Root&gt;$ sbt publishLocal
+</code></pre>
+
+<p>This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/ChimpCombinator$ sbt publishLocal
+</code></pre>
+
+<p>Now, you&rsquo;ll need to do the same again for ChimpDriver. However, ChimpDriver is a gradle project, run the following instead:</p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/ChimpDriver$ gradlew assembleDebug
+&lt;ChimpCheck Root&gt;/ChimpDriver$ gradlew uploadArchives
+</code></pre>
+
+<p>That&rsquo;s more or less it. The test app(s) will fetch ChimpCombinator and ChimpDriver from your local repositories.</p>
+
+<h2 id="running-a-sample-app">Running a Sample App</h2>
+
+<p>Go to <code>&lt;ChimpCheck Root&gt;/examples/ChimpSample1</code> , you will find two folders:</p>
+
+<ul>
+<li><p>App : The Android App with ChimpDriver test harnesses (see TestExpresso)</p></li>
+
+<li><p>ChimpChecker : In general, this is where you define generators and property-based tests. See TestApp.scala, you&rsquo;ll find two test routines runBasic and runCustom</p></li>
+</ul>
+
+<p>First, compile the App and Android Test harness:</p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/examples/ChimpSample1/App$ ./gradlew assembleDebug
+&lt;ChimpCheck Root&gt;/examples/ChimpSample1/App$ ./gradlew assembleAndroidTest
+</code></pre>
+
+<p>Now copy the APKs (app-debug.apk and app-debug-androidTest.apk) to &lsquo;/data/chimp/ChimpSample1&rsquo;</p>
+
+<p>For the next step, you need to start an emulator (preferably x86 and API-23) on port 5554. In runBasic and runCustom of TestApp.scala, you&rsquo;ll also need to point &lsquo;androidSDKHome&rsquo; to your Android SDK home path and ensure that Aapt 24.0.3 is installed.</p>
+
+<p>Finally, you can run a quick test script in <code>&lt;ChimpCheck Root&gt;/examples/App/ChimpChecker</code>:</p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/examples/ChimpSample1/ChimpChecker$ sbt &quot;run edu.colorado.plv.chimp.example.TestApp&quot;
+</code></pre>
+
+<p>Choose either runBasic or runCustom .</p>
+
+<h2 id="how-to-start-up-your-own-tests">How to start up your own tests</h2>
+
+<p>Currently, selective cut and paste from ChimpSample1 is the best option. But here are the main components you need:</p>
+
+<ul>
+<li><p>A ChimpDriver Test Harness: Equivalent of &lsquo;TestExpresso&rsquo; class in the App project. This is the AndroidJUnit4 harness that extends the ChimpDriver. This is just boilerplate code and all you need is to instantiate &lsquo;ActivityTestRule&rsquo; with your app&rsquo;s main activity class.</p></li>
+
+<li><p>A ChimpChecker Test Generator: Equivalent of TestApp.scala in the ChimpChecker project. Its the main loader for your test cases.</p></li>
+
+<li><p>.Jar of the Android App classes in &lsquo;lib&rsquo; folder of the ChimpChecker test generator. You will have to manually extract this from your Android App project for now. Will work on a better (gradle) solution to this in the near future.</p></li>
+</ul>
+
+<p>The third bullet for now, is needed only because we want to reference the R.id.XXX static identifiers of your App, but in future that could be more reasons for this dependency..</p>
+
+<p>The current way I fulfill this dependency (.Jar in lib folder) is obviously a hack, but we are still looking for a better solution. Embedding this dependency
+naively with gradle is not feasible, because &lsquo;pure&rsquo; Java/Scala projects cannot depend on &lsquo;Android&rsquo; projects for some reason (something to do with the Android aar&rsquo;s).</p>
+
+
+			<aside class="copyright" role="note">
+				
+				Documentation built with
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+			</aside>
+
+			<footer class="footer">
+				
+
+<nav class="pagination" aria-label="Footer">
+  <div class="previous">
+  
+  </div>
+
+  <div class="next">
+  
+      <a href="https://example.org/" title="A combinator library to write test generators and test properties for Android Apps">
+        <span class="direction">
+          Next
+        </span>
+        <div class="page">
+          <div class="stretch">
+            <div class="title">
+              A combinator library to write test generators and test properties for Android Apps
+            </div>
+          </div>
+          <div class="button button-next" role="button" aria-label="Next">
+            <i class="icon icon-forward"></i>
+          </div>
+        </div>
+      </a>
+  
+  </div>
+</nav>
+
+
+
+
+
+			</footer>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+    <script>
+    
+      var base_url = '';
+      var repo_id  = '';
+    
+    </script>
+
+    <script src="https://example.org/javascripts/application.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var headers   = document.getElementsByTagName("h2");
+      var scrollspy = document.getElementById('scrollspy');
+
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            var li = document.createElement("li");
+            li.setAttribute("class", "anchor");
+
+            var a  = document.createElement("a");
+            a.setAttribute("href", "#" + headers[i].id);
+            a.setAttribute("title", headers[i].innerHTML);
+            a.innerHTML = headers[i].innerHTML;
+
+            li.appendChild(a)
+            scrollspy.appendChild(li);
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+
+
+        /* Add permanent link next to the headers */
+        var headers = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+        for(var i = 0; i < headers.length; i++) {
+            var a = document.createElement("a");
+            a.setAttribute("class", "headerlink");
+            a.setAttribute("href", "#" + headers[i].id);
+            a.setAttribute("title", "Permanent link")
+            a.innerHTML = "¶";
+            headers[i].appendChild(a);
+        }
+      }
+    </script>
+
+    
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
+
