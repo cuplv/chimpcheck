@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Getting-starteds on ChimpCheck: Concise and Effective Android Testing Library</title>
-    <link>https://pezhin.github.io/getting-started/</link>
+    <link>http://plv.colorado.edu/chimpchecksite/getting-started/</link>
     <description>Recent content in Getting-starteds on ChimpCheck: Concise and Effective Android Testing Library</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 09 Mar 2016 00:11:02 +0100</lastBuildDate>
     
-	<atom:link href="https://pezhin.github.io/getting-started/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://plv.colorado.edu/chimpchecksite/getting-started/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>ChimpCheck: Concise and Effective Android Testing Library</title>
-      <link>https://pezhin.github.io/getting-started/</link>
+      <link>http://plv.colorado.edu/chimpchecksite/getting-started/</link>
       <pubDate>Wed, 09 Mar 2016 00:11:02 +0100</pubDate>
       
-      <guid>https://pezhin.github.io/getting-started/</guid>
+      <guid>http://plv.colorado.edu/chimpchecksite/getting-started/</guid>
       <description>Build Instructions Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
 First step: Clone and locally publish ScalaBashing at https://github.com/cuplv/ScalaBashing
 $ git clone https://github.com/cuplv/ScalaBashing.git &amp;lt;ScalaBashing Root&amp;gt;$ sbt publishLocal  This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</description>

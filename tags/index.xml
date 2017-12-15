@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on ChimpCheck: Concise and Effective Android Testing Library</title>
-    <link>https://pezhin.github.io/tags/</link>
+    <link>http://plv.colorado.edu/chimpchecksite/tags/</link>
     <description>Recent content in Tags on ChimpCheck: Concise and Effective Android Testing Library</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="https://pezhin.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://plv.colorado.edu/chimpchecksite/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
