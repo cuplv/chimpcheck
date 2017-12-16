@@ -2,13 +2,13 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on ChimpCheck: Concise and Effective Android Testing</title>
-    <link>https://plv.colorado.edu/chimpchecksite/categories/</link>
+    <link>http://plv.colorado.edu/ChimpCheckSite/categories/</link>
     <description>Recent content in Categories on ChimpCheck: Concise and Effective Android Testing</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>The content in the website is released under the CC license</copyright>
     
-	<atom:link href="https://plv.colorado.edu/chimpchecksite/categories/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://plv.colorado.edu/ChimpCheckSite/categories/index.xml" rel="self" type="application/rss+xml" />
     
     
   </channel>
