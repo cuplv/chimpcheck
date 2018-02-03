@@ -57,7 +57,7 @@ public class PropertyActivityManager extends ActivityManager {
            throws MalformedBuiltinPredicateException, ReflectionPredicateException {
        // Check if predicate is a ViewBuiltinPredicate
 
-       Log.i("Chimp-Property-Check", "Name: " + predicate.getName().toString() + " Pred: " + predicate.toString());
+       Log.i("Chimp-Property-Check", "Name: " + predicate.getName() + " Pred: " + predicate.toString());
 
        if( ViewBuiltInPredicates.containsKey(predicate.getName()) ) {
            Matcher<View> predicateMatcher = ViewBuiltInPredicates.get(predicate.getName());

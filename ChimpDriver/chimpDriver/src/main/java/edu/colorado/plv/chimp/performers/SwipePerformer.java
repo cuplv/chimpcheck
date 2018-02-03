@@ -18,14 +18,11 @@ import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 
-import static android.support.test.espresso.action.ViewActions.clearText;
-import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.scrollTo;
 import static android.support.test.espresso.action.ViewActions.swipeDown;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;
 import static android.support.test.espresso.action.ViewActions.swipeRight;
 import static android.support.test.espresso.action.ViewActions.swipeUp;
-import static android.support.test.espresso.action.ViewActions.typeText;
 
 /**
  * Created by Pezh on 9/5/17.

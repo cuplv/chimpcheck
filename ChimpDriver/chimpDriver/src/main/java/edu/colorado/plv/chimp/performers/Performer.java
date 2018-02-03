@@ -117,8 +117,7 @@ public abstract class Performer<Act> {
                 WildCardTarget target = wildCardManager.popOne(matchers);
                 try {
                     Log.i(tag("wildcard"), "Attempting to perform action on UiObject");
-                    Act result = performWildCardTargetAction(origin, target);
-                    return result;
+                    return performWildCardTargetAction(origin, target);
                 } catch (AmbiguousViewMatcherException avme){
                     Log.e(tag("wildcard"), avme.toString());
                 } catch (NoMatchingViewException nmve){

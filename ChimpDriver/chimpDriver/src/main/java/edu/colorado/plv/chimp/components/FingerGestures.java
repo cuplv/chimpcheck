@@ -3,7 +3,6 @@ package edu.colorado.plv.chimp.components;
 import android.app.Instrumentation;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.ViewInteraction;
@@ -13,7 +12,6 @@ import android.view.View;
 import org.hamcrest.Matcher;
 
 import chimp.protobuf.AppEventOuterClass;
-import edu.colorado.plv.chimp.exceptions.NoViewEnabledException;
 
 import static android.support.test.espresso.action.ViewActions.swipeDown;
 import static android.support.test.espresso.action.ViewActions.swipeLeft;

@@ -2,9 +2,7 @@ package edu.colorado.plv.chimp.performers;
 
 import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
-import android.support.test.espresso.NoMatchingViewException;
 import android.support.test.uiautomator.BySelector;
-import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
@@ -18,7 +16,6 @@ import edu.colorado.plv.chimp.managers.MatcherManager;
 import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
-import edu.colorado.plv.chimp.viewactions.PermissionGranter;
 import edu.colorado.plv.chimp.viewmatchers.AmbiguousCounter;
 import edu.colorado.plv.chimp.viewmatchers.MatchWithIndex;
 
@@ -46,10 +43,6 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
 
     @Override
     public AppEventOuterClass.Click performMatcherAction(AppEventOuterClass.Click origin, Matcher<View> matcher) {
-        if(origin.getUiid().getNameid().equals("ALLOW PERMISSION")){
-            PermissionGranter.allowPermissionsIfNeeded();
-            return origin;
-        }
         try{
             AmbiguousCounter.resetCounter();
             Espresso.onView(new AmbiguousCounter(allOf(matcher, isDisplayed()))).perform(click());

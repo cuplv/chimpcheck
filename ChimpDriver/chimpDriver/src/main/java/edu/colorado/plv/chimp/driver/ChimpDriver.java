@@ -1,9 +1,7 @@
 package edu.colorado.plv.chimp.driver;
 
-import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.NoMatchingViewException;
-import android.support.test.rule.ActivityTestRule;
 import android.util.Base64;
 import android.util.Log;
 
@@ -74,7 +72,7 @@ abstract public class ChimpDriver /* <A extends Activity> */ extends PropertyAct
         if (runner != null && trace == null) setEventTrace(runner.getEventTrace());
         if (wildCardManager == null) {
             wildCardManager = new WildCardManager();
-            wildCardManager.initUiDevice();;
+            wildCardManager.initUiDevice();
         }
         if (viewManager == null) {
             viewManager = new ViewManager();

@@ -1,14 +1,10 @@
 package edu.colorado.plv.chimp.components;
 
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.res.Resources;
-import android.os.IInterface;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.*;
 import android.support.test.espresso.util.TreeIterables;
-import android.support.test.runner.intent.IntentCallback;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 import android.util.Log;
@@ -25,8 +21,6 @@ import org.hamcrest.TypeSafeMatcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.Random;
 
 import static android.support.test.espresso.Espresso.onView;

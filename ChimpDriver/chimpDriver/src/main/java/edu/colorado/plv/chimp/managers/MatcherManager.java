@@ -2,13 +2,13 @@ package edu.colorado.plv.chimp.managers;
 
 import android.support.test.uiautomator.StaleObjectException;
 import android.support.test.uiautomator.UiObject2;
-import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import edu.colorado.plv.chimp.performers.WildCardTarget;
@@ -40,9 +40,7 @@ public class MatcherManager {
         }
 
 
-        for (int i = 0; i < matcher.length; ++i) {
-            list.add(matcher[i]);
-        }
+        Collections.addAll(list, matcher);
         return allOf(list);
     }
 

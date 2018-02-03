@@ -1,6 +1,5 @@
 package edu.colorado.plv.chimp.managers;
 
-import android.support.test.uiautomator.UiObject;
 import android.util.Log;
 import android.view.View;
 
@@ -9,10 +8,8 @@ import org.hamcrest.Matcher;
 import java.util.ArrayList;
 
 import chimp.protobuf.AppEventOuterClass;
-import edu.colorado.plv.chimp.utils.ViewOption;
 import edu.colorado.plv.chimp.viewmatchers.ChildAtPosition;
 
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;

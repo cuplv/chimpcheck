@@ -1,7 +1,6 @@
 package edu.colorado.plv.chimp.managers;
 
 import android.support.test.InstrumentationRegistry;
-import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
@@ -12,7 +11,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -65,8 +63,7 @@ public class WildCardManager {
 
     public ArrayList<UiObject2> retrieveTopLevelUiObjects(BySelector uiSelector) throws UiObjectNotFoundException {
         int i = 0;
-        ArrayList<UiObject2> uiObjects = (ArrayList<UiObject2>) mDevice.findObjects(uiSelector);
-        return uiObjects;
+        return (ArrayList<UiObject2>) mDevice.findObjects(uiSelector);
     }
     public ArrayList<UiObject2> retrieveChildUiObjects(UiObject2 uiObject, BySelector uiSelector) throws UiObjectNotFoundException {
         ArrayList<UiObject2> list = new ArrayList<>();

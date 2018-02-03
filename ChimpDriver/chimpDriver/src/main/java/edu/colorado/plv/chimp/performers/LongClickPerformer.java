@@ -15,7 +15,6 @@ import edu.colorado.plv.chimp.managers.ViewManager;
 import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 
-import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.longClick;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 
