@@ -261,11 +261,71 @@
 
 			
 
+<h2 id="high-level-description-of-the-architecture">High-level description of the architecture</h2>
+
+<ol>
+<li>Compile Android Apps with ChimpCheck library</li>
+<li>Use ChimpCombinator to generate the test script</li>
+<li>Use ScalaBashing to run the script (suggested but optional)</li>
+</ol>
+
 <h2 id="build-instructions">Build Instructions</h2>
 
 <p>Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.</p>
 
-<p>First step: Clone and locally publish ScalaBashing at <a href="https://github.com/cuplv/ScalaBashing">https://github.com/cuplv/ScalaBashing</a></p>
+<p><strong>1. Configurate your Android application</strong>:</p>
+
+<p>In the build.gradle of the app module, add ChimpCheck dependency and use ChimpCheck as the testInstrumentationRunner:</p>
+
+<pre><code>android {
+  defaultConfig {
+    ...
+    testInstrumentationRunner &quot;edu.colorado.plv.chimp.driver.ChimpJUnitRunner&quot; 
+  }
+}
+
+dependencies {
+   compile 'edu.colorado.plv.chimp:chimpcheck:1.0'
+}
+</code></pre>
+
+<p>Remember to use JCenter in the project build.gradle file (default setting in Android Studio)</p>
+
+<pre><code>allprojects {
+    repositories {
+        jcenter()
+    }
+}
+</code></pre>
+
+<p><strong>2. Add a tester class in the app</strong>:
+In the path <code>src/androidTest/java/**package**/</code>, create a file (e.g TestExpresso):</p>
+
+<pre><code>
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class TestExpresso extends EspressoChimpDriver {
+
+    @Rule
+    public ActivityTestRule&lt;MainActivity&gt; activityTestRule =
+            new ActivityTestRule&lt;MainActivity&gt;(MainActivity.class);
+
+}
+</code></pre>
+
+<p><code>MainActivity</code> is the activity where you want to start your test.
+<strong>3. Compile your Android apk</strong>
+Run</p>
+
+<pre><code>./gradle assembleDebug
+./gradle assembleAndroidTest
+</code></pre>
+
+<p>and find your apks at
+<code>path-to-project/app/build/outputs/apk/</code> and we want <code>app-debug.apk</code> and <code>app-debug-androidTest.apk</code></p>
+
+<p><strong>4. Set up ScalaBashing and ChimpCombinator</strong>
+Clone and locally publish ScalaBashing at <a href="https://github.com/cuplv/ScalaBashing">https://github.com/cuplv/ScalaBashing</a></p>
 
 <pre><code>$ git clone https://github.com/cuplv/ScalaBashing.git
 &lt;ScalaBashing Root&gt;$ sbt publishLocal
@@ -273,43 +333,15 @@
 
 <p>This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</p>
 
-<pre><code>&lt;ChimpCheck Root&gt;/ChimpCombinator$ sbt publishLocal
+<pre><code>git clone https://github.com/cuplv/ChimpCheck
+&lt;ChimpCheck Root&gt;/ChimpCombinator$ sbt publishLocal
 </code></pre>
 
-<p>Now, you&rsquo;ll need to do the same again for ChimpDriver. However, ChimpDriver is a gradle project, run the following instead:</p>
+<h2 id="try-this-checker-sample">Try this checker sample!</h2>
 
-<pre><code>&lt;ChimpCheck Root&gt;/ChimpDriver$ gradlew assembleDebug
-&lt;ChimpCheck Root&gt;/ChimpDriver$ gradlew uploadArchives
-</code></pre>
+<p>We have a skeleton testing template for you already:</p>
 
-<p>That&rsquo;s more or less it. The test app(s) will fetch ChimpCombinator and ChimpDriver from your local repositories.</p>
-
-<h2 id="running-a-sample-app">Running a Sample App</h2>
-
-<p>Go to <code>&lt;ChimpCheck Root&gt;/examples/ChimpSample1</code> , you will find two folders:</p>
-
-<ul>
-<li><p>App : The Android App with ChimpDriver test harnesses (see TestExpresso)</p></li>
-
-<li><p>ChimpChecker : In general, this is where you define generators and property-based tests. See TestApp.scala, you&rsquo;ll find two test routines runBasic and runCustom</p></li>
-</ul>
-
-<p>First, compile the App and Android Test harness:</p>
-
-<pre><code>&lt;ChimpCheck Root&gt;/examples/ChimpSample1/App$ ./gradlew assembleDebug
-&lt;ChimpCheck Root&gt;/examples/ChimpSample1/App$ ./gradlew assembleAndroidTest
-</code></pre>
-
-<p>Now copy the APKs (app-debug.apk and app-debug-androidTest.apk) to &lsquo;/data/chimp/ChimpSample1&rsquo;</p>
-
-<p>For the next step, you need to start an emulator (preferably x86 and API-23) on port 5554. In runBasic and runCustom of TestApp.scala, you&rsquo;ll also need to point &lsquo;androidSDKHome&rsquo; to your Android SDK home path and ensure that Aapt 24.0.3 is installed.</p>
-
-<p>Finally, you can run a quick test script in <code>&lt;ChimpCheck Root&gt;/examples/App/ChimpChecker</code>:</p>
-
-<pre><code>&lt;ChimpCheck Root&gt;/examples/ChimpSample1/ChimpChecker$ sbt &quot;run edu.colorado.plv.chimp.example.TestApp&quot;
-</code></pre>
-
-<p>Choose either runBasic or runCustom .</p>
+<p><code>https://github.com/cuplv/ChimpCheck/tree/master/ChimpChecker</code></p>
 
 <h2 id="how-to-start-up-your-own-tests">How to start up your own tests</h2>
 
@@ -331,7 +363,7 @@ naively with gradle is not feasible, because &lsquo;pure&rsquo; Java/Scala proje
 
 			<aside class="copyright" role="note">
 				
-				&copy; 2017 The content in the website is released under the CC license &ndash;
+				&copy; 2018 The content in the website is released under the CC license &ndash;
 				
 				Documentation built with
 				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
