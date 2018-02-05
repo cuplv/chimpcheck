@@ -3,7 +3,7 @@ apply plugin: 'com.google.protobuf'
 apply plugin: 'maven'
 
 group = 'edu.colorado.plv.fixr'
-version = '1.0'
+version = '1.1'
 
 buildscript {
     repositories {
@@ -67,7 +67,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName version
         // testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -91,7 +91,6 @@ dependencies {
     // compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.google.protobuf:protobuf-lite:3.0.1'
 
-    compile 'com.android.support:support-compat:25.1.0'
 
 }
 
