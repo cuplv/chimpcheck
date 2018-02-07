@@ -299,9 +299,17 @@ dependencies {
 </code></pre>
 
 <p><strong>2. Add a tester class in the app</strong>:
-In the path <code>src/androidTest/java/**package**/</code>, create a file (e.g TestExpresso):</p>
+In the path <code>src/androidTest/java/**com.packagename.sample**/</code>, create a file (e.g TestExpresso):</p>
 
-<pre><code>
+<pre><code>package com.packagename.sample; // replace with your app's package name
+
+import android.support.test.filters.LargeTest;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import edu.colorado.plv.chimp.driver.EspressoChimpDriver;
+
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class TestExpresso extends EspressoChimpDriver {
@@ -313,9 +321,10 @@ public class TestExpresso extends EspressoChimpDriver {
 }
 </code></pre>
 
-<p><code>MainActivity</code> is the activity where you want to start your test.
-<strong>3. Compile your Android apk</strong>
-Run</p>
+<p><code>MainActivity</code> is the activity where you want to start your test.</p>
+
+<p><strong>3. Compile your Android apk</strong>
+Run in command line (or click in Android Studio)</p>
 
 <pre><code>./gradle assembleDebug
 ./gradle assembleAndroidTest
@@ -326,6 +335,8 @@ Run</p>
 
 <p><strong>4. Set up ScalaBashing and ChimpCombinator</strong>
 Clone and locally publish ScalaBashing at <a href="https://github.com/cuplv/ScalaBashing">https://github.com/cuplv/ScalaBashing</a></p>
+
+<p>You need to have <strong>sbt</strong> installed. See instructions <a href="https://www.scala-sbt.org/1.0/docs/Setup.html">here</a></p>
 
 <pre><code>$ git clone https://github.com/cuplv/ScalaBashing.git
 &lt;ScalaBashing Root&gt;$ sbt publishLocal
@@ -339,9 +350,18 @@ Clone and locally publish ScalaBashing at <a href="https://github.com/cuplv/Scal
 
 <h2 id="try-this-checker-sample">Try this checker sample!</h2>
 
+<p>You need to have <strong>adb</strong> in the <code>$PATH</code></p>
+
 <p>We have a skeleton testing template for you already:</p>
 
 <p><code>https://github.com/cuplv/ChimpCheck/tree/master/ChimpChecker</code></p>
+
+<p>or manually run through adb:</p>
+
+<pre><code>adb -s emulator-5554 install PATH-TO-APP_DEBUG_APK
+adb -s emulator-5554 install PATH-TO-APP_DEBUG-ANDROIDTEST_APK
+adb -s emulator-5554 shell am instrument -r -w -e debug false -e eventTrace CgwIARIICAESBAoCCAMKDAgBEggIARIECgIIAwoGCAIaAggG -e appPackageName com.marakana.android.yamba -e class com.marakana.android.yamba.TestExpresso com.packagename.sample.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner
+</code></pre>
 
 <h2 id="how-to-start-up-your-own-tests">How to start up your own tests</h2>
 
