@@ -3,10 +3,12 @@ package edu.colorado.plv.chimp.performers;
 import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
 import android.support.test.uiautomator.BySelector;
+import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -18,6 +20,7 @@ import edu.colorado.plv.chimp.managers.WildCardManager;
 import edu.colorado.plv.chimp.viewactions.ChimpActionFactory;
 import edu.colorado.plv.chimp.viewmatchers.AmbiguousCounter;
 import edu.colorado.plv.chimp.viewmatchers.MatchWithIndex;
+//import edu.colorado.plv.tracerunner_runtime_instrumentation.TraceRunnerRuntimeInstrumentation;
 
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -72,6 +75,22 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
         builder.setUiid(AppEventOuterClass.UIID.newBuilder().setIdType(AppEventOuterClass.UIID.UIIDType.NAME_ID)
                 .setNameid(MatcherManager.describeMatcherAsDisplay(target.uiObj)));
         Espresso.onView(target.uiMatcher).perform(click());
+        Log.d("ChimpLog", "Logging here");
+        //TraceRunnerRuntimeInstrumentation.logChimp(target.uiMatcher.toString(), click().toString());
+        try {
+            Class claz = Class.forName("edu.colorado.plv.tracerunner_runtime_instrumentation.TraceRunnerRuntimeInstrumentation");
+            Object obj = claz.newInstance();
+            Class[] params = new Class[2];
+            params[0] = String.class;
+            params[1] = String.class;
+            Method method = claz.getDeclaredMethod("logChimp", params);
+            method.invoke(obj, target.uiMatcher.toString(), click().toString());
+
+        } catch (Throwable t){
+            // ignore
+            Log.d("ChimpLog", "Exception");
+        }
+
         return builder.build();
 
     }
