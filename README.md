@@ -19,4 +19,4 @@ The ChimpCheck repo comprises of three main components:
 
 please visit the site to see building instructions:
 
-http://plv.colorado.edu/ChimpCheckSite/
+http://plv.colorado.edu/ChimpCheck/
