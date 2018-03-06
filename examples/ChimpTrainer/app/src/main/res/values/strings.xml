@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ChimpTrainer</string>
+    <string name="welcome">This application is developed to be used as the sample applications for ChimpCheck to exercise on. \n \nClick begin button to get started</string>
+    <string name="count5">5 seconds</string>
+    <string name="count10">10 seconds</string>
+    <string name="count_default">Click a button to start counting</string>
+
+</resources>
