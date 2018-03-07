@@ -22,43 +22,6 @@ uploadArchives {
     }
 }
 
-/*
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Implementation-Title'   : 'Chimp Robot Driver',
-                   'Implementation-Version' : version
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
-jar {
-    manifest {
-        attributes 'Implementation-Title'   : 'Chimp Robot Driver',
-                   'Implementation-Version' : version
-    }
-
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
-android.libraryVariants.all { variant ->
-    def name = variant.buildType.name
-    def task = project.tasks.create "jar${name.capitalize()}", Jar
-    task.dependsOn variant.javaCompile
-    //Include Java classes
-    task.from variant.javaCompile.destinationDir
-    //Include dependent jars with some exceptions
-    task.from configurations.compile.findAll {
-        it.getName() != 'android.jar' && !it.getName().startsWith('hamcrest')
-    }.collect {
-        it.isDirectory() ? it : zipTree(it)
-    }
-    artifacts.add('archives', task);
-} */
-
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -84,14 +47,13 @@ dependencies {
     compile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2';
+    compile ('com.android.support.test.uiautomator:uiautomator-v18:2.1.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    });
 
     compile 'junit:junit:4.12'
 
-    // compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.google.protobuf:protobuf-lite:3.0.1'
-
-    compile 'com.android.support:support-compat:25.1.0'
 
 }
 

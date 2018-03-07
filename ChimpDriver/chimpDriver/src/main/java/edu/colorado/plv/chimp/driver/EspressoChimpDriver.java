@@ -106,11 +106,12 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
             throws MalformedBuiltinPredicateException, ReflectionPredicateException, PropertyViolatedException, NoViewEnabledException {
         Log.i(runner.chimpTag("EspressoChimpDriver@launchQualifiesEvent"), qualifies.toString());
 
-        Espresso.onView(isRoot()).perform( new ChimpStagingAction() );
 
         PropResult res = check( qualifies.getCondition() );
 
+        Log.i(runner.chimpTag("QualifiesEvent"), "check finishes");
         if (res.success) {
+            Log.i(runner.chimpTag("QualifiesEvent"), "check success");
             for (EventTraceOuterClass.UIEvent uiEvent : qualifies.getTrace().getEventsList()) {
                 executeEvent( uiEvent );
             }
