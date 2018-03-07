@@ -3,9 +3,16 @@ package edu.colorado.plv.chimp.components;
 /**
  * Created by edmund on 3/30/17.
  */
+import android.app.Instrumentation;
+import android.os.Build;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiSelector;
 import android.util.Log;
 import android.view.View;
 import chimp.protobuf.Property;
+import edu.colorado.plv.chimp.driver.BuildConfig;
 import edu.colorado.plv.chimp.exceptions.MalformedBuiltinPredicateException;
 import edu.colorado.plv.chimp.exceptions.ReflectionPredicateException;
 import org.hamcrest.Matcher;
@@ -60,32 +67,43 @@ public class PropertyActivityManager extends ActivityManager {
        Log.i("Chimp-Property-Check", "Name: " + predicate.getName().toString() + " Pred: " + predicate.toString());
 
        if( ViewBuiltInPredicates.containsKey(predicate.getName()) ) {
-           Matcher<View> predicateMatcher = ViewBuiltInPredicates.get(predicate.getName());
-           if(predicate.getArgsCount() != 1) {
-               String msg = String.format("Builtin predicate %s has wrong number of arguments: Suppose to be 1 instead of %s.",
-                       predicate.getName(), predicate.getArgsCount());
-               throw new MalformedBuiltinPredicateException(msg);
-           }
-           Property.Arg arg = predicate.getArgs(0);
-           if(arg.getArgType() == Property.Arg.ArgType.BOOL_ARG) {
-               String msg = String.format("Builtin predicate %s has wrong argumemt type: Boolean",
-                       predicate.getName());
-               throw new MalformedBuiltinPredicateException(msg);
-           }
-           int count = 0;
-           switch (arg.getArgType()) {
-               case INT_ARG:
-                   count = getAllViews( allOf( withId(arg.getIntVal()) , predicateMatcher ) ).size();
-                   break;
-               case STR_ARG:
-                   count = getAllViews( allOf( withText(arg.getStrVal()) , predicateMatcher ) ).size();
-                   break;
-           }
-           if (count == 0) {
-               return violatedProp(Property.BaseProp.newBuilder().setPropType(Property.BaseProp.BasePropType.PRIM_TYPE)
-                       .setPred(predicate).build() );
+           if(!predicate.getName().toString().equals("isDisplayed")) {
+               Matcher<View> predicateMatcher = ViewBuiltInPredicates.get(predicate.getName());
+               if (predicate.getArgsCount() != 1) {
+                   String msg = String.format("Builtin predicate %s has wrong number of arguments: Suppose to be 1 instead of %s.",
+                           predicate.getName(), predicate.getArgsCount());
+                   throw new MalformedBuiltinPredicateException(msg);
+               }
+               Property.Arg arg = predicate.getArgs(0);
+               if (arg.getArgType() == Property.Arg.ArgType.BOOL_ARG) {
+                   String msg = String.format("Builtin predicate %s has wrong argumemt type: Boolean",
+                           predicate.getName());
+                   throw new MalformedBuiltinPredicateException(msg);
+               }
+               int count = 0;
+               switch (arg.getArgType()) {
+                   case INT_ARG:
+                       count = getAllViews(allOf(withId(arg.getIntVal()), predicateMatcher)).size();
+                       break;
+                   case STR_ARG:
+                       count = getAllViews(allOf(withText(arg.getStrVal()), predicateMatcher)).size();
+                       break;
+               }
+
+               if (count == 0) {
+                   return violatedProp(Property.BaseProp.newBuilder().setPropType(Property.BaseProp.BasePropType.PRIM_TYPE)
+                           .setPred(predicate).build() );
+               } else {
+                   return success();
+               }
            } else {
-               return success();
+               UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+               if(Build.VERSION.SDK_INT >= 23){
+                   UiObject allowPermission = mDevice.findObject(new UiSelector().text(predicate.getArgs(0).getStrVal()));
+                   if(allowPermission.exists()){
+                        return success();
+                   }
+               }
            }
        }
        // TODO: Implement reflection call on top-level Chimp Driver

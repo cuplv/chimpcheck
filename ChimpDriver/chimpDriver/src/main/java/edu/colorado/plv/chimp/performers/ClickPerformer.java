@@ -1,8 +1,14 @@
 package edu.colorado.plv.chimp.performers;
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.AmbiguousViewMatcherException;
 import android.support.test.espresso.Espresso;
 import android.support.test.uiautomator.BySelector;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObjectNotFoundException;
+import android.support.test.uiautomator.UiSelector;
+import android.util.Log;
 import android.view.View;
 
 import org.hamcrest.Matcher;
@@ -43,7 +49,23 @@ public class ClickPerformer extends Performer<AppEventOuterClass.Click> {
 
     @Override
     public AppEventOuterClass.Click performMatcherAction(AppEventOuterClass.Click origin, Matcher<View> matcher) {
-        
+
+        if(origin.getUiid().getIdType() == AppEventOuterClass.UIID.UIIDType.NAME_ID){
+            String text = origin.getUiid().getNameid();
+            if(text.equals("Allow") || text.equals("Deny")){
+                UiDevice mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+                UiObject allowPermission = mDevice.findObject(new UiSelector().text(text));
+                if(allowPermission.exists()){
+                    try {
+                        allowPermission.click();
+                    } catch (UiObjectNotFoundException ui){
+                        ui.printStackTrace();
+                    }
+
+                }
+                return origin;
+            }
+        }
         try{
             AmbiguousCounter.resetCounter();
             Espresso.onView(new AmbiguousCounter(allOf(matcher, isDisplayed()))).perform(click());
