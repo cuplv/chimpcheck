@@ -1,5 +1,8 @@
 # ChimpCheck
-Combinator Library for writing test generators and test properties for Android Apps
+
+ChimpCheck is a property-based testing tool for interactive apps.
+
+Rich interactive applications, such as apps on mobile platforms, are complex stateful and often distributed systems where sufficiently exercising the app with user-interaction (UI) event sequences to expose defects is both hard and time-consuming. In particular, there is a fundamental tension between brute-force random UI exercising tools, which are fully-automated but offer low relevance, and UI test scripts, which are manual but offer high relevance. With ChimpCheck, we fuse scripting with randomized UI testing, enabling programming, generating, and executing property-based randomized test cases for Android apps.
 
 By Edmund Lam, Peilun Zhang and Bor-Yuh Evan Chang
 
