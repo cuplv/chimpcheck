@@ -357,18 +357,27 @@ public class TestExpresso extends EspressoChimpDriver {
 
 <p>We have a skeleton testing template for you already:</p>
 
-<p><code>https://github.com/cuplv/ChimpCheck/tree/master/ChimpChecker</code></p>
+<pre><code>https://github.com/cuplv/chimpcheck/tree/master/examples/
 
-<p>or manually run through adb:</p>
+</code></pre>
 
-<pre><code>adb -s emulator-5554 install PATH-TO-APP_DEBUG_APK
-adb -s emulator-5554 install PATH-TO-APP_DEBUG-ANDROIDTEST_APK
-adb -s emulator-5554 shell am instrument -r -w -e debug false -e eventTrace CgwIARIICAESBAoCCAMKDAgBEggIARIECgIIAwoGCAIaAggG -e appPackageName com.marakana.android.yamba -e class com.marakana.android.yamba.TestExpresso com.packagename.sample.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner
+<p>Compile the Android project in <code>ChimpTrainer</code> and use <code>ChimpChecker</code> to test it!</p>
+
+<p>Please refer <code>https://github.com/cuplv/chimpcheck/blob/master/examples/ChimpChecker/src/main/scala/edu/colorado/plv/chimp/example/TestApp.scala</code> for how to write ChimpCheck scripts.</p>
+
+<p>Sample Scripts:</p>
+
+<pre><code>Sleep(3000):&gt;&gt; Click(&quot;Begin&quot;) :&gt;&gt; Type(*, &quot;test&quot;) :&gt;&gt; Type(*, &quot;test&quot;) :&gt;&gt; Click(&quot;Login&quot;) :&gt;&gt; Click(&quot;Countdowntimer Testing&quot;) :&gt;&gt; Click(&quot;5 seconds&quot;) :&gt;&gt; ClickBack
+
+Click(R.id.buttonOK) :&gt;&gt; (isDisplayed(&quot;Allow&quot;) Then (Click(&quot;Allow&quot;) :&gt;&gt; Skip)) :&gt;&gt; LongClick(&quot;*&quot;)
 </code></pre>
 
 <h2 id="how-to-start-up-your-own-tests">How to start up your own tests</h2>
 
-<p>Currently, selective cut and paste from ChimpSample1 is the best option. But here are the main components you need:</p>
+<p><em>Currently, selective cut and paste from ChimpChecker is the best option.</em>
+<a href="https://github.com/cuplv/chimpcheck/blob/master/examples/ChimpChecker/src/main/scala/edu/colorado/plv/chimp/example/TestApp.scala">ChimpCheck example here</a></p>
+
+<p>But here are the main components you need:</p>
 
 <ul>
 <li><p>A ChimpDriver Test Harness: Equivalent of &lsquo;TestExpresso&rsquo; class in the App project. This is the AndroidJUnit4 harness that extends the ChimpDriver. This is just boilerplate code and all you need is to instantiate &lsquo;ActivityTestRule&rsquo; with your app&rsquo;s main activity class.</p></li>
