@@ -28,12 +28,8 @@
       <pubDate>Thu, 14 Dec 2017 10:07:13 +0100</pubDate>
       
       <guid>http://plv.colorado.edu/ChimpCheckSite/</guid>
-      <description>Introduction Combinator Library for writing test generators and test properties for Android Apps
-By Edmund Lam, Peilun Zhang and Bor-Yuh Evan Chang
-edmund.lam@colorado.edu, peilun.zhang@colorado.edu and evan.chang@colorado.edu
-ChimpCheck on Github: https://github.com/cuplv/ChimpCheck
-Notes ChimpCheck paper can be found here: arxiv
-It is offically accepted to appear in the Onward! 2017</description>
+      <description>Introduction ChimpCheck is a property-based testing tool for interactive apps.
+Rich interactive applications, such as apps on mobile platforms, are complex stateful and often distributed systems where sufficiently exercising the app with user-interaction (UI) event sequences to expose defects is both hard and time-consuming. In particular, there is a fundamental tension between brute-force random UI exercising tools, which are fully-automated but offer low relevance, and UI test scripts, which are manual but offer high relevance.</description>
     </item>
     
     <item>
