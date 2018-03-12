@@ -2,42 +2,42 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ChimpCheck: Concise and Effective Android Testing</title>
-    <link>http://plv.colorado.edu/ChimpCheckSite/</link>
+    <link>http://plv.colorado.edu/chimpcheck/</link>
     <description>Recent content on ChimpCheck: Concise and Effective Android Testing</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>The content in the website is released under the CC license</copyright>
     <lastBuildDate>Thu, 14 Dec 2017 15:07:13 +0100</lastBuildDate>
     
-	<atom:link href="http://plv.colorado.edu/ChimpCheckSite/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://plv.colorado.edu/chimpcheck/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>ChimpCheck: Concise and Effective Android Testing Library</title>
-      <link>http://plv.colorado.edu/ChimpCheckSite/getting-started/</link>
+      <link>http://plv.colorado.edu/chimpcheck/getting-started/</link>
       <pubDate>Thu, 14 Dec 2017 15:07:13 +0100</pubDate>
       
-      <guid>http://plv.colorado.edu/ChimpCheckSite/getting-started/</guid>
+      <guid>http://plv.colorado.edu/chimpcheck/getting-started/</guid>
       <description>High-level description of the architecture  Compile Android Apps with ChimpCheck library Use ChimpCombinator to generate the test script Use ScalaBashing to run the script (suggested but optional)  Build Instructions Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
 1. Configurate your Android application:</description>
     </item>
     
     <item>
       <title>ChimpCheck</title>
-      <link>http://plv.colorado.edu/ChimpCheckSite/</link>
+      <link>http://plv.colorado.edu/chimpcheck/</link>
       <pubDate>Thu, 14 Dec 2017 10:07:13 +0100</pubDate>
       
-      <guid>http://plv.colorado.edu/ChimpCheckSite/</guid>
+      <guid>http://plv.colorado.edu/chimpcheck/</guid>
       <description>Introduction ChimpCheck is a property-based testing tool for interactive apps.
 Rich interactive applications, such as apps on mobile platforms, are complex stateful and often distributed systems where sufficiently exercising the app with user-interaction (UI) event sequences to expose defects is both hard and time-consuming. In particular, there is a fundamental tension between brute-force random UI exercising tools, which are fully-automated but offer low relevance, and UI test scripts, which are manual but offer high relevance.</description>
     </item>
     
     <item>
       <title>ChimpCheck</title>
-      <link>http://plv.colorado.edu/ChimpCheckSite/license/</link>
+      <link>http://plv.colorado.edu/chimpcheck/license/</link>
       <pubDate>Thu, 14 Dec 2017 16:07:13 +0100</pubDate>
       
-      <guid>http://plv.colorado.edu/ChimpCheckSite/license/</guid>
+      <guid>http://plv.colorado.edu/chimpcheck/license/</guid>
       <description>Apache License Version 2.0, January 2004 http://www.apache.org/licenses/
 TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
  Definitions.
