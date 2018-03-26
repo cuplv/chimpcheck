@@ -1,0 +1,69 @@
+baseurl = "http://plv.colorado.edu/chimpcheck/"
+languageCode = "en-us"
+title = "ChimpCheck: Concise and Effective Android Testing"
+theme = "hugo-material-docs"
+metadataformat = "yaml"
+canonifyurls = true
+# Enable Google Analytics by entering your tracking id
+googleAnalytics = ""
+
+[params]
+	# General information
+	author = "CUPLV"
+	description = "A combinator library for writing test generators and properties for Android applications"
+	copyright = "The content in the website is released under the CC license"
+
+	# Repository
+	provider = "GitHub"
+	repo_url = "https://github.com/cuplv/chimpcheck"
+
+	version = "0.1.0-SNAPSHOT"
+	logo = "images/cclogo.jpeg"
+	favicon = ""
+
+	permalink = "#"
+
+	# Custom assets
+	custom_css = []
+	custom_js  = []
+
+	# Syntax highlighting theme
+	highlight_css  = ""
+
+	[params.palette]
+    	primary = "indigo"
+    	accent  = "teal"
+
+    [params.font]
+    	text = "Ubuntu"
+    	code = "Ubuntu Mono"
+
+
+[social]
+	twitter = ""
+	github  = "Pezhin"
+	email   = "me@peilun.org"
+
+
+[[menu.main]]
+	name   = "ChimpCheck"
+	url    = "/"
+	weight = 5 
+
+[[menu.main]]
+	name   = "Getting started"
+	url    = "getting-started/"
+	weight = 10
+
+
+[[menu.main]]
+	name   = "License"
+	url    = "license/"
+	weight = 40
+
+
+[blackfriday]
+	smartypants	= true
+	fractions = true
+	smartDashes = true
+	plainIDAnchors = true
