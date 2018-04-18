@@ -1,0 +1,3 @@
+[submodule "ScalaBashing"]
+	path = ScalaBashing
+	url = https://github.com/cuplv/ScalaBashing.git
