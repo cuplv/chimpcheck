@@ -12,8 +12,31 @@ weight: 10
 ## Build Instructions
 
 Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
+**1. Building dependencies and libraries**
+First, please clone ChimpCheck from its GitHub repo and init its submodule.
+```
+git clone https://github.com/cuplv/chimpcheck.git
+git submodule init
+git submodule update
+```
+**2. Build and upload ChimpDriver in local ivy2 repo**
+```
+<ChimpCheck Root>/ChimpDriver$ ./gradlew uploadArchives
+```
+**3. Set up ScalaBashing and ChimpCombinator**
 
-**1. Configurate your Android application**:
+You need to have **sbt** installed. See instructions [here](https://www.scala-sbt.org/1.0/docs/Setup.html)
+```
+<ChimpCheck Root>/ScalaBashing$ sbt publishLocal
+```
+
+This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:
+
+```
+<ChimpCheck Root>/ChimpCombinator$ sbt publishLocal
+```
+
+**4. Configurate your Android application**:
 
   In the build.gradle of the app module, add ChimpCheck dependency and use ChimpCheck as the testInstrumentationRunner:
 ```
@@ -23,20 +46,22 @@ android {
     testInstrumentationRunner "edu.colorado.plv.chimp.driver.ChimpJUnitRunner" 
   }
 }
-
+repositories {
+  ...
+  mavenLocal()
+  ...
+}
 dependencies {
-   compile 'edu.colorado.plv.chimp:chimpcheck:1.0'
+  ...
+  compile (group: 'edu.colorado.plv.fixr',
+            name : 'chimpDriver',
+            version: '1.0', configuration: "compile")
+  ...
+    
 }
 ```
-Remember to use JCenter in the project build.gradle file (default setting in Android Studio)
-```
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-```
-**2. Add a tester class in the app**:
+
+**5. Add a tester class in the app**:
 
 
 In the path `src/androidTest/java/**com.packagename.sample**/`, create a file (e.g TestExpresso):
@@ -64,7 +89,7 @@ public class TestExpresso extends EspressoChimpDriver {
 `MainActivity` is the activity where you want to start your test.
 
 
-**3. Compile your Android apk**
+**6. Compile your Android apk**
 
 
 Run in command line (or click in Android Studio)
@@ -75,23 +100,7 @@ Run in command line (or click in Android Studio)
 and find your apks at 
 `path-to-project/app/build/outputs/apk/` and we want `app-debug.apk` and `app-debug-androidTest.apk`
 
-**4. Set up ScalaBashing and ChimpCombinator**
 
-
-Clone and locally publish ScalaBashing at https://github.com/cuplv/ScalaBashing
-
-You need to have **sbt** installed. See instructions [here](https://www.scala-sbt.org/1.0/docs/Setup.html)
-```
-$ git clone https://github.com/cuplv/ScalaBashing.git
-<ScalaBashing Root>$ sbt publishLocal
-```
-
-This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:
-
-```
-git clone https://github.com/cuplv/ChimpCheck
-<ChimpCheck Root>/ChimpCombinator$ sbt publishLocal
-```
 
 ## Try this checker sample!
 You need to have **adb** in the `$PATH`
