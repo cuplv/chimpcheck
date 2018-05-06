@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <title>ChimpCheck: Concise and Effective Android Testing Library - ChimpCheck: Concise and Effective Android Testing</title>
-    <meta name="generator" content="Hugo 0.31.1" />
+    <meta name="generator" content="Hugo 0.27" />
 
     
     <meta name="description" content="A combinator library for writing test generators and properties for Android applications">
@@ -133,15 +133,16 @@
   <a href="https://github.com/cuplv/chimpcheck" class="project">
     <div class="banner">
       
-      <div class="logo">
-        <img src="http://plv.colorado.edu/chimpcheck/images/cclogo.jpeg">
-      </div>
+        <div class="logo">
+          <img src="http://plv.colorado.edu/chimpcheck/images/cclogo.jpeg">
+        </div>
       
       <div class="name">
-        <strong>ChimpCheck: Concise and Effective Android Testing 
-          <span class="version">0.1.0-SNAPSHOT</span></strong>
+        <strong>ChimpCheck: Concise and Effective Android Testing <span class="version">0.1.0-SNAPSHOT</span></strong>
         
-        <br> cuplv/chimpcheck 
+          <br>
+          cuplv/chimpcheck
+        
       </div>
     </div>
   </a>
@@ -149,20 +150,21 @@
   <div class="scrollable">
     <div class="wrapper">
       
-      <ul class="repo">
-        <li class="repo-download">
-          <a href="https://github.com/cuplv/chimpcheck/archive/master.zip" target="_blank" title="Download" data-action="download">
-            <i class="icon icon-download"></i> Download
-          </a>
-        </li>
-        <li class="repo-stars">
-          <a href="https://github.com/cuplv/chimpcheck/stargazers" target="_blank" title="Stargazers" data-action="star">
-            <i class="icon icon-star"></i> Stars
-            <span class="count">&ndash;</span>
-          </a>
-        </li>
-      </ul>
-      <hr> 
+        <ul class="repo">
+          <li class="repo-download">
+            <a href="https://github.com/cuplv/chimpcheck/archive/master.zip" target="_blank" title="Download" data-action="download">
+              <i class="icon icon-download"></i> Download
+            </a>
+          </li>
+          <li class="repo-stars">
+            <a href="https://github.com/cuplv/chimpcheck/stargazers" target="_blank" title="Stargazers" data-action="star">
+              <i class="icon icon-star"></i> Stars
+              <span class="count">&ndash;</span>
+            </a>
+          </li>
+        </ul>
+        <hr>
+      
 
       <div class="toc">
         
@@ -229,18 +231,24 @@
 
 
         </ul>
-         
-        <hr>
-        <span class="section">The website maintainer</span>
+        
 
+        
+        <hr>
+        <span class="section">The author</span>
+        
         <ul>
-           
+          
+
+          
           <li>
             <a href="https://github.com/Pezhin" target="_blank" title="@Pezhin on GitHub">
               @Pezhin on GitHub
             </a>
           </li>
-           
+          
+
+          
           <li>
             <a href="mailto:me@peilun.org" title="Email of me@peilun.org">
               Contact via email
@@ -253,6 +261,7 @@
     </div>
   </div>
 </nav>
+
 	</div>
 
 	<article class="article">
@@ -271,9 +280,33 @@
 
 <h2 id="build-instructions">Build Instructions</h2>
 
-<p>Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.</p>
+<p>Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
+<strong>1. Building dependencies and libraries</strong>
+First, please clone ChimpCheck from its GitHub repo and init its submodule.</p>
 
-<p><strong>1. Configurate your Android application</strong>:</p>
+<pre><code>git clone https://github.com/cuplv/chimpcheck.git
+git submodule init
+git submodule update
+</code></pre>
+
+<p><strong>2. Build and upload ChimpDriver in local ivy2 repo</strong></p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/ChimpDriver$ ./gradlew uploadArchives
+</code></pre>
+
+<p><strong>3. Set up ScalaBashing and ChimpCombinator</strong></p>
+
+<p>You need to have <strong>sbt</strong> installed. See instructions <a href="https://www.scala-sbt.org/1.0/docs/Setup.html">here</a></p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/ScalaBashing$ sbt publishLocal
+</code></pre>
+
+<p>This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</p>
+
+<pre><code>&lt;ChimpCheck Root&gt;/ChimpCombinator$ sbt publishLocal
+</code></pre>
+
+<p><strong>4. Configurate your Android application</strong>:</p>
 
 <p>In the build.gradle of the app module, add ChimpCheck dependency and use ChimpCheck as the testInstrumentationRunner:</p>
 
@@ -283,22 +316,22 @@
     testInstrumentationRunner &quot;edu.colorado.plv.chimp.driver.ChimpJUnitRunner&quot; 
   }
 }
-
+repositories {
+  ...
+  mavenLocal()
+  ...
+}
 dependencies {
-   compile 'edu.colorado.plv.chimp:chimpcheck:1.0'
+  ...
+  compile (group: 'edu.colorado.plv.fixr',
+            name : 'chimpDriver',
+            version: '1.0', configuration: &quot;compile&quot;)
+  ...
+    
 }
 </code></pre>
 
-<p>Remember to use JCenter in the project build.gradle file (default setting in Android Studio)</p>
-
-<pre><code>allprojects {
-    repositories {
-        jcenter()
-    }
-}
-</code></pre>
-
-<p><strong>2. Add a tester class in the app</strong>:</p>
+<p><strong>5. Add a tester class in the app</strong>:</p>
 
 <p>In the path <code>src/androidTest/java/**com.packagename.sample**/</code>, create a file (e.g TestExpresso):</p>
 
@@ -324,7 +357,7 @@ public class TestExpresso extends EspressoChimpDriver {
 
 <p><code>MainActivity</code> is the activity where you want to start your test.</p>
 
-<p><strong>3. Compile your Android apk</strong></p>
+<p><strong>6. Compile your Android apk</strong></p>
 
 <p>Run in command line (or click in Android Studio)</p>
 
@@ -334,22 +367,6 @@ public class TestExpresso extends EspressoChimpDriver {
 
 <p>and find your apks at
 <code>path-to-project/app/build/outputs/apk/</code> and we want <code>app-debug.apk</code> and <code>app-debug-androidTest.apk</code></p>
-
-<p><strong>4. Set up ScalaBashing and ChimpCombinator</strong></p>
-
-<p>Clone and locally publish ScalaBashing at <a href="https://github.com/cuplv/ScalaBashing">https://github.com/cuplv/ScalaBashing</a></p>
-
-<p>You need to have <strong>sbt</strong> installed. See instructions <a href="https://www.scala-sbt.org/1.0/docs/Setup.html">here</a></p>
-
-<pre><code>$ git clone https://github.com/cuplv/ScalaBashing.git
-&lt;ScalaBashing Root&gt;$ sbt publishLocal
-</code></pre>
-
-<p>This is required by ChimpCombinator. Next, you will need to do the same for ChimpCombinator. Assuming that you have cloned this repository, just do the following:</p>
-
-<pre><code>git clone https://github.com/cuplv/ChimpCheck
-&lt;ChimpCheck Root&gt;/ChimpCombinator$ sbt publishLocal
-</code></pre>
 
 <h2 id="try-this-checker-sample">Try this checker sample!</h2>
 

@@ -3,8 +3,18 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://plv.colorado.edu/chimpcheck/getting-started/</loc>
+    <lastmod>2017-12-14T15:07:13+01:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://plv.colorado.edu/chimpcheck/</loc>
     <lastmod>2017-12-14T10:07:13+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://plv.colorado.edu/chimpcheck/license/</loc>
+    <lastmod>2017-12-14T16:07:13+01:00</lastmod>
   </url>
   
   <url>
@@ -14,7 +24,19 @@
   
   <url>
     <loc>http://plv.colorado.edu/chimpcheck/</loc>
-    <lastmod>2017-12-14T10:07:13+01:00</lastmod>
+    <lastmod>2017-12-14T15:07:13+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://plv.colorado.edu/chimpcheck/getting-started/</loc>
+    <lastmod>2017-12-14T15:07:13+01:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://plv.colorado.edu/chimpcheck/license/</loc>
+    <lastmod>2017-12-14T16:07:13+01:00</lastmod>
     <priority>0</priority>
   </url>
   
