@@ -1,7 +1,7 @@
 package edu.colorado.plv.chimp.example
 
 import com.typesafe.scalalogging.Logger
-import edu.colorado.plv.chimp.combinator.{Assert, Rotate, _}
+import edu.colorado.plv.chimp.combinator.{Assert, Rotate, Type, _}
 import edu.colorado.plv.chimp.combinator.Implicits._
 import edu.colorado.plv.chimp.generator.Implicits._
 import edu.colorado.plv.chimp.coordinator.{ChimpLoader, CrashChimpOutcome, SuccChimpOutcome}
@@ -17,7 +17,7 @@ object TestApp {
 
   def main(args: Array[String]): Unit = {
 
-    val buildDir = "/Users/Pezh/ChimpCheck/examples/ChimpTrainer/app"
+    val buildDir = "/Users/Pezh/Documents/Tutorial/chimpcheck/examples/ChimpTrainer/app"
     val appBuildDir = buildDir + "/build/outputs/apk/"
     val testerClass = "TestExpresso"
     val aaptHome = "/Users/Pezh/Library/Android/sdk/build-tools/24.0.3"
@@ -32,7 +32,8 @@ object TestApp {
 
 
     // To support Click(R.id._) please import the R class file
-    val trace = Sleep(3000):>> Click("Begin") :>> Type(*, "test") :>> Type(*, "test") :>> Click("Login") :>> Click("Countdowntimer Testing") :>> Click("5 seconds") :>> ClickBack
+    val trace = Sleep(1000):>> Click("Begin") :>> Type("username", "test") :>> Type("password", "test") :>>
+                Click("Login") :>> Click("Countdowntimer Testing") :>> Click("5 seconds") :>> Sleep(5000):>> ClickBack
 
     val outcome = ChimpLoader.quickLoad(emuID, trace, appAPKPath, chimpAPKPath, testerClass, aaptHome)
     outcome match {
