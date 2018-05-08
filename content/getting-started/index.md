@@ -9,6 +9,10 @@ weight: 10
 2. Use ChimpCombinator to generate the test script
 3. Use ScalaBashing to run the script (suggested but optional)
 
+## Video tutorial
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/pUvbm5g2pWM?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 ## Build Instructions
 
 Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
