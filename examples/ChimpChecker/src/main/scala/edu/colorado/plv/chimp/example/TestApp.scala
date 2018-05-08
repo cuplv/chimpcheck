@@ -17,13 +17,14 @@ object TestApp {
 
   def main(args: Array[String]): Unit = {
 
-    val buildDir = "/Users/Pezh/Documents/Tutorial/chimpcheck/examples/ChimpTrainer/app"
+    //val buildDir = "/Users/Pezh/Documents/Tutorial/chimpcheck/examples/ChimpTrainer/app"
+    val buildDir = "/opt/ChimpCheck/examples/ChimpTrainer/app"
     val appBuildDir = buildDir + "/build/outputs/apk/"
     val testerClass = "TestExpresso"
-    val aaptHome = "/Users/Pezh/Library/Android/sdk/build-tools/24.0.3"
+    val aaptHome = "/opt/android-sdk/build-tools/25.0.2" //"/Users/Pezh/Library/Android/sdk/build-tools/24.0.3"
     val emuID = "emulator-5554"
     val appAPKPath = appBuildDir + "app-debug.apk"
-    val chimpAPKPath = appBuildDir + "app-debug-androidTest.apk"
+    val chimpAPKPath = appBuildDir + "app-debug-androidTest-unaligned.apk"
 
 
     implicit val logger = Logger(LoggerFactory.getLogger("chimp-tester"))
