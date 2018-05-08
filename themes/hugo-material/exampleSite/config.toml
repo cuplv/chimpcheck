@@ -1,7 +1,7 @@
-baseurl = "http://plv.colorado.edu/chimpcheck/"
+baseurl = "https://example.org/"
 languageCode = "en-us"
-title = "ChimpCheck: Concise and Effective Android Testing"
-theme = "hugo-material"
+title = "Material Docs"
+theme = "hugo-material-docs"
 metadataformat = "yaml"
 canonifyurls = true
 # Enable Google Analytics by entering your tracking id
@@ -9,16 +9,16 @@ googleAnalytics = ""
 
 [params]
 	# General information
-	author = "CUPLV"
-	description = "A combinator library for writing test generators and properties for Android applications"
-	copyright = "The content in the website is released under the CC license"
+	author = "Digitalcraftsman"
+	description = "A material design theme for documentations."
+	copyright = "Released under the MIT license"
 
 	# Repository
 	provider = "GitHub"
-	repo_url = "https://github.com/cuplv/chimpcheck"
+	repo_url = "https://github.com/digitalcraftsman/hugo-material-docs"
 
-	version = "0.1.0-SNAPSHOT"
-	logo = "images/cclogo.jpeg"
+	version = "1.0.0"
+	logo = "images/logo.png"
 	favicon = ""
 
 	permalink = "#"
@@ -31,7 +31,7 @@ googleAnalytics = ""
 	highlight_css  = ""
 
 	[params.palette]
-    	primary = "indigo"
+    	primary = "red"
     	accent  = "teal"
 
     [params.font]
@@ -41,20 +41,29 @@ googleAnalytics = ""
 
 [social]
 	twitter = ""
-	github  = "Pezhin"
-	email   = "me@peilun.org"
+	github  = "digitalcraftsman"
+	email   = "hello@email.com"
 
 
 [[menu.main]]
-	name   = "ChimpCheck"
+	name   = "Material"
 	url    = "/"
-	weight = 5 
+	weight = 0
 
 [[menu.main]]
 	name   = "Getting started"
 	url    = "getting-started/"
 	weight = 10
 
+[[menu.main]]
+	name   = "Adding content"
+	url    = "adding-content/"
+	weight = 20
+
+[[menu.main]]
+	name   = "Roadmap"
+	url    = "roadmap/"
+	weight = 30
 
 [[menu.main]]
 	name   = "License"
