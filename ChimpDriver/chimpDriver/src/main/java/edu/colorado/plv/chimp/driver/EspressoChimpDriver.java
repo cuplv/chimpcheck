@@ -107,16 +107,21 @@ public class EspressoChimpDriver /* <A extends Activity> */ extends ChimpDriver 
         Log.i(runner.chimpTag("EspressoChimpDriver@launchQualifiesEvent"), qualifies.toString());
 
 
-        PropResult res = check( qualifies.getCondition() );
+        PropResult res = null ;
+        try {
+            res = check( qualifies.getCondition() );
+        } catch (ReflectionPredicateException e) {
+            e.printStackTrace();
+        }
 
         Log.i(runner.chimpTag("QualifiesEvent"), "check finishes");
-        if (res.success) {
-            Log.i(runner.chimpTag("QualifiesEvent"), "check success");
-            for (EventTraceOuterClass.UIEvent uiEvent : qualifies.getTrace().getEventsList()) {
-                executeEvent( uiEvent );
-            }
+        if(res != null && res.success) {
+                Log.i(runner.chimpTag("QualifiesEvent"), "check success");
+                for (EventTraceOuterClass.UIEvent uiEvent : qualifies.getTrace().getEventsList()) {
+                    executeEvent(uiEvent);
+                }
         } else {
-            Log.i(runner.chimpTag("EspressoChimpDriver@launchQualifiesEvent"),"Condition failed: " + qualifies.getCondition().toString());
+            Log.i(runner.chimpTag("EspressoChimpDriver@launchQualifiesEvent"), "Condition failed: " + qualifies.getCondition().toString());
         }
 
         return qualifies;

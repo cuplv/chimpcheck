@@ -2,6 +2,7 @@ package edu.colorado.plv.chimp.performers;
 
 
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.PerformException;
 import android.support.test.espresso.ViewAction;
 import android.support.test.espresso.core.deps.guava.collect.ImmutableMap;
 import android.support.test.uiautomator.BySelector;
@@ -55,7 +56,19 @@ public class SwipePerformer extends Performer<AppEventOuterClass.Swipe> {
     @Override
     public AppEventOuterClass.Swipe performMatcherAction(AppEventOuterClass.Swipe origin, Matcher<View> matcher) {
         ViewAction swipe = swipeActions.get(origin.getPos().getOrientType());
-        Espresso.onView(matcher).perform(scrollTo());
+        try {
+            Espresso.onView(matcher).perform(scrollTo());
+        } catch (PerformException pe){
+            //ignored
+            pe.printStackTrace();
+        }
+
+        try {
+            Espresso.onView(matcher).perform(swipe);
+        } catch (PerformException pe){
+            // ignored
+            pe.printStackTrace();
+        }
         return origin;
     }
     @Override
