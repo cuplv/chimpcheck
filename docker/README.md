@@ -8,4 +8,6 @@
 ```docker build -t chimpcheck .```
 
 - Run the container
-```docker run -di -p 3000:3000 --name=chimpcheck chimpcheck```
+```docker run -di -p 3001:3001 --name=chimpcheck chimpcheck```
+
+- The docker container will start a web server reachable on port 3001 with the web demo of chimpcheck (check http://localhost:3001 if deploying the docker container locally)
