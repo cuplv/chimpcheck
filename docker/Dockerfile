@@ -17,8 +17,11 @@ RUN sudo apt-get install -y nodejs
 RUN sudo npm cache clean -f
 
 RUN cd ./chimpcheck/ChimpWebDemo && npm install
+RUN cd ./chimpcheck/ChimpWebDemo/client && npm install
 
-EXPOSE 3000
+EXPOSE 3001
+
 
 WORKDIR ./chimpcheck/ChimpWebDemo
-ENTRYPOINT ["npm", "start"]
+COPY start_web_server.bash start_web_server.bash
+ENTRYPOINT ["/bin/bash", "start_web_server.bash"]
