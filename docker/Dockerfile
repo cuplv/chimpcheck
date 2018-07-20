@@ -11,7 +11,7 @@ RUN cd ./chimpcheck/ChimpCombinator && sbt publishLocal
 
 
 # Install npm
-RUN apt-get remove nodejs npm nodejs-legacy
+RUN echo "Y" | apt-get remove nodejs npm nodejs-legacy
 RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 RUN sudo apt-get install -y nodejs
 RUN sudo npm cache clean -f
@@ -24,4 +24,6 @@ EXPOSE 3001
 
 WORKDIR ./chimpcheck/ChimpWebDemo
 COPY start_web_server.bash start_web_server.bash
-ENTRYPOINT ["/bin/bash", "start_web_server.bash"]
+COPY start_docker.bash start_docker.bash
+ADD chimpcheck.conf /etc/supervisor/conf.d
+ENTRYPOINT ["/usr/bin/supervisord"]
