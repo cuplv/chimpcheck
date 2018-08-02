@@ -21,9 +21,24 @@ RUN cd ./chimpcheck/ChimpWebDemo/client && npm install
 
 EXPOSE 3001
 
+# Install NDK (Android Size is 320x480)
+RUN cd tmp && wget https://dl.google.com/android/repository/android-ndk-r17b-linux-x86_64.zip
+RUN cd tmp && unzip android-ndk-r17b-linux-x86_64.zip -d /
+RUN cd tmp && rm android-ndk-r17b-linux-x86_64.zip
+ENV PATH $PATH:/android-ndk-r17b
+
+# Install minicap server
+RUN git clone https://github.com/openstf/minicap
+RUN cd ./minicap && git submodule update --init
+RUN cd ./minicap && ndk-build
+RUN npm install ws
+RUN npm install express
+EXPOSE 9002
+
 
 WORKDIR ./chimpcheck/ChimpWebDemo
 COPY start_web_server.bash start_web_server.bash
 COPY start_docker.bash start_docker.bash
+COPY start_adb_stream.bash start_adb_stream.bash
 ADD chimpcheck.conf /etc/supervisor/conf.d
 ENTRYPOINT ["/usr/bin/supervisord"]
