@@ -40,5 +40,5 @@ WORKDIR ./chimpcheck/ChimpWebDemo
 COPY start_web_server.bash start_web_server.bash
 COPY start_docker.bash start_docker.bash
 COPY start_adb_stream.bash start_adb_stream.bash
-ADD chimpcheck.conf /etc/supervisor/conf.d
+ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
 ENTRYPOINT ["/usr/bin/supervisord"]
