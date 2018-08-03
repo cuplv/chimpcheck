@@ -41,4 +41,5 @@ COPY start_web_server.bash start_web_server.bash
 COPY start_docker.bash start_docker.bash
 COPY start_adb_stream.bash start_adb_stream.bash
 ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
+RUN cd /chimpcheck && git checkout docker_container
 ENTRYPOINT ["/usr/bin/supervisord"]
