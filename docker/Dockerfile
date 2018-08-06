@@ -40,6 +40,9 @@ WORKDIR ./chimpcheck/ChimpWebDemo
 COPY start_web_server.bash start_web_server.bash
 COPY start_docker.bash start_docker.bash
 COPY start_adb_stream.bash start_adb_stream.bash
-ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
+COPY replacements.bash replacements.bash
+ADD chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git checkout docker_container
+RUN cd /chimpcheck && git pull
+ENV STREAM_PORT 9002
 ENTRYPOINT ["/usr/bin/supervisord"]

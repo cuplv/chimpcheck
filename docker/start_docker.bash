@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Replace Lines (This is honestly really hack-y. :( )
+bash replacements.bash
 # Start the web server! (This is for hardware acceleration)
 bash /chimpcheck/ChimpWebDemo/start_web_server.bash & \
 (sleep 10 && sudo env "PATH=$PATH" emulator -avd test -noaudio -no-boot-anim -gpu swiftshader_indirect) & \
