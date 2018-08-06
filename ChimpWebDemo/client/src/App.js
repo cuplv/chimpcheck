@@ -20,7 +20,7 @@ class App extends Component {
 
             </div>
             <div className="col-4">
-            <img src={emulator} height="500" width="250" alt="logo" />
+            <iframe src="http://localhost:9002" title="proxied" width="360" height="520" frameBorder="0"></iframe>
             </div>
           </div>
         </div>
