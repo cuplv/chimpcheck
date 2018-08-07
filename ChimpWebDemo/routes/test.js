@@ -13,7 +13,7 @@ router.post('/', function(req, res, next) {
   var scriptPath = __dirname + '/../example/' + testName + '.sh'
   console.log(scriptPath)
   async function ls() {
-    const { stdout, stderr } = await exec('bash ' +scriptPath);
+    const { stdout, stderr } = await exec('bash toOutput.sh ' +scriptPath);
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
     res.send(stdout);
