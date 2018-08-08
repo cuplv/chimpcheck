@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Make sure everything's up to date.
+cd /chimpcheck && git pull
 #Replace Lines (This is honestly really hack-y. :( )
 bash replacements.bash
 # Start the web server! (This is for hardware acceleration)
