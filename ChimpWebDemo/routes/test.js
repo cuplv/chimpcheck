@@ -10,10 +10,11 @@ router.post('/', function(req, res, next) {
   var appName = appMap[reqBody.appname]
   var testName = reqBody.testname
   console.log(appName,testName)
-  var scriptPath = __dirname + '/../example/' + testName + '.sh'
+  //var scriptPath = __dirname + '/../example/' + testName + '.sh'
+  var scriptPath = __dirname + '/../example/runCommand.sh ' + appName
   console.log(scriptPath)
   async function ls() {
-    const { stdout, stderr } = await exec('bash ' +scriptPath);
+    const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat ' + testName + '-eventTrace.txt )');
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
     res.send(stdout);
