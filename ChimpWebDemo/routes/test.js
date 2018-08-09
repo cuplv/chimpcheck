@@ -14,7 +14,7 @@ router.post('/', function(req, res, next) {
   var scriptPath = __dirname + '/../example/runCommand.sh ' + appName
   console.log(scriptPath)
   async function ls() {
-    const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat /../example/' + testName + '-eventTrace.txt )');
+    const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat ' + __dirname + '/../example/' + testName + '-eventTrace.txt )');
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
     res.send(stdout);
