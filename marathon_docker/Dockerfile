@@ -20,7 +20,5 @@ WORKDIR ./chimpRun
 COPY start_docker.bash start_docker.bash
 COPY ../docker/start_adb_stream.bash start_adb_stream.bash
 ADD ../docker/dummy_chimpcheck.conf /etc/supervisor/conf.d
-RUN cd /chimpcheck && git pull
-RUN cd /chimpcheck && git checkout demo_server_plus_docker
 ENV STREAM_PORT 9002
 ENTRYPOINT ["/usr/bin/supervisord"]
