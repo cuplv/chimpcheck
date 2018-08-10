@@ -24,7 +24,7 @@ RUN mkdir chimpRun
 
 WORKDIR ./chimpRun
 COPY start_docker.bash start_docker.bash
-COPY ../docker/start_adb_stream.bash start_adb_stream.bash
-ADD ../docker/dummy_chimpcheck.conf /etc/supervisor/conf.d
+COPY start_adb_stream.bash start_adb_stream.bash
+ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
 ENV STREAM_PORT 9002
 ENTRYPOINT ["/usr/bin/supervisord"]
