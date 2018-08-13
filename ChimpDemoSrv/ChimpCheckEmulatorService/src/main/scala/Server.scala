@@ -37,7 +37,7 @@ object Server {
       args(0).toInt
     } else conf.getInt("port")
     val bindingFuture = Http().bindAndHandle(route, "localhost", port)
-    println(s"Github Service started on Port $port!")
+    println(s"Chimpcheck Driver started on Port $port!")
     StdIn.readLine() // let it run until user presses return
     bindingFuture
       .flatMap(_.unbind()) // trigger unbinding from the port

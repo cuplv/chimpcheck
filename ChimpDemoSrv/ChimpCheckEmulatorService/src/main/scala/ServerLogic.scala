@@ -1,9 +1,11 @@
 import com.typesafe.config.Config
+import edu.colorado.plv.fixr.bash.android.Adb
 import spray.json.{JsNumber, JsObject, JsString}
 
 import scalaj.http.Http
 import spray.json._
-import scala.sys.process._
+
+// import scala.sys.process._
 
 /**
   * Created by chanceroberts on 8/10/18.
@@ -42,15 +44,18 @@ object ServerLogic {
     val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now.
     // Http("").asString.body
     //Yes, exprAPK and testAPK are two different things.
-    //Here's the bash scripts!
-    s"adb -H $newHost -P $adbPort -s emulator-5554 uninstall $testAPK".!
-    s"adb -H $newHost -P $adbPort -s emulator-5554 uninstall $testAPK.test".!
-    s"adb -H $newHost -P $adbPort -s emulator-5554 install $chimpCheckLoc/$test/app-debug.apk".!
-    s"adb -H $newHost -P $adbPort -s emulator-5554 install $chimpCheckLoc/$test/app-debug-androidTest.apk".!
-    val chimpCheckReturn =
+    //Here's the bash scripts! (Now with ScalaBashing)
+    Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").uninstall(testAPK).!
+    Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").uninstall(s"$testAPK.test").!
+    Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").install(s"$chimpCheckLoc/$test/app-debug.apk").!
+    Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").install(s"$chimpCheckLoc/$test/app-debug-androidTest.apk").!
+    val chimpCheckReturn = Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").shell(s"am instrument -r -w -e debug false " +
+      s"-e eventTrace $eventTrace -e appPackageName $packAPK -e class $packAPK.TestExpresso " +
+      s"$testAPK.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner").!!!.toString
+    /*val chimpCheckReturn =
       s"adb -H $newHost -P $adbPort -s emulator-5554 shell am instrument -r -w -e debug false " +
         s"-e eventTrace $eventTrace -e appPackageName $packAPK -e class $packAPK.TestExpresso " +
-        s"$testAPK.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner".!!
+        s"$testAPK.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner".!!*/
     //val chimpCheckReturn = s"bash runCommand.sh $newHost $adbPort $test $packAPK $testAPK $eventTrace".!!
     //Close the Emulator
     /*val done = Http("???").postData(
