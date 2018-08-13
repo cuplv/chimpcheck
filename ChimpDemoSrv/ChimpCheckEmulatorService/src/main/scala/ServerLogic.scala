@@ -1,4 +1,5 @@
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.Logger
 import edu.colorado.plv.fixr.bash.android.Adb
 import spray.json.{JsNumber, JsObject, JsString}
 
@@ -11,6 +12,7 @@ import spray.json._
   * Created by chanceroberts on 8/10/18.
   */
 object ServerLogic {
+  implicit val bashLogger = Logger
   def runAnEmulator(queryStr: String, conf: Config): String = {
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val json = queryStr.parseJson.asJsObject
