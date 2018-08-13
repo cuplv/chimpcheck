@@ -52,9 +52,11 @@ object ServerLogic {
     Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").uninstall(s"$testAPK.test").!
     Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").install(s"$chimpCheckLoc/$test/app-debug.apk").!
     Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").install(s"$chimpCheckLoc/$test/app-debug-androidTest.apk").!
-    val chimpCheckReturn = Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").shell(s"am instrument -r -w -e debug false " +
-      s"-e eventTrace $eventTrace -e appPackageName $packAPK -e class $packAPK.TestExpresso " +
-      s"$testAPK.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner").!!!.toString
+    val chimpCheckReturn = for {
+      a <- Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").shell(s"am instrument -r -w -e debug false " +
+        s"-e eventTrace $eventTrace -e appPackageName $packAPK -e class $packAPK.TestExpresso " +
+        s"$testAPK.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner").!!!
+    } yield a
     /*val chimpCheckReturn =
       s"adb -H $newHost -P $adbPort -s emulator-5554 shell am instrument -r -w -e debug false " +
         s"-e eventTrace $eventTrace -e appPackageName $packAPK -e class $packAPK.TestExpresso " +
