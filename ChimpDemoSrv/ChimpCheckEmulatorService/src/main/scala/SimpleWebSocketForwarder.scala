@@ -14,7 +14,6 @@ import com.typesafe.config.ConfigFactory
 import spray.json._
 
 import scala.io.StdIn
-import scala.util.Random
 
 object SimpleWebSocketForwarder {
   var ipDir: Map[String, String] = Map()
@@ -22,7 +21,6 @@ object SimpleWebSocketForwarder {
   implicit val materializer = ActorMaterializer()
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
-  val random = new Random
 
   def makeWebSocket: Route = {
     post {
@@ -30,17 +28,16 @@ object SimpleWebSocketForwarder {
         queryStr =>
           path("add") {
             val json = queryStr.parseJson.asJsObject
-            val randVal = random.nextString(16)
-            ipDir = json.fields.get("streamingIP") match {
-              case Some(JsString(sIP)) =>
-                ipDir + (randVal -> sIP)
+            ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match {
+              case (Some(JsString(cIP)), Some(JsString(sIP))) =>
+                ipDir + (cIP -> sIP)
               case (_, _) => ipDir
             }
-            complete(randVal)
+            complete("")
           }~
           path("remove") {
             val json = queryStr.parseJson.asJsObject
-            ipDir = (json.fields.get("streamingIP"), json.fields.get("streamingIP")) match{
+            ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match{
               case (Some(JsString(cIP)), Some(JsString(sIP))) =>
                 ipDir.filter{case (key, str) => !(key.equals(cIP) && str.equals(sIP))}
               case (Some(JsString(cIP)), _) =>
