@@ -14,6 +14,7 @@ import com.typesafe.config.ConfigFactory
 import spray.json._
 
 import scala.io.StdIn
+import scala.util.Random
 
 object SimpleWebSocketForwarder {
   var ipDir: Map[String, String] = Map()
@@ -21,30 +22,25 @@ object SimpleWebSocketForwarder {
   implicit val materializer = ActorMaterializer()
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
+  val random = new Random
 
   def makeWebSocket: Route = {
-    get{
-      extractClientIP {
-        ip =>
-          val stringIP = s"${ip.toOption.map(_.getHostAddress()).getOrElse("")}:${ip.getPort()}"
-          handleWebSocketMessages(makeTwoWayConnection(stringIP))
-      }
-    } ~
     post {
       entity(as[String]){
         queryStr =>
           path("add") {
             val json = queryStr.parseJson.asJsObject
-            ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match {
-              case (Some(JsString(cIP)), Some(JsString(sIP))) =>
-                ipDir + (cIP -> sIP)
+            val randVal = random.nextString(16)
+            ipDir = json.fields.get("streamingIP") match {
+              case Some(JsString(sIP)) =>
+                ipDir + (randVal -> sIP)
               case (_, _) => ipDir
             }
-            complete("")
+            complete(randVal)
           }~
           path("remove") {
             val json = queryStr.parseJson.asJsObject
-            ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match{
+            ipDir = (json.fields.get("streamingIP"), json.fields.get("streamingIP")) match{
               case (Some(JsString(cIP)), Some(JsString(sIP))) =>
                 ipDir.filter{case (key, str) => !(key.equals(cIP) && str.equals(sIP))}
               case (Some(JsString(cIP)), _) =>
@@ -56,11 +52,16 @@ object SimpleWebSocketForwarder {
             complete("")
           }
       }
+    } ~
+    extractClientIP {
+      ip =>
+        val stringIP = s"${ip.toOption.map(_.getHostAddress()).getOrElse("")}:${ip.getPort()}"
+        handleWebSocketMessages(makeTwoWayConnection(stringIP))
     }
   }
 
   def makeTwoWayConnection(clientIP: String): Flow[Message, Message, Any] = {
-    if (!ipDir.contains(clientIP)){
+    if (ipDir.contains(clientIP)){
       val sink: Sink[Message, Any] = Sink.asPublisher(false)
       val flow1: Flow[Message, Message, Any] = Flow.fromSinkAndSource(sink, Source.maybe)
       val source: Source[Message, Any] = Source.fromPublisher(flow1.toProcessor.run)

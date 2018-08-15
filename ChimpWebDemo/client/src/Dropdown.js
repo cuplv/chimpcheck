@@ -31,6 +31,18 @@ class Dropdown extends Component {
   }
   onClick(e) {
     fetch('/test', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appname:this.state.appname,
+        testname: this.state.test,
+        toRun: 'setUp'
+      })
+    }).then(res => res.text()).then(data => document.getElementById("streamed").src = "http://"+document.location.href+"/stream")
+    fetch('/test', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -39,10 +51,23 @@ class Dropdown extends Component {
         body: JSON.stringify({
             appname:this.state.appname,
             testname: this.state.test,
+            toRun: 'runADB'
             })
         }).then(res => 
             res.text())
           .then(data => this.setState({results:data}))
+    fetch('/test', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        appname:this.state.appname,
+        testname: this.state.test,
+        toRun: 'setUp'
+      })
+    }).then(res => res.text()).then(data => document.getElementById("streamed").src = "")
   }
   render() {
         return (
