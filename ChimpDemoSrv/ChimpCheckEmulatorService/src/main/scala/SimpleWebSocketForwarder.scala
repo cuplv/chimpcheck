@@ -51,6 +51,7 @@ object SimpleWebSocketForwarder {
                 ipDir.filter{case (key, _) => !key.equals(cIP)}
               case (_, Some(JsString(sIP))) =>
                 ipDir.filter{case (_, str) => !str.equals(sIP)}
+              case (_, _) => ipDir
             }
             complete("")
           }
