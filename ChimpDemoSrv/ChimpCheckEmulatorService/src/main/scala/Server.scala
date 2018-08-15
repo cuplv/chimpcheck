@@ -20,27 +20,27 @@ object Server {
 
   def runChimpCheck(conf: Config): server.Route = {
     extractClientIP { ip =>
-      //val stringIP = s"${ip.toOption.map(_.getHostAddress()).getOrElse("")}:${ip.getPort()}"
+      val stringIP = s"${ip.toOption.map(_.getHostAddress()).getOrElse("")}:${ip.getPort()}"
       post {
         entity(as[String]) {
           queryStr =>
             path("setUp"){
               try{
-                complete(ServerLogic.setUpEmulator(queryStr, conf))
+                complete(ServerLogic.setUpEmulator(queryStr, conf, stringIP))
               } catch {
                 case e: Exception => complete(e.getMessage())
               }
             }~
             path("runADB") {
               try {
-                complete(ServerLogic.runAnEmulator(queryStr, conf))
+                complete(ServerLogic.runAnEmulator(queryStr, conf, stringIP))
               } catch {
                 case e: Exception => complete(e.getMessage())
               }
             }~
             path("tearDown"){
               try{
-                complete(ServerLogic.closeAnEmulator(queryStr, conf))
+                complete(ServerLogic.closeAnEmulator(queryStr, conf, stringIP))
               } catch {
                 case e: Exception => complete(e.getMessage())
               }
