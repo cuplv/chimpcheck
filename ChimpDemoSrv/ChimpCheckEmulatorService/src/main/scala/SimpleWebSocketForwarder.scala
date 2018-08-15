@@ -33,13 +33,27 @@ object SimpleWebSocketForwarder {
     post {
       entity(as[String]){
         queryStr =>
-          val json = queryStr.parseJson.asJsObject
-          ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match{
-            case (Some(JsString(cIP)), Some(JsString(sIP))) =>
-              ipDir + (cIP -> sIP)
-            case (_, _) => ipDir
+          path("add") {
+            val json = queryStr.parseJson.asJsObject
+            ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match {
+              case (Some(JsString(cIP)), Some(JsString(sIP))) =>
+                ipDir + (cIP -> sIP)
+              case (_, _) => ipDir
+            }
+            complete("")
+          }~
+          path("remove") {
+            val json = queryStr.parseJson.asJsObject
+            ipDir = (json.fields.get("clientIP"), json.fields.get("streamingIP")) match{
+              case (Some(JsString(cIP)), Some(JsString(sIP))) =>
+                ipDir.filter{case (key, str) => !(key.equals(cIP) && str.equals(sIP))}
+              case (Some(JsString(cIP)), _) =>
+                ipDir.filter{case (key, _) => !key.equals(cIP)}
+              case (_, Some(JsString(sIP))) =>
+                ipDir.filter{case (_, str) => !str.equals(sIP)}
+            }
+            complete("")
           }
-          complete("")
       }
     }
   }

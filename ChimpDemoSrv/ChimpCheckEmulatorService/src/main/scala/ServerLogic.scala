@@ -24,7 +24,7 @@ object ServerLogic {
     val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now.
 
     //Create the connection between the server and the adb client.
-    Http(s"localhost:${conf.getString("webSocketPort")}").postData(
+    Http(s"localhost:${conf.getString("webSocketPort")}/add").postData(
       JsObject("clientIP" -> JsString(ip), "streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint)
     s"$newHost:$streamPort"
   }
@@ -72,6 +72,8 @@ object ServerLogic {
 
   def closeAnEmulator(queryStr: String, conf: Config, ip: String): String ={
     //This does nothing for now; However, this will de-allocate the Docker Container using the Marathon APIs.
+    Http(s"localhost:${conf.getString("webSocketPort")}/remove").postData(
+      JsObject("clientIP" -> JsString(ip)).prettyPrint)
     ""
   }
 }
