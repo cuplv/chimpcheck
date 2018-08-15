@@ -1,3 +1,5 @@
+import java.net.InetAddress
+
 import akka.actor.ActorSystem
 import akka.http.scaladsl.{Http, server}
 import akka.http.scaladsl.server.Directives._
@@ -17,15 +19,18 @@ object Server {
   implicit val executionContext = system.dispatcher
 
   def runChimpCheck(conf: Config): server.Route = {
-    post{
-      entity(as[String]){
-        queryStr =>
-          try {
-            val finalString = ServerLogic.runAnEmulator(queryStr, conf)
-            complete(finalString)
-          } catch {
-            case e: Exception => complete(e.getMessage())
-          }
+    extractClientIP { ip =>
+      post {
+        entity(as[String]) {
+          queryStr =>
+            try {
+              val stringIP = s"${ip.toOption.map(_.getHostAddress()).getOrElse("")}:${ip.getPort()}"
+              val finalString = ServerLogic.runAnEmulator(queryStr, conf, stringIP)
+              complete(finalString)
+            } catch {
+              case e: Exception => complete(e.getMessage())
+            }
+        }
       }
     }
   }

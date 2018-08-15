@@ -14,7 +14,15 @@ import spray.json._
   */
 object ServerLogic {
   implicit val bashLogger = Logger(LoggerFactory.getLogger(""))
-  def runAnEmulator(queryStr: String, conf: Config): String = {
+  def setUpEmulator(queryStr: String, conf: Config, ip: String): String = {
+    val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now.
+    //Create the connection between the server and the adb client.
+    Http(s"localhost:${conf.getString("webSocketPort")}").postData(
+      JsObject("clientIP" -> JsString(ip), "streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint)
+    s"$newHost:$streamPort"
+  }
+  def runAnEmulator(queryStr: String, conf: Config, ip: String): String = {
+    val (newHost, adbPort, _) = ("localhost", "5037", "9002") //Hardcoded for now.
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val json = queryStr.parseJson.asJsObject
     val test = json.fields.getOrElse("test",
@@ -44,9 +52,7 @@ object ServerLogic {
     /*val newContainer = Http("???").postData(
       JsObject(Map("id" -> JsString(conf.getString("id")), "instances" -> JsNumber(1))).prettyPrint
     ).method("PATCH").header("accept", "application/json").asString.body.parseJson*/
-    val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now.
-    // Http("").asString.body
-    //Yes, exprAPK and testAPK are two different things.
+
     //Here's the bash scripts! (Now with ScalaBashing)
     Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").uninstall(testAPK).!
     Adb.extend(s"-H $newHost -P $adbPort").target("emulator-5554").uninstall(s"$testAPK.test").!
