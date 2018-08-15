@@ -14,8 +14,15 @@ import spray.json._
   */
 object ServerLogic {
   implicit val bashLogger = Logger(LoggerFactory.getLogger(""))
+  val testToAPK = Map(
+    "trainer" -> ("plv.colorado.edu.chimptrainer", "plv.colorado.edu.chimptrainer"),
+    "nextcloud" -> ("com.nextcloud.client", "com.owncloud.android"),
+    "kisten" -> ("de.d120.ophasekistenstapeln", "de.d120.ophasekistenstapeln")
+  ) //Hardcoded for now?
+
   def setUpEmulator(queryStr: String, conf: Config, ip: String): String = {
     val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now.
+
     //Create the connection between the server and the adb client.
     Http(s"localhost:${conf.getString("webSocketPort")}").postData(
       JsObject("clientIP" -> JsString(ip), "streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint)
@@ -30,24 +37,13 @@ object ServerLogic {
       case JsString(s) => s
       case _ => throw new Exception("Unexpected JSON Format (Requires field test to be a string.")
     }
-    val packAPK = json.fields.getOrElse("appPack",
-      throw new Exception("Unexpected JSON Format (Requires field appPack for the app package name.")) match{
-      case JsString(s) => s
-      case _ => throw new Exception("Unexpected JSON Format (Requires field packAPK to be a string.")
-    }
-    val testAPK = json.fields.getOrElse("apk",
-      throw new Exception("Unexpected JSON Format (Requires field apk for the package to install. " +
-        "(Yes, this is different than the app package name...)")
-    ) match{
-      case JsString(s) => s
-      case _ => throw new Exception("Unexpected JSON Format (Requires field testAPK to be a string.")
-    }
     val eventTrace = json.fields.getOrElse("eventTrace",
       throw new Exception("Unexpected JSON Format (Requires field eventTrace for the Base64-encoded version of the event trace.)")
     ) match{
       case JsString(s) => s
       case _ => throw new Exception("Unexpected JSON Format (Requires field eventTrace to be a string.")
     }
+    val (testAPK, packAPK) = testToAPK(test)
     //Get the Emulator (Returns Host:Port)
     /*val newContainer = Http("???").postData(
       JsObject(Map("id" -> JsString(conf.getString("id")), "instances" -> JsNumber(1))).prettyPrint
@@ -72,5 +68,10 @@ object ServerLogic {
       JsObject(Map("id" -> JsString(conf.getString("id")), "instances" -> JsNumber(0))).prettyPrint
     )*/
     chimpCheckReturn.substring(8, chimpCheckReturn.length()-1)
+  }
+
+  def closeAnEmulator(queryStr: String, conf: Config, ip: String): String ={
+    //This does nothing for now; However, this will de-allocate the Docker Container using the Marathon APIs.
+    ""
   }
 }
