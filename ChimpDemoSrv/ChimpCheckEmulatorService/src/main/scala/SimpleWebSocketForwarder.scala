@@ -1,6 +1,8 @@
 /**
   * Created by chanceroberts on 8/13/18.
   */
+import java.util.Base64
+
 import Server.system
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -15,7 +17,7 @@ import spray.json._
 
 import scala.io.StdIn
 import scala.util.Random
-import scalaj.http.Base64
+//import scalaj.http.Base64
 
 object SimpleWebSocketForwarder {
   var ipDir: Map[String, String] = Map()
@@ -23,6 +25,7 @@ object SimpleWebSocketForwarder {
   implicit val materializer = ActorMaterializer()
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
+  val random = new Random()
 
   def makeWebSocket: Route = {
     post {
@@ -30,7 +33,7 @@ object SimpleWebSocketForwarder {
         queryStr =>
           path("add") {
             val json = queryStr.parseJson.asJsObject
-            val uID = Base64.encodeString(new Random().nextString(16))
+            val uID = Base64.getEncoder.encodeToString(random.nextString(16).getBytes)
             ipDir = json.fields.get("streamingIP") match {
               case Some(JsString(sIP)) =>
                 ipDir + (uID -> sIP)
