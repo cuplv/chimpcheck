@@ -41,8 +41,8 @@ class Dropdown extends Component {
         testname: this.state.test,
         toRun: 'setUp'
       })
-    }).then(res => res.text()).then(data => 
-      document.getElementById("streamed").src = "http://"+document.location.href+"/stream.html",
+    }).then(res => res.text()).then(function(data){ 
+      document.getElementById("streamed").src = "http://"+document.location.href+"/stream.html";
       fetch('/test', {
         method: 'POST',
         headers: {
@@ -56,8 +56,8 @@ class Dropdown extends Component {
             })
         }).then(res => 
             res.text())
-          .then(data => 
-            this.setState({results:data}),
+          .then(function(data){ 
+            this.setState({results:data});
             fetch('/test', {
               method: 'POST',
               headers: {
@@ -69,9 +69,11 @@ class Dropdown extends Component {
                 testname: this.state.test,
                 toRun: 'tearDown'
               })
-            }).then(res => res.text()).then(data => document.getElementById("streamed").src = "http://"+document.location.href+"/empty.html")
-          )
-    )
+            }).then(res => res.text()).then(function(data){
+              document.getElementById("streamed").src = "http://"+document.location.href+"/empty.html"
+            })
+          })
+    })
   }
   render() {
         return (
