@@ -46,7 +46,7 @@ class Dropdown extends Component {
         UID: '0'
       })
     }).then(res => res.text()).then(function(uID){ 
-      document.getElementById("streamed").src = document.location.href+"stream.html";
+      document.getElementById("streamed").src = document.location.href+"stream.html/"+uID;
       fetch('/test', {
         method: 'POST',
         headers: {

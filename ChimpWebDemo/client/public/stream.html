@@ -10,8 +10,8 @@ var BLANK_IMG =
 
 var canvas = document.getElementById('canvas')
   , g = canvas.getContext('2d')
-
-var ws = new WebSocket('ws://'+document.location.hostname+':19002', 'minicap')
+var uID = document.URL.split("?")[1]
+var ws = new WebSocket('ws://'+document.location.hostname+':19002/'+uID, 'minicap')
 ws.binaryType = 'blob'
 
 ws.onclose = function() {
