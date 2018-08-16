@@ -30,9 +30,9 @@ class Dropdown extends Component {
     this.setState({test: e.target.value})
   }
   onClick(e) {
-    app = this.state.appname;
-    test = this.state.test;
-    original = this;
+    var app = this.state.appname;
+    var test = this.state.test;
+    var original = this;
     fetch('/test', {
       method: 'POST',
       headers: {
