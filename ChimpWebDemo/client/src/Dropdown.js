@@ -30,6 +30,9 @@ class Dropdown extends Component {
     this.setState({test: e.target.value})
   }
   onClick(e) {
+    app = this.state.appname;
+    test = this.state.test;
+    original = this;
     fetch('/test', {
       method: 'POST',
       headers: {
@@ -37,8 +40,8 @@ class Dropdown extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        appname:this.state.appname,
-        testname: this.state.test,
+        appname: app,
+        testname: test,
         toRun: 'setUp',
         UID: '0'
       })
@@ -51,15 +54,15 @@ class Dropdown extends Component {
             'Content-Type': 'application/json'
           },
         body: JSON.stringify({
-            appname:this.state.appname,
-            testname: this.state.test,
+            appname: app,
+            testname: test,
             toRun: 'runADB',
             UID: uID
             })
         }).then(res => 
             res.text())
           .then(function(data){ 
-            this.setState({results:data});
+            original.setState({results:data});
             fetch('/test', {
               method: 'POST',
               headers: {
@@ -67,8 +70,8 @@ class Dropdown extends Component {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                appname:this.state.appname,
-                testname: this.state.test,
+                appname: app,
+                testname: test,
                 toRun: 'tearDown',
                 UID: uID
               })
