@@ -39,9 +39,10 @@ class Dropdown extends Component {
       body: JSON.stringify({
         appname:this.state.appname,
         testname: this.state.test,
-        toRun: 'setUp'
+        toRun: 'setUp',
+        UID: '0'
       })
-    }).then(res => res.text()).then(function(data){ 
+    }).then(res => res.text()).then(function(uID){ 
       document.getElementById("streamed").src = "http://"+document.location.href+"/stream.html";
       fetch('/test', {
         method: 'POST',
@@ -52,7 +53,8 @@ class Dropdown extends Component {
         body: JSON.stringify({
             appname:this.state.appname,
             testname: this.state.test,
-            toRun: 'runADB'
+            toRun: 'runADB',
+            UID: uID
             })
         }).then(res => 
             res.text())
@@ -67,7 +69,8 @@ class Dropdown extends Component {
               body: JSON.stringify({
                 appname:this.state.appname,
                 testname: this.state.test,
-                toRun: 'tearDown'
+                toRun: 'tearDown',
+                UID: uID
               })
             }).then(res => res.text()).then(function(data){
               document.getElementById("streamed").src = "http://"+document.location.href+"/empty.html"
