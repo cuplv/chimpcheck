@@ -15,6 +15,7 @@ import spray.json._
 
 import scala.io.StdIn
 import scala.util.Random
+import scalaj.http.Base64
 
 object SimpleWebSocketForwarder {
   var ipDir: Map[String, String] = Map()
@@ -29,7 +30,7 @@ object SimpleWebSocketForwarder {
         queryStr =>
           path("add") {
             val json = queryStr.parseJson.asJsObject
-            val uID = new Random().nextString(16)
+            val uID = Base64.encodeString(new Random().nextString(16))
             ipDir = json.fields.get("streamingIP") match {
               case Some(JsString(sIP)) =>
                 ipDir + (uID -> sIP)

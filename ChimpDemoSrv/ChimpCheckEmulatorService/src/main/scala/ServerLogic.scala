@@ -24,7 +24,7 @@ object ServerLogic {
 
   def setUpEmulator(queryStr: String, conf: Config): String = {
     val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now. Waiting for Marathon APIs
-    val uID = Http(s"localhost:${conf.getString("webSocketPort")}/add").postData(
+    val uID = Http(s"http://localhost:${conf.getString("webSocketPort")}/add").postData(
       JsObject("streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint).asString.body
     ports += uID -> (newHost, adbPort, streamPort)
     uID
