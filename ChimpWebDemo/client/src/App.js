@@ -6,7 +6,7 @@ import Dropdown from './Dropdown'
 
 class App extends Component {
   render() {
-    return (
+    freturn (
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
@@ -20,7 +20,7 @@ class App extends Component {
 
             </div>
             <div className="col-4">
-            <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
+            <iframe src="http://localhost:3001/empty.html" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
             </div>
           </div>
         </div>
