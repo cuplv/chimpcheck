@@ -54,10 +54,13 @@ object SimpleWebSocketForwarder {
           }
       }
     } ~
-    path(Segment){
-      uID =>
-        handleWebSocketMessages(makeTwoWayConnection(uID))
+    scheme("ws") {
+      path(Segment) {
+        uID =>
+          handleWebSocketMessagesForProtocol(makeTwoWayConnection(uID), "ws")
+      }
     }
+
     /*extractIP {
       ip =>
         val stringIP = s"${ip.toOption.map(_.getHostAddress()).getOrElse("")}:${ip.getPort()}"
