@@ -57,7 +57,7 @@ object SimpleWebSocketForwarder {
     scheme("ws") {
       path(Segment) {
         uID =>
-          handleWebSocketMessagesForProtocol(makeTwoWayConnection(uID), "ws")
+          handleWebSocketMessages(makeTwoWayConnection(uID))
       }
     }
 
