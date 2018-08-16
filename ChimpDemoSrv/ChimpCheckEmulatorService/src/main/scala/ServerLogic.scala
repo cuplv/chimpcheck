@@ -20,16 +20,18 @@ object ServerLogic {
     "kisten" -> ("de.d120.ophasekistenstapeln", "de.d120.ophasekistenstapeln")
   ) //Hardcoded for now?
 
-  def setUpEmulator(queryStr: String, conf: Config, ip: String): String = {
-    val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now.
+  var ports = Map[String, (String,String,String)]()
 
+  def setUpEmulator(queryStr: String, conf: Config, ip: String): String = {
+    val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now. Waiting for Marathon APIs
+    ports += ip -> (newHost, adbPort, streamPort)
     //Create the connection between the server and the adb client.
     Http(s"localhost:${conf.getString("webSocketPort")}/add").postData(
       JsObject("clientIP" -> JsString(ip), "streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint)
     s"$newHost:$streamPort"
   }
   def runAnEmulator(queryStr: String, conf: Config, ip: String): String = {
-    val (newHost, adbPort, _) = ("localhost", "5037", "9002") //Hardcoded for now.
+    val (newHost, adbPort, _) = ports.getOrElse(ip, throw new Exception("Allocate an emulator before trying to run it."))
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val json = queryStr.parseJson.asJsObject
     val test = json.fields.getOrElse("test",
@@ -70,8 +72,9 @@ object ServerLogic {
     chimpCheckReturn.substring(8, chimpCheckReturn.length()-1)
   }
 
-  def closeAnEmulator(queryStr: String, conf: Config, ip: String): String ={
+  def closeAnEmulator(queryStr: String, conf: Config, ip: String): String = {
     //This does nothing for now; However, this will de-allocate the Docker Container using the Marathon APIs.
+    ports = ports.filter{case (key, _) => !key.equals(ip)}
     Http(s"localhost:${conf.getString("webSocketPort")}/remove").postData(
       JsObject("clientIP" -> JsString(ip)).prettyPrint)
     ""
