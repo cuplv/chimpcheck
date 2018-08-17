@@ -11,7 +11,7 @@ object OutputTransformer {
   private def goUntilNewLine(lines: List[String], concat: String, addNewLine: Boolean = false): String = lines match{
     case Nil => concat
     case _ =>
-      if (lines.head.length() == 0 || lines.head.startsWith("INSTRUMENTATION_RESULT:")){
+      if (lines.head.length() == 0 || lines.head.startsWith("INSTRUMENTATION_")){
         concat
       } else {
         if (addNewLine)
