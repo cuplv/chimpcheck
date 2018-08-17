@@ -26,32 +26,34 @@ object SimpleWebSocketForwarder {
   val random = new Random()
 
   def makeWebSocket: Route = {
-    post {
-      entity(as[String]){
-        queryStr =>
-          path("add") {
-            val json = queryStr.parseJson.asJsObject
-            val uID = random.nextInt(10000).toString
-            ipDir = json.fields.get("streamingIP") match {
-              case Some(JsString(sIP)) =>
-                ipDir + (uID -> sIP)
-              case _ => ipDir
-            }
-            complete(uID)
-          }~
-          path("remove") {
-            val json = queryStr.parseJson.asJsObject
-            ipDir = (json.fields.get("uID"), json.fields.get("streamingIP")) match{
-              case (Some(JsString(uID)), Some(JsString(sIP))) =>
-                ipDir.filter{case (key, str) => !(key.equals(uID) && str.equals(sIP))}
-              case (Some(JsString(uID)), _) =>
-                ipDir.filter{case (key, _) => !key.equals(uID)}
-              case (_, Some(JsString(sIP))) =>
-                ipDir.filter{case (_, str) => !str.equals(sIP)}
-              case (_, _) => ipDir
-            }
-            complete("")
-          }
+    scheme("http") {
+      post {
+        entity(as[String]) {
+          queryStr =>
+            path("add") {
+              val json = queryStr.parseJson.asJsObject
+              val uID = random.nextInt(10000).toString
+              ipDir = json.fields.get("streamingIP") match {
+                case Some(JsString(sIP)) =>
+                  ipDir + (uID -> sIP)
+                case _ => ipDir
+              }
+              complete(uID)
+            } ~
+              path("remove") {
+                val json = queryStr.parseJson.asJsObject
+                ipDir = (json.fields.get("uID"), json.fields.get("streamingIP")) match {
+                  case (Some(JsString(uID)), Some(JsString(sIP))) =>
+                    ipDir.filter { case (key, str) => !(key.equals(uID) && str.equals(sIP)) }
+                  case (Some(JsString(uID)), _) =>
+                    ipDir.filter { case (key, _) => !key.equals(uID) }
+                  case (_, Some(JsString(sIP))) =>
+                    ipDir.filter { case (_, str) => !str.equals(sIP) }
+                  case (_, _) => ipDir
+                }
+                complete("")
+              }
+        }
       }
     } ~
     scheme("ws") {
