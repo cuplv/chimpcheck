@@ -1,0 +1,95 @@
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+plv.colorado.edu.chimptrainer.TestExpresso:
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=runChimpTrace
+INSTRUMENTATION_STATUS: class=plv.colorado.edu.chimptrainer.TestExpresso
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+Error in runChimpTrace(plv.colorado.edu.chimptrainer.TestExpresso):
+java.lang.IllegalStateException: Fragment CountdownFragment{20959b2} not attached to Activity
+	at android.app.Fragment.getResources(Fragment.java:805)
+	at android.app.Fragment.getString(Fragment.java:827)
+	at plv.colorado.edu.chimptrainer.Countdown.CountdownFragment$4.onFinish(CountdownFragment.java:81)
+	at android.os.CountDownTimer$1.handleMessage(CountDownTimer.java:127)
+	at android.os.Handler.dispatchMessage(Handler.java:102)
+	at android.support.test.espresso.base.UiControllerImpl.loopUntil(UiControllerImpl.java:470)
+	at android.support.test.espresso.base.UiControllerImpl.loopUntil(UiControllerImpl.java:411)
+	at android.support.test.espresso.base.UiControllerImpl.loopMainThreadForAtLeast(UiControllerImpl.java:396)
+	at edu.colorado.plv.chimp.components.ActivityManager$2.perform(ActivityManager.java:193)
+	at android.support.test.espresso.ViewInteraction$1.run(ViewInteraction.java:144)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:423)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:237)
+	at android.os.Handler.handleCallback(Handler.java:739)
+	at android.os.Handler.dispatchMessage(Handler.java:95)
+	at android.os.Looper.loop(Looper.java:148)
+	at android.app.ActivityThread.main(ActivityThread.java:5417)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: test=runChimpTrace
+INSTRUMENTATION_STATUS: class=plv.colorado.edu.chimptrainer.TestExpresso
+INSTRUMENTATION_STATUS: stack=java.lang.IllegalStateException: Fragment CountdownFragment{20959b2} not attached to Activity
+	at android.app.Fragment.getResources(Fragment.java:805)
+	at android.app.Fragment.getString(Fragment.java:827)
+	at plv.colorado.edu.chimptrainer.Countdown.CountdownFragment$4.onFinish(CountdownFragment.java:81)
+	at android.os.CountDownTimer$1.handleMessage(CountDownTimer.java:127)
+	at android.os.Handler.dispatchMessage(Handler.java:102)
+	at android.support.test.espresso.base.UiControllerImpl.loopUntil(UiControllerImpl.java:470)
+	at android.support.test.espresso.base.UiControllerImpl.loopUntil(UiControllerImpl.java:411)
+	at android.support.test.espresso.base.UiControllerImpl.loopMainThreadForAtLeast(UiControllerImpl.java:396)
+	at edu.colorado.plv.chimp.components.ActivityManager$2.perform(ActivityManager.java:193)
+	at android.support.test.espresso.ViewInteraction$1.run(ViewInteraction.java:144)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:423)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:237)
+	at android.os.Handler.handleCallback(Handler.java:739)
+	at android.os.Handler.dispatchMessage(Handler.java:95)
+	at android.os.Looper.loop(Looper.java:148)
+	at android.app.ActivityThread.main(ActivityThread.java:5417)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 22.345
+There was 1 failure:
+1) runChimpTrace(plv.colorado.edu.chimptrainer.TestExpresso)
+java.lang.IllegalStateException: Fragment CountdownFragment{20959b2} not attached to Activity
+	at android.app.Fragment.getResources(Fragment.java:805)
+	at android.app.Fragment.getString(Fragment.java:827)
+	at plv.colorado.edu.chimptrainer.Countdown.CountdownFragment$4.onFinish(CountdownFragment.java:81)
+	at android.os.CountDownTimer$1.handleMessage(CountDownTimer.java:127)
+	at android.os.Handler.dispatchMessage(Handler.java:102)
+	at android.support.test.espresso.base.UiControllerImpl.loopUntil(UiControllerImpl.java:470)
+	at android.support.test.espresso.base.UiControllerImpl.loopUntil(UiControllerImpl.java:411)
+	at android.support.test.espresso.base.UiControllerImpl.loopMainThreadForAtLeast(UiControllerImpl.java:396)
+	at edu.colorado.plv.chimp.components.ActivityManager$2.perform(ActivityManager.java:193)
+	at android.support.test.espresso.ViewInteraction$1.run(ViewInteraction.java:144)
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:423)
+	at java.util.concurrent.FutureTask.run(FutureTask.java:237)
+	at android.os.Handler.handleCallback(Handler.java:739)
+	at android.os.Handler.dispatchMessage(Handler.java:95)
+	at android.os.Looper.loop(Looper.java:148)
+	at android.app.ActivityThread.main(ActivityThread.java:5417)
+	at java.lang.reflect.Method.invoke(Native Method)
+	at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:726)
+	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:616)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_RESULT: ChimpDriver-Outcome=Crashed
+INSTRUMENTATION_RESULT: ChimpDriver-ExecutedTrace=CgsIARIHCAY6AwjoBwoTCAESDwgBEgsKCQgCGgVCZWdpbgocCAESGAgFMhQKDAgCGgh1c2VybmFt
+ZRIEdGVzdAocCAESGAgFMhQKDAgCGghwYXNzd29yZBIEdGVzdAoTCAESDwgBEgsKCQgCGgVMb2dp
+bgokCAESIAgBEhwKGggCGhZDb3VudGRvd250aW1lciBUZXN0aW5nChgIARIUCAESEAoOCAIaCjEw
+IHNlY29uZHMKCwgBEgcIBjoDCJBOChcIARITCAESDwoNCAIaCTUgc2Vjb25kcwoGCAIaAggB
+
+INSTRUMENTATION_CODE: -1

@@ -74,7 +74,7 @@ object ServerLogic {
       //I'm not convinced that this is the correct way to do it...
       JsObject(Map("id" -> JsString(conf.getString("id")), "instances" -> JsNumber(0))).prettyPrint
     )*/
-    chimpCheckReturn.substring(8, chimpCheckReturn.length()-1)
+    OutputTransformer.transformOutput(chimpCheckReturn.substring(8, chimpCheckReturn.length()-1))
   }
 
   def closeAnEmulator(queryStr: String, conf: Config): String = {

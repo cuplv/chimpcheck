@@ -8,9 +8,12 @@ import edu.colorado.plv.chimp.coordinator.{ChimpLoader, CrashChimpOutcome, SuccC
 import edu.colorado.plv.chimp.generator.Gorilla
 import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext
+import
 
 object StubGenerator extends App {
   implicit val logger = Logger(LoggerFactory.getLogger("chimp-tester"))
+
+  val test = "10"
 
   // To support Click(R.id._) please import the R class file
   val traceGen = Sleep(1000):>> Click("Begin") :>>

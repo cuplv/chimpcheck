@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
   "org.scalaj" %% "scalaj-http" % "2.3.0",
-  "edu.colorado.plv.fixr" %% "scalabashing" % "1.0-SNAPSHOT"
+  "edu.colorado.plv.fixr" %% "scalabashing" % "1.0-SNAPSHOT",
+  "edu.colorado.plv.chimp.combinator" %% "chimpcombinator" % "1.0-SNAPSHOT"
 )
         
