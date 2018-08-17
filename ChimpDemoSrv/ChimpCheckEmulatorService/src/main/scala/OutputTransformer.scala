@@ -8,15 +8,17 @@ import scala.io.Source
   * Created by chanceroberts on 8/17/18.
   */
 object OutputTransformer {
-  private def goUntilNewLine(lines: List[String], concat: String, addNewLine: Boolean = false): String ={
-    if (lines.head.length() == 0){
-      concat
-    } else {
-      if (addNewLine)
-        goUntilNewLine(lines.tail, s"$concat${lines.head}\n", addNewLine)
-      else
-        goUntilNewLine(lines.tail, s"$concat${lines.head}")
-    }
+  private def goUntilNewLine(lines: List[String], concat: String, addNewLine: Boolean = false): String = lines match{
+    case Nil => concat
+    case _ =>
+      if (lines.head.length() == 0 || lines.head.startsWith("INSTRUMENTATION_RESULT:")){
+        concat
+      } else {
+        if (addNewLine)
+          goUntilNewLine(lines.tail, s"$concat${lines.head}\n", addNewLine)
+        else
+          goUntilNewLine(lines.tail, s"$concat${lines.head}")
+      }
   }
 
   private def findResult(lines: List[String], after: String, addNewLine: Boolean = false): String = lines match{
