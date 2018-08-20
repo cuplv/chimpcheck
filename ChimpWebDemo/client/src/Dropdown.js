@@ -24,6 +24,7 @@ class Dropdown extends Component {
       appname: app_names[0],
       tests: test_names[0],
       test: test_names[0][0],
+      written_test: "",
       results: "Test output"
     };
   }
@@ -32,12 +33,16 @@ class Dropdown extends Component {
     this.setState({
       appname: e.target.value,
       tests: app_test[e.target.value],
-      test: app_test[e.target.value][0]
+      test: app_test[e.target.value][0],
+      written_test: start_scripts[app_test[e.target.value][0]],
     })
     console.log(this.state)
   }
   onChangeTest(e) {
-    this.setState({test: e.target.value})
+    this.setState({
+      test: e.target.value,
+      written_test: start_scripts[e.target.value]
+    })
   }
   onClick(e) {
     var app = this.state.appname;
@@ -109,7 +114,7 @@ class Dropdown extends Component {
             </select>
             <div className='row'>
               <div className='col'>
-                <textarea className=""></textarea>
+                <textarea className="" cols="100"></textarea>
               </div>
             </div>
                 <div className='row'>
