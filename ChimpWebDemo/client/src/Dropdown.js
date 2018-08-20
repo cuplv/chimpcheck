@@ -6,6 +6,15 @@ var app_test = {
   'Kistenstapleln': ['kisten-1', 'kisten-2']
 };
 
+var test_explanations = {
+  'trainer-1': 'This test logs into an application, and then plays around with sliders.',
+  'trainer-2': 'This test logs into an application, and then demonstrates an IllegalStateException by going to another screen as a timer is counting down.',
+  'kisten-1': 'This test clicks around the application 500 times. There is a pop-up, Turm, that we have to deal with by Clicking Back.',
+  'kisten-2': 'This test demonstrates a crash by being on a different screen when a timer goes down.',
+  'nextcloud-1': 'This test logs into a dummy account, and then plays around with some of the functionality of the NextCloud application',
+  'nextcloud-2': 'This test logs into a dummy account, and then crashes the application by rotating on a page that doesn\'t handle rotation.'
+}
+
 var start_scripts = {
   'trainer-1': 'Sleep(1000) :>> Click("Begin") :>> Type("username","test") :>> Type("password","test") :>> Click("Login") :>> Click("Swipe Testing") :>> Swipe(2131427438,Right) :>> Swipe(2131427439,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427438,Left) :>> Swipe(2131427439,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427438,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427439,Left) :>> Swipe(2131427437,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427437,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427439,Left) :>> Swipe(2131427439,Right) :>> Swipe(2131427439,Left) :>> Skip :>> Skip :>> Sleep(5000) :>> ClickBack',
   'trainer-2': 'Sleep(1000) :>> Click("Begin") :>> Type("username","test") :>> Type("password","test") :>> Click("Login") :>> Click("Countdowntimer Testing") :>> Click("10 seconds") :>> Sleep(10000) :>> Click("5 seconds") :>> ClickBack :>> Sleep(5000)',
@@ -24,7 +33,7 @@ class Dropdown extends Component {
       appname: app_names[0],
       tests: test_names[0],
       test: test_names[0][0],
-      written_test: "",
+      written_test: start_scripts[test_names[0][0]],
       results: "Test output"
     };
   }
@@ -39,11 +48,18 @@ class Dropdown extends Component {
     console.log(this.state)
   }
   onChangeTest(e) {
+    const testName = e.target.value.substring(0, e.target.value.indexOf(" "))
     this.setState({
-      test: e.target.value,
-      written_test: start_scripts[e.target.value]
+      test: testName,
+      written_test: start_scripts[testName]
     })
   }
+
+  // From https://reactjs.org/docs/forms.html
+  handleChange(event) {
+    this.setState({value: event.target.value});
+  }
+
   onClick(e) {
     var app = this.state.appname;
     var test = this.state.test;
@@ -114,7 +130,7 @@ class Dropdown extends Component {
             </select>
             <div className='row'>
               <div className='col'>
-                <textarea className="w-100 p-7" rows="4" value={this.state.written_test}></textarea>
+                <textarea className="w-100 p-7" rows="4" value={this.state.written_test} onChange ={this.handleChange}></textarea>
               </div>
             </div>
                 <div className='row'>

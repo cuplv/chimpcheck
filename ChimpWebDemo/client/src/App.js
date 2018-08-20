@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import emulator from './emulator.jpeg';
+//import emulator from './emulator.jpeg';
 import './App.css';
 import Dropdown from './Dropdown'
 
