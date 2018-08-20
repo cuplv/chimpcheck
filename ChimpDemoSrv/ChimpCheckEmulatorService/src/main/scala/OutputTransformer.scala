@@ -41,7 +41,7 @@ object OutputTransformer {
   def transformInput(input: String): String = {
     // Get the input into the file.
 
-    Cmd("cd ../ChimpTrainerStub && sbt run").!!!.toString
+    //Cmd("cd ../ChimpTrainerStub && sbt run").!!!.toString
   }
 
   def transformOutput(output: String): String = {
