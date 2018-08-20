@@ -7,11 +7,11 @@ var app_test = {
 };
 
 var start_scripts = {
-  'trainer-1': '',
-  'trainer-2': '',
+  'trainer-1': 'Sleep(1000) :>> Click("Begin") :>> Type("username","test") :>> Type("password","test") :>> Click("Login") :>> Click("Swipe Testing") :>> Swipe(2131427438,Right) :>> Swipe(2131427439,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427438,Left) :>> Swipe(2131427439,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427438,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427439,Left) :>> Swipe(2131427437,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427437,Right) :>> Swipe(2131427437,Left) :>> Swipe(2131427438,Right) :>> Swipe(2131427439,Left) :>> Swipe(2131427439,Right) :>> Swipe(2131427439,Left) :>> Skip :>> Skip :>> Sleep(5000) :>> ClickBack',
+  'trainer-2': 'Sleep(1000) :>> Click("Begin") :>> Type("username","test") :>> Type("password","test") :>> Click("Login") :>> Click("Countdowntimer Testing") :>> Click("10 seconds") :>> Sleep(10000) :>> Click("5 seconds") :>> ClickBack :>> Sleep(5000)',
   'nextcloud-1': 'Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com"):>> Type(R.id.account_username, "22203"):>> Type(R.id.account_password, "12321qweqaz!") :>> Click(R.id.buttonOK) :>> (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000) ) :>> Click("Documents") :>> Sleep(2000) :>> Click("About.odt") :>> Sleep(2000)  :>> Click("About.txt") :>> Sleep(2000) :>>ClickBack :>> ClickBack :>> Sleep(1500) :>> Click("Photos") :>> Click("Coast.jpg") :>> ClickBack :>> Click("Hummingbird.jpg") :>> ClickBack :>> ClickBack :>> LongClick("Nextcloud Manual.pdf") :>> Sleep(2000) :>> ClickMenu :>> Click("Move") :>> Click("Documents") :>>Sleep(1000) :>> Click("Choose") :>> Sleep(2000) :>> Click("Documents")  :>>LongClick("Nextcloud Manual.pdf") :>> ClickMenu:>> Sleep(2000) :>> Click("Move") :>> Click("Choose") :>> Sleep(5000)',
   'nextcloud-2': 'Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com"):>> Type(R.id.account_username, "22203"):>> Type(R.id.account_password, "12321qweqaz!") :>> Click(R.id.buttonOK) :>> (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)) :>> LongClick("Documents") :>> ClickMenu :>> Click("Move") :>> Rotate',
-  'kisten-1': '',
+  'kisten-1': 'Repeat(500, Click(*) :>> Try((isDisplayed("Turm") Then ClickBack:>>Skip).generator.sample.get)) :>> Skip',
   'kisten-2': 'Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> Click("Punktzahl berechnen") :>> Sleep(10000)'
 }
 
@@ -114,7 +114,7 @@ class Dropdown extends Component {
             </select>
             <div className='row'>
               <div className='col'>
-                <textarea className="w-100 p-3"></textarea>
+                <textarea className="w-100 p-7" rows="4" value={this.state.written_test}></textarea>
               </div>
             </div>
                 <div className='row'>
@@ -124,7 +124,7 @@ class Dropdown extends Component {
                 </div>
                 <div className='row'>
                     <div className='col'>
-                      <textarea className="w-100 p-3" value={this.state.results} readOnly></textarea>
+                      <textarea className="w-100 p-7" rows="10" value={this.state.results} readOnly></textarea>
                     </div>
                 </div>
             </div>
