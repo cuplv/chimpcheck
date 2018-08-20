@@ -29,11 +29,12 @@ var test_names = Object.values(app_test)
 class Dropdown extends Component {
   constructor(props) {
     super(props);
+    this.handleChange = this.handleChange.bind(this)
     this.state = {
       appname: app_names[0],
       tests: test_names[0],
-      test: test_names[0][0],
-      written_test: start_scripts[test_names[0][0]],
+      test: this.getTestName(test_names[0][0]),
+      written_test: start_scripts[this.getTestName(test_names[0][0])],
       results: "Test output"
     };
   }
@@ -42,13 +43,19 @@ class Dropdown extends Component {
     this.setState({
       appname: e.target.value,
       tests: app_test[e.target.value],
-      test: app_test[e.target.value][0],
-      written_test: start_scripts[app_test[e.target.value][0]],
+      test: this.getTestName(app_test[e.target.value][0]),
+      written_test: start_scripts[this.getTestName(app_test[e.target.value][0])],
     })
     console.log(this.state)
   }
+  getTestName(s) {
+    if (s.indexOf(" ") > 0){
+      return(s.substring(0, s.indexOf(" ")))
+    }  
+    return(s)
+  }
   onChangeTest(e) {
-    const testName = e.target.value.substring(0, e.target.value.indexOf(" "))
+    var testName = this.getTestName(e.target.value)
     this.setState({
       test: testName,
       written_test: start_scripts[testName]
@@ -56,8 +63,8 @@ class Dropdown extends Component {
   }
 
   // From https://reactjs.org/docs/forms.html
-  handleChange(event) {
-    this.setState({value: event.target.value});
+  handleChange(e) {
+    this.setState({written_test: e.target.value});
   }
 
   onClick(e) {

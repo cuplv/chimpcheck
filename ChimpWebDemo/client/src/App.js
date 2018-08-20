@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import logo from './chimpLogo.png';
 //import emulator from './emulator.jpeg';
 import './App.css';
 import Dropdown from './Dropdown'
