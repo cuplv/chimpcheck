@@ -8,6 +8,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import spray.json._
 
 import scala.io.StdIn
+import scala.concurrent.duration._
 
 /**
   * Created by chanceroberts on 8/9/18.
@@ -19,32 +20,34 @@ object Server {
   implicit val executionContext = system.dispatcher
 
   def runChimpCheck(conf: Config): server.Route = {
-    post {
-      entity(as[String]) {
-        queryStr =>
-          path("setUp") {
-            try {
-              complete(ServerLogic.setUpEmulator(queryStr, conf))
-            } catch {
-              case e: Exception => complete(e.getMessage())
+    withRequestTimeout(1.hour) {
+      post {
+        entity(as[String]) {
+          queryStr =>
+            path("setUp") {
+              try {
+                complete(ServerLogic.setUpEmulator(queryStr, conf))
+              } catch {
+                case e: Exception => complete(e.getMessage())
+              }
+            } ~
+            path("runADB") {
+              try {
+                complete(ServerLogic.runAnEmulator(queryStr, conf))
+              } catch {
+                case e: Exception => complete(e.getMessage())
+              }
+            } ~
+            path("tearDown") {
+              try {
+                complete(ServerLogic.closeAnEmulator(queryStr, conf))
+              } catch {
+                case e: Exception => complete(e.getMessage())
+              }
             }
-          } ~
-          path("runADB") {
-            try {
-              complete(ServerLogic.runAnEmulator(queryStr, conf))
-            } catch {
-              case e: Exception => complete(e.getMessage())
-            }
-          } ~
-          path("tearDown") {
-            try {
-              complete(ServerLogic.closeAnEmulator(queryStr, conf))
-            } catch {
-              case e: Exception => complete(e.getMessage())
-            }
-          }
         }
       }
+    }
   }
 
   def main(args: Array[String]): Unit = {
@@ -53,7 +56,7 @@ object Server {
     val port = if (args.length > 0){
       args(0).toInt
     } else conf.getInt("port")
-    val bindingFuture = Http().bindAndHandle(route, "localhost", port)
+    val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", port)
     println(s"Chimpcheck Driver started on Port $port!")
     StdIn.readLine() // let it run until user presses return
     bindingFuture

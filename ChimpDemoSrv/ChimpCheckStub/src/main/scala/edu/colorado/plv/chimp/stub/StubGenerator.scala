@@ -16,7 +16,8 @@ object StubGenerator extends App {
   val test = "10"
 
   // To support Click(R.id._) please import the R class file
-  val traceGen = Sleep(1000):>> Click("Begin") :>>
+  val traceGen =
+    Sleep(1000):>> Click("Begin") :>>
     Type("username", "test") :>> Type("password", "test") :>>
     Click("Login") :>> Click("Countdowntimer Testing") :>>
     Click("5 seconds") :>> Sleep(5000):>> ClickBack

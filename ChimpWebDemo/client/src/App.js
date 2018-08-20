@@ -14,12 +14,12 @@ class App extends Component {
         </header>
         <div id="container">
           <div className="row">
-            <div className="col-4">
+            <div className="col-6">
             <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
             <br/>
 
             </div>
-            <div className="col-4">
+            <div className="col-6">
             <iframe src="http://localhost:3001/empty.html" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
             </div>
           </div>

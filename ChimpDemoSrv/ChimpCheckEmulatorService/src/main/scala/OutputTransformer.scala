@@ -1,6 +1,7 @@
 import java.io.File
 
 import edu.colorado.plv.chimp.combinator.EventTrace
+import edu.colorado.plv.fixr.bash._
 
 import scala.io.Source
 
@@ -35,6 +36,12 @@ object OutputTransformer {
       case -1 => findResultOneLine(tail, after)
       case x => head.substring(x+after.length())
     }
+  }
+
+  def transformInput(input: String): String = {
+    // Get the input into the file.
+
+    Cmd("cd ../ChimpTrainerStub && sbt run").!!!.toString
   }
 
   def transformOutput(output: String): String = {

@@ -5,6 +5,16 @@ var app_test = {
   'Nextcloud': ['nextcloud-1', 'nextcloud-2'],
   'Kistenstapleln': ['kisten-1', 'kisten-2']
 };
+
+var start_scripts = {
+  'trainer-1': '',
+  'trainer-2': '',
+  'nextcloud-1': 'Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com"):>> Type(R.id.account_username, "22203"):>> Type(R.id.account_password, "12321qweqaz!") :>> Click(R.id.buttonOK) :>> (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000) ) :>> Click("Documents") :>> Sleep(2000) :>> Click("About.odt") :>> Sleep(2000)  :>> Click("About.txt") :>> Sleep(2000) :>>ClickBack :>> ClickBack :>> Sleep(1500) :>> Click("Photos") :>> Click("Coast.jpg") :>> ClickBack :>> Click("Hummingbird.jpg") :>> ClickBack :>> ClickBack :>> LongClick("Nextcloud Manual.pdf") :>> Sleep(2000) :>> ClickMenu :>> Click("Move") :>> Click("Documents") :>>Sleep(1000) :>> Click("Choose") :>> Sleep(2000) :>> Click("Documents")  :>>LongClick("Nextcloud Manual.pdf") :>> ClickMenu:>> Sleep(2000) :>> Click("Move") :>> Click("Choose") :>> Sleep(5000)',
+  'nextcloud-2': 'Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com"):>> Type(R.id.account_username, "22203"):>> Type(R.id.account_password, "12321qweqaz!") :>> Click(R.id.buttonOK) :>> (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)) :>> LongClick("Documents") :>> ClickMenu :>> Click("Move") :>> Rotate',
+  'kisten-1': '',
+  'kisten-2': 'Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> Click("Punktzahl berechnen") :>> Sleep(10000)'
+}
+
 var app_names = Object.keys(app_test)
 var test_names = Object.values(app_test)
 class Dropdown extends Component {
@@ -84,19 +94,24 @@ class Dropdown extends Component {
   render() {
         return (
             <div>
-            <label htmlFor='sel1'>Select one of the App</label> 
+            <label htmlFor='sel1'>Select an Application</label> 
             <select className="form-control" onChange={this.onChangeApp.bind(this)} id="sel1">
                 {
                     app_names.map(option => {
                             return <option value={option} key={option} >{option}</option>})
                 }
             </select>
-            <label htmlFor='sel1'>Select one of the test</label>
+            <label htmlFor='sel1'>Select a Test</label>
             <select className ='form-control' onChange = {this.onChangeTest.bind(this)} id = 'sel1'> {
                     this.state.tests.map(option => {
                         return <option value={option} key={option} >{option}</option>})
                     }
             </select>
+            <div className='row'>
+              <div className='col'>
+                <textarea className=""></textarea>
+              </div>
+            </div>
                 <div className='row'>
                     <div className='col'>
                     <button className='btn-normal' onClick={this.onClick.bind(this)}> Test </button>

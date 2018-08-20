@@ -75,7 +75,7 @@ object SimpleWebSocketForwarder {
       val sink: Sink[Message, Any] = Sink.asPublisher(false)
       val flow1: Flow[Message, Message, Any] = Flow.fromSinkAndSource(sink, Source.maybe)
       val source: Source[Message, Any] = Source.fromPublisher(flow1.toProcessor.run)
-      val (_, _) = Http().singleWebSocketRequest(WebSocketRequest(s"ws://${ipDir(uID)}"), flow1)
+      val (_, _) = Http().singleWebSocketRequest(WebSocketRequest(s"ws://${ipDir(uID)}", subprotocol = Some("minicap")), flow1)
       Flow.fromSinkAndSource(Sink.ignore, source)
     } else {
       Flow[Message]
@@ -88,7 +88,7 @@ object SimpleWebSocketForwarder {
     val port = if (args.length > 0){
       args(0).toInt
     } else conf.getInt("webSocketPort")
-    val bindingFuture = Http().bindAndHandle(route, "localhost", port)
+    val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", port)
     println(s"Web Socket Forwarder Started on port 19002!")
     StdIn.readLine() // let it run until user presses return
     bindingFuture
