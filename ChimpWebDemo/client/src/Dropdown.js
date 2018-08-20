@@ -114,7 +114,7 @@ class Dropdown extends Component {
             </select>
             <div className='row'>
               <div className='col'>
-                <textarea className="" cols="100"></textarea>
+                <textarea className="w-100 p-3"></textarea>
               </div>
             </div>
                 <div className='row'>
