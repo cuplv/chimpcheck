@@ -37,7 +37,8 @@ object ServerLogic {
       case Some(JsString(s)) => s
       case _ => throw new Exception("Requires a unique ID.")
     }
-    val (newHost, adbPort, _) = ports.getOrElse(uID, throw new Exception("Allocate an emulator before trying to run it."))
+    //val (newHost, adbPort, _) = ports.getOrElse(uID, throw new Exception("Allocate an emulator before trying to run it."))
+    val (newHost, adbPort) = ("localhost", "5037")
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val test = json.fields.getOrElse("test",
       throw new Exception("Unexpected JSON Format (Requires field test for the test to run.)")) match{
