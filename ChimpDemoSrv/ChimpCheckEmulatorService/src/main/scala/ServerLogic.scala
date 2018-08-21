@@ -22,18 +22,24 @@ object ServerLogic {
 
   var ports = Map[String, (String,String,String)]()
 
-  def setUpEmulator(queryStr: String, conf: Config, ip: String): String = {
+  def setUpEmulator(queryStr: String, conf: Config): String = {
     val (newHost, adbPort, streamPort) = ("localhost", "5037", "9002") //Hardcoded for now. Waiting for Marathon APIs
-    ports += ip -> (newHost, adbPort, streamPort)
+    val uID = Http(s"http://localhost:${conf.getString("webSocketPort")}/add").postData(
+      JsObject("streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint).asString.body
+    ports += uID -> (newHost, adbPort, streamPort)
+    uID
     //Create the connection between the server and the adb client.
-    Http(s"localhost:${conf.getString("webSocketPort")}/add").postData(
-      JsObject("clientIP" -> JsString(ip), "streamingIP" -> JsString(s"$newHost:$streamPort")).prettyPrint)
-    s"$newHost:$streamPort"
+    //s"$newHost:$streamPort"
   }
-  def runAnEmulator(queryStr: String, conf: Config, ip: String): String = {
-    val (newHost, adbPort, _) = ports.getOrElse(ip, throw new Exception("Allocate an emulator before trying to run it."))
-    val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
+  def runAnEmulator(queryStr: String, conf: Config): String = {
     val json = queryStr.parseJson.asJsObject
+    val uID = json.fields.get("uID") match{
+      case Some(JsString(s)) => s
+      case _ => throw new Exception("Requires a unique ID.")
+    }
+    //val (newHost, adbPort, _) = ports.getOrElse(uID, throw new Exception("Allocate an emulator before trying to run it."))
+    val (newHost, adbPort) = ("localhost", "5037")
+    val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val test = json.fields.getOrElse("test",
       throw new Exception("Unexpected JSON Format (Requires field test for the test to run.)")) match{
       case JsString(s) => s
@@ -69,14 +75,19 @@ object ServerLogic {
       //I'm not convinced that this is the correct way to do it...
       JsObject(Map("id" -> JsString(conf.getString("id")), "instances" -> JsNumber(0))).prettyPrint
     )*/
-    chimpCheckReturn.substring(8, chimpCheckReturn.length()-1)
+    OutputTransformer.transformOutput(chimpCheckReturn.substring(8, chimpCheckReturn.length()-1))
   }
 
-  def closeAnEmulator(queryStr: String, conf: Config, ip: String): String = {
+  def closeAnEmulator(queryStr: String, conf: Config): String = {
     //This does nothing for now; However, this will de-allocate the Docker Container using the Marathon APIs.
-    ports = ports.filter{case (key, _) => !key.equals(ip)}
+    val json = queryStr.parseJson.asJsObject
+    val uID = json.fields.get("uID") match{
+      case Some(JsString(s)) => s
+      case _ => throw new Exception("Requires a unique ID.")
+    }
+    ports = ports.filter{case (key, _) => !key.equals(uID)}
     Http(s"localhost:${conf.getString("webSocketPort")}/remove").postData(
-      JsObject("clientIP" -> JsString(ip)).prettyPrint)
+      JsObject("uID" -> JsString(uID)).prettyPrint)
     ""
   }
 }
