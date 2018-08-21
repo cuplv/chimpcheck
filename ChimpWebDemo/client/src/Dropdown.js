@@ -74,50 +74,21 @@ class Dropdown extends Component {
     fetch('/test', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
       body: JSON.stringify({
-        appname: app,
-        testname: test,
-        toRun: 'setUp',
-        UID: '0'
-      })
-    }).then(res => res.text()).then(function(uID){ 
-      document.getElementById("streamed").src = document.location.href+"stream.html?"+uID;
-      fetch('/test', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-        body: JSON.stringify({
-            appname: app,
-            testname: test,
-            toRun: 'runADB',
-            UID: uID
-            })
-        }).then(res => 
-            res.text())
-          .then(function(data){ 
-            original.setState({results:data});
-            fetch('/test', {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                appname: app,
-                testname: test,
-                toRun: 'tearDown',
-                UID: uID
-              })
-            }).then(res => res.text()).then(function(data){
-              document.getElementById("streamed").src = document.location.href+"empty.html"
-            })
+          appname: app,
+          testname: test,
+          toRun: 'runADB',
+          UID: '0'
           })
-    })
+      }).then(res => 
+          res.text())
+        .then(function(data){ 
+          original.setState({results:data});
+            
+      })
   }
   render() {
         return (
