@@ -35,6 +35,8 @@ RUN npm install ws
 RUN npm install express
 EXPOSE 9002
 
+#Get Ports Exposed for WebSocket Forwarder
+EXPOSE 19002
 
 WORKDIR ./chimpcheck/ChimpWebDemo
 COPY start_web_server.bash start_web_server.bash
