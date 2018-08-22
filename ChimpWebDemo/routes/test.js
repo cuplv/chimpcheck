@@ -1,3 +1,4 @@
+import React from "react";
 var express = require('express');
 var router = express.Router();
 var appMap = {"ChimpTrainer":"trainer", "Nextcloud":"nextcloud", "Kistenstapleln":"kisten"};
