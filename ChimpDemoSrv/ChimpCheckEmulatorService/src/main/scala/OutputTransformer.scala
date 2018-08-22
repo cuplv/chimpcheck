@@ -1,9 +1,5 @@
-import java.io.File
-
 import edu.colorado.plv.chimp.combinator.EventTrace
-import edu.colorado.plv.fixr.bash._
-
-import scala.io.Source
+import edu.colorado.plv.fixr.bash.android.Adb
 
 /**
   * Created by chanceroberts on 8/17/18.
@@ -38,12 +34,6 @@ object OutputTransformer {
     }
   }
 
-  /*def transformInput(input: String): String = {
-    // Get the input into the file.
-
-    //Cmd("cd ../ChimpTrainerStub && sbt run").!!!.toString
-  }*/
-
   def transformOutput(output: String): String = {
     val outputList = output.split("\n").toList
     val result = findResultOneLine(outputList, "ChimpDriver-Outcome=")
@@ -69,7 +59,9 @@ object OutputTransformer {
 object OutputTransformerTest {
   def main(args: Array[String]): Unit = {
     //val file = new File("successTest.txt")
-    val file = new File("failedTest.txt")
-    println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
+    //val file = new File("failedTest.txt")
+    val eventTrace = "Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>> Click(\"Login\") :>> Click(\"Countdowntimer Testing\") :>> Click(\"10 seconds\") :>> Sleep(10000) :>> Click(\"5 seconds\") :>> ClickBack :>> Sleep(5000)"
+    println(InputTransformer.transformInput(eventTrace))
+    //println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
   }
 }

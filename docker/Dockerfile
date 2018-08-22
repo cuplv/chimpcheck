@@ -45,6 +45,6 @@ COPY start_adb_stream.bash start_adb_stream.bash
 COPY replacements.bash replacements.bash
 ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git pull
-RUN cd /chimpcheck && git checkout demo_server_plus_docker
+RUN cd /chimpcheck && git checkout docker_input
 ENV STREAM_PORT 9002
 ENTRYPOINT ["/usr/bin/supervisord"]

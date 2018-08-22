@@ -8,14 +8,15 @@ router.post('/', function(req, res, next) {
   console.log(req.body)
   var reqBody = req.body
   var appName = appMap[reqBody.appname]
-  var testName = reqBody.testname
-  console.log(appName,testName)
+  var test = reqBody.test
+  console.log(appName,test)
   //var scriptPath = __dirname + '/../example/' + testName + '.sh'
   var scriptPath = __dirname + '/../example/runCommand.sh ' + appName
   console.log(scriptPath)
   async function ls() {
     // This is only temporarily here.
-    const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat ' + __dirname + '/../example/' + testName + '-eventTrace.txt )' + ' '+ reqBody.toRun+' '+reqBody.UID);
+    //const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat ' + __dirname + '/../example/' + testName + '-eventTrace.txt )' + ' '+ reqBody.toRun+' '+reqBody.UID);
+    const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( echo "' + test.replace(/"/g, '\\"') + '" )' + ' '+ reqBody.toRun+' '+reqBody.UID);
     console.log('stdout:', stdout);
     console.log('stderr:', stderr);
     // const stdout = $.post("localhost:18010", '{"test": "'+appName+'", '+eventTrace+'}', "")

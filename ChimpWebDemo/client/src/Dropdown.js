@@ -69,7 +69,7 @@ class Dropdown extends Component {
 
   onClick(e) {
     var app = this.state.appname;
-    var test = this.state.test;
+    var script = this.state.written_test;
     var original = this;
     fetch('/test', {
       method: 'POST',
@@ -79,7 +79,7 @@ class Dropdown extends Component {
         },
       body: JSON.stringify({
           appname: app,
-          testname: test,
+          test: script,
           toRun: 'runADB',
           UID: '0'
           })
