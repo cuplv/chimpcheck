@@ -80,8 +80,7 @@ class Dropdown extends Component {
       body: JSON.stringify({
           appname: app,
           test: script,
-          toRun: 'runADB',
-          UID: '0'
+          toRun: 'runADB'
           })
       }).then(res => 
           res.text())

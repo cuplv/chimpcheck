@@ -16,9 +16,14 @@ router.post('/', function(req, res, next) {
   async function ls() {
     // This is only temporarily here.
     //const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat ' + __dirname + '/../example/' + testName + '-eventTrace.txt )' + ' '+ reqBody.toRun+' '+reqBody.UID);
-    const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( echo "' + test.replace(/"/g, '\\\\"') + '" )' + ' '+ reqBody.toRun+' '+reqBody.UID);
+    const stdout = await fetch('http://localhost:18010/'+reqBody.toRun, {
+      method: 'POST',
+      body: '{"test": "'+appName+'", "eventTrace": '+test+'" }'
+    }).then(res => 
+      res.text())
+    //const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( echo "' + test.replace(/"/g, '\\\\"') + '" )' + ' '+ reqBody.toRun+' '+reqBody.UID);
     console.log('stdout:', stdout);
-    console.log('stderr:', stderr);
+    //console.log('stderr:', stderr);
     // const stdout = $.post("localhost:18010", '{"test": "'+appName+'", '+eventTrace+'}', "")
     /*const stdout = fetch('localhost:18010', {
       method: 'POST',
