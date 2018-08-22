@@ -46,7 +46,19 @@ object ServerLogic {
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val test = json.fields.getOrElse("test",
       throw new Exception("Unexpected JSON Format (Requires field test for the test to run.)")) match{
-      case JsString(s) => s
+      case JsString(s) =>
+        val output = InputTransformer.transformInput(s)
+        output.fields.get("status") match{
+          case Some(JsTrue) =>
+            output.fields.get("output") match{
+              case Some(JsString(trace)) => trace
+              case _ => throw new Exception("An unknown error occurred.")
+            }
+          case _ => output.fields.get("output") match{
+            case Some(JsString(err)) => return err
+            case _ => throw new Exception("An unknown error occurred.")
+          }
+        }
       case _ => throw new Exception("Unexpected JSON Format (Requires field test to be a string.")
     }
     val eventTrace = json.fields.getOrElse("eventTrace",
