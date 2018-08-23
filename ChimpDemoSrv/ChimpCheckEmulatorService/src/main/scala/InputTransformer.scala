@@ -13,18 +13,24 @@ import scala.io.Source
   * Created by chanceroberts on 8/21/18.
   */
 object InputTransformer {
+  val correctInput: Map[String, String] = Map("trainer" -> "import plv.colorado.edu.chimptrainer.R",
+  "nextcloud" -> "import com.owncloud.android.R",
+  "kisten" -> "import de.d120.ophasekistenstapeln.R")
   implicit val bashLogger = Logger(LoggerFactory.getLogger(""))
-  def transformInput(input: String): JsObject = {
+  def transformInput(input: String, app: String): JsObject = {
     // Get the input into the file.
     val file = new File("../ChimpCheckStub/src/main/scala/edu/colorado/plv/chimp/stub/StubGenerator.scala")
     val strList = Source.fromFile(file).mkString.split("\n").toList
     val inputList = input.split("\n").toList
     val (newVal, _) = strList.foldRight(List[String](), true){
-      case (s, (lis, true)) =>
-        if (s.contains("val samples: List[EventTrace] ="))
+      case (s, (lis, true)) => s match {
+        case "import plv.colorado.edu.chimptrainer.R"
+             | "import com.owncloud.android.R" | "import de.d120.ophasekistenstapeln.R" =>
+          (correctInput.getOrElse(app, s) :: lis, true)
+        case _ if s.contains ("val samples: List[EventTrace] =") =>
           ("  " :: (s :: lis), false)
-        else
-          (s :: lis, true)
+        case _ => (s :: lis, true)
+      }
       case (s, (lis, false)) =>
         if (s.contains("val traceGen =")) {
           val newLis = inputList.foldRight(lis) {

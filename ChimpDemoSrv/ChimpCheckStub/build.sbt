@@ -6,6 +6,10 @@ organization := "edu.colorado.plv"
 
 scalaVersion := "2.12.1"
 
+unmanagedJars in Compile += file("lib/trainer.jar")
+unmanagedJars in Compile += file("lib/nextcloud.jar")
+unmanagedJars in Compile += file("lib/kisten.jar")
+
 mainClass in (Compile, run) := Some("edu.colorado.plv.chimp.stub.StubGenerator")
 
 resolvers += "Local Ivy2 Repository" at "file:///"+Path.userHome.absolutePath+"/.ivy2/local"

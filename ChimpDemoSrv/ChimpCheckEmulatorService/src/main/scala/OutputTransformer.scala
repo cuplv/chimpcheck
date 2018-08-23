@@ -61,7 +61,8 @@ object OutputTransformerTest {
     //val file = new File("successTest.txt")
     //val file = new File("failedTest.txt")
     val eventTrace = "Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>> Click(\"Login\") :>> Click(\"Countdowntimer Testing\") :>> Click(\"10 seconds\") :>> Sleep(10000) :>> Click(\"5 seconds\") :>> ClickBack :>> Sleep(5000)"
-    println(InputTransformer.transformInput(eventTrace))
+    //val eventTrace = "Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK) :>> (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) :>> LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate"
+    println(InputTransformer.transformInput(eventTrace, "trainer"))
     //println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
   }
 }

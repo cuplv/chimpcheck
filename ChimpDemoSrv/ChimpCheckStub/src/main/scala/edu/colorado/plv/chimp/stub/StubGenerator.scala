@@ -7,8 +7,11 @@ import edu.colorado.plv.chimp.generator.Implicits._
 import edu.colorado.plv.chimp.coordinator.{ChimpLoader, CrashChimpOutcome, SuccChimpOutcome}
 import edu.colorado.plv.chimp.generator.Gorilla
 import org.slf4j.LoggerFactory
+
 import scala.concurrent.ExecutionContext
 import edu.colorado.plv.chimp.generator._
+import plv.colorado.edu.chimptrainer.R
+
 
 object StubGenerator extends App {
   implicit val logger = Logger(LoggerFactory.getLogger("chimp-tester"))

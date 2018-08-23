@@ -46,8 +46,14 @@ object ServerLogic {
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")
     val test = json.fields.getOrElse("test",
       throw new Exception("Unexpected JSON Format (Requires field test for the test to run.)")) match{
+      case JsString(s) => s
+      case _ => throw new Exception("Unexpected JSON Format (Requires field test to be a string.")
+    }
+    val eventTrace = json.fields.getOrElse("eventTrace",
+      throw new Exception("Unexpected JSON Format (Requires field eventTrace for the Base64-encoded version of the event trace.)")
+    ) match{
       case JsString(s) =>
-        val output = InputTransformer.transformInput(s)
+        val output = InputTransformer.transformInput(s, test)
         output.fields.get("status") match{
           case Some(JsTrue) =>
             output.fields.get("output") match{
@@ -59,12 +65,6 @@ object ServerLogic {
             case _ => throw new Exception("An unknown error occurred.")
           }
         }
-      case _ => throw new Exception("Unexpected JSON Format (Requires field test to be a string.")
-    }
-    val eventTrace = json.fields.getOrElse("eventTrace",
-      throw new Exception("Unexpected JSON Format (Requires field eventTrace for the Base64-encoded version of the event trace.)")
-    ) match{
-      case JsString(s) => s
       case _ => throw new Exception("Unexpected JSON Format (Requires field eventTrace to be a string.")
     }
     val (testAPK, packAPK) = testToAPK(test)
