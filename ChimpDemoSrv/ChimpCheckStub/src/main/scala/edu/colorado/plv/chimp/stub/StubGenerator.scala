@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 import edu.colorado.plv.chimp.generator._
-import plv.colorado.edu.chimptrainer.R
+import de.d120.ophasekistenstapeln.R
 
 
 object StubGenerator extends App {
@@ -20,7 +20,7 @@ object StubGenerator extends App {
 
   // To support Click(R.id) please import the R class file
   val traceGen =
-    Sleep(1000) :>> Click("Begin") :>> Type("username","test") :>> Type("password","test") :>> Click("Login") :>> Click("Countdowntimer Testing") :>> Click("10 seconds") :>> Sleep(10000) :>> Click("5 seconds") :>> ClickBack :>> Sleep(5000)
+    Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> Click("Punktzahl berechnen") :>> Sleep(10000)
   
   val samples: List[EventTrace] =
     List.fill(1)(traceGen.generator().sample.get)

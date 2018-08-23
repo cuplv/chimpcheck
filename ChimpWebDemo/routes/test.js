@@ -7,16 +7,18 @@ const exec = util.promisify(require('child_process').exec);
 router.post('/', function(req, res, next) {
   console.log(req.body)
   var reqBody = req.body
+  console.log(appMap[reqBody.appname])
   var appName = appMap[reqBody.appname]
-  var test = reqBody.test.replace('"', '\\"')
-  console.log(appName,test)
+  var test = reqBody.test.replace(/"/g, '\\\"')
+  //console.log(appName,test)
   //var scriptPath = __dirname + '/../example/' + testName + '.sh'
-  var scriptPath = __dirname + '/../example/runCommand.sh ' + appName
-  console.log(scriptPath)
+  //var scriptPath = __dirname + '/../example/runCommand.sh ' + appName
+  //console.log(scriptPath)
+  console.log(test)
   async function ls() {
     // This is only temporarily here.
     //const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( cat ' + __dirname + '/../example/' + testName + '-eventTrace.txt )' + ' '+ reqBody.toRun+' '+reqBody.UID);
-    const stdout = await exec('curl -X POST -d \'{"test": "'+ reqBody.appName +'", "eventTrace": "'+reqBody.test+'"}\' http://localhost:18010')
+    const { stdout, stderr } = await exec('curl -X POST -d \'{"test": "'+appMap[reqBody.appname]+'", "eventTrace": "'+test+'"}\' http://localhost:18010/runADB')
     //const { stdout, stderr } = await exec('bash ' +scriptPath + ' $( echo "' + test.replace(/"/g, '\\\\"') + '" )' + ' '+ reqBody.toRun+' '+reqBody.UID);
     console.log('stdout:', stdout);
     //console.log('stderr:', stderr);

@@ -36,11 +36,8 @@ object ServerLogic {
     //s"$newHost:$streamPort"
   }
   def runAnEmulator(queryStr: String, conf: Config): String = {
+    println(queryStr);
     val json = queryStr.parseJson.asJsObject
-    val uID = json.fields.get("uID") match{
-      case Some(JsString(s)) => s
-      case _ => throw new Exception("Requires a unique ID.")
-    }
     //val (newHost, adbPort, _) = ports.getOrElse(uID, throw new Exception("Allocate an emulator before trying to run it."))
     val (newHost, adbPort) = ("localhost", "5037")
     val chimpCheckLoc = conf.getString("chimpCheckAPKLoc")

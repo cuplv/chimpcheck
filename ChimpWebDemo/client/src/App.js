@@ -20,8 +20,8 @@ class App extends Component {
 
             </div>
             <div className="col-6">
-            <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
-            <script>"document.getElementById('streamed').src = document.location.hostname + ':9002"</script>
+            <iframe src="http://localhost:9003" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
+            <script>"document.getElementById('streamed').src = document.location.hostname + ':9003"</script>
             </div>
           </div>
         </div>
