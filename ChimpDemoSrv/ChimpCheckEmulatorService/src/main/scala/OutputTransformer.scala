@@ -48,7 +48,7 @@ object OutputTransformer {
       case "Unknown" | "" => s"Trace $realTrace ended for an unknown reason."
       case _ => s"Trace $realTrace led to something weird happening. Outcome $result"
     }
-    findResult(outputList, "stack=") match{
+    findResult(outputList, "stack=", addNewLine=true) match{
       case "" => firstRet
       case x => s"$firstRet\nStack Trace: $x"
     }
@@ -60,9 +60,9 @@ object OutputTransformerTest {
   def main(args: Array[String]): Unit = {
     //val file = new File("successTest.txt")
     //val file = new File("failedTest.txt")
-    val eventTrace = "Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>> Click(\"Login\") :>> Click(\"Countdowntimer Testing\") :>> Click(\"10 seconds\") :>> Sleep(10000) :>> Click(\"5 seconds\") :>> ClickBack :>> Sleep(5000)"
+    val eventTrace = "//If we land on the \"Turm\" screen, then Click(*) won't work, so we need to go back to the previous screen.\nval checkTurm = Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)\n//This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.\nval traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip"
     //val eventTrace = "Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK) :>> (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) :>> LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate"
-    println(InputTransformer.transformInput(eventTrace, "trainer"))
+    println(InputTransformer.transformInput(eventTrace, "kisten"))
     //println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
   }
 }

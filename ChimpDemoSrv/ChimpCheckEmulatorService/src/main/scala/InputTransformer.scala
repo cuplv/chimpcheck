@@ -20,16 +20,12 @@ object InputTransformer {
   def transformInput(input: String, app: String): JsObject = {
     // Get the input into the file.
     val file = new File("../ChimpCheckStub/src/main/scala/edu/colorado/plv/chimp/stub/StubGenerator.scala")
+    val fileArr = Source.fromFile(file).mkString.split("\n")
     val strList = Source.fromFile(file).mkString.split("\n").toList
     val inputList = input.split("\n").toList
-    val (newVal, _) = strList.foldRight(List[String](), true){
+    /*val (newVal, _) = strList.foldRight(List[String](), true){
       case (s, (lis, true)) => s match {
-        case "import plv.colorado.edu.chimptrainer.R"
-             | "import com.owncloud.android.R" | "import de.d120.ophasekistenstapeln.R" =>
-          (correctInput.getOrElse(app, s) :: lis, true)
-        case _ if s.contains ("val samples: List[EventTrace] =") =>
-          ("  " :: (s :: lis), false)
-        case _ => (s :: lis, true)
+
       }
       case (s, (lis, false)) =>
         if (s.contains("val traceGen =")) {
@@ -39,6 +35,21 @@ object InputTransformer {
           (s :: newLis, true)
         } else
           (lis, false)
+    }
+    */
+    val (newVal, _) = strList.foldRight(List[String](), fileArr.length){
+      case (s, (lis, x)) if x <= (fileArr.length-16) && x > 22 =>
+        (lis, x-1)
+      case (s, (lis, 22)) => val newLis = inputList.foldRight(lis) {
+        case (x, myLis) => s"  $x" :: myLis
+      }
+        (newLis, 21)
+      case (s, (lis, x)) => s match{
+        case "import plv.colorado.edu.chimptrainer.R"
+             | "import com.owncloud.android.R" | "import de.d120.ophasekistenstapeln.R" =>
+          (correctInput.getOrElse(app, s) :: lis, x-1)
+        case _ => (s :: lis, x-1)
+      }
     }
     val writer = new BufferedWriter(new FileWriter(file, false))
     newVal.foreach(dta => writer.append(s"$dta\n"))
@@ -61,6 +72,6 @@ object InputTransformer {
         case (x, z) => s"$x\n$z"
       }*/
     }
-    JsObject("status" -> JsBoolean(res.isSucc()), "output" -> JsString(output))
+    JsObject("status" -> JsBoolean(res.isSucc()), "output" -> JsString(output.split("\n")(0)))
   }
 }

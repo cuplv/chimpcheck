@@ -19,9 +19,11 @@ object StubGenerator extends App {
   val test = "10"
 
   // To support Click(R.id) please import the R class file
-  val traceGen =
-    Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> Click("Punktzahl berechnen") :>> Sleep(10000)
-  
+  //If we land on the "Turm" screen, then Click(*) won't work, so we need to go back to the previous screen.
+  val checkTurm = Try((isDisplayed("Turm") Then ClickBack:>>Skip).generator.sample.get)
+  //This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.
+  val traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip
+
   val samples: List[EventTrace] =
     List.fill(1)(traceGen.generator().sample.get)
 
