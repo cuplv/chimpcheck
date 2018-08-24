@@ -79,8 +79,8 @@ object ServerLogic {
       s"-e eventTrace $eventTrace -e appPackageName $packAPK -e class $packAPK.TestExpresso " +
       s"$testAPK.test/edu.colorado.plv.chimp.driver.ChimpJUnitRunner")
     val chimpCheckReturn = cmd.!!! match{
-      case s: SuccTry[Succ, Fail] => s.toString
-      case f: FailTry[Succ, Fail] =>
+      case s: SuccTry[_, _] => s.toString
+      case f: FailTry[_, _] =>
         val writer = new BufferedWriter(new FileWriter(new File("runMe.bash"), false))
         writer.append(cmd.cmd)
         writer.close()
