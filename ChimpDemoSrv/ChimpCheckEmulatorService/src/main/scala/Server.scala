@@ -9,7 +9,7 @@ import spray.json._
 
 import scala.io.StdIn
 import scala.concurrent.duration._
-import scala.concurrent.Lock
+//import scala.concurrent.Lock
 
 /**
   * Created by chanceroberts on 8/9/18.
@@ -19,8 +19,9 @@ object Server {
   implicit val materializer = ActorMaterializer()
   // needed for the future flatMap/onComplete in the end
   implicit val executionContext = system.dispatcher
-  val lock = new Lock()
+  //val lock = new Lock()
 
+  /*
   def lockedroute(conf: Config): server.Route = {
     if (!lock.available) complete("The ChimpCheck Demo Blocked!")
     lock.acquire
@@ -28,6 +29,7 @@ object Server {
     lock.release
     route
   }
+  */
 
   def runChimpCheck(conf: Config): server.Route = {
     withRequestTimeout(1.hour) {
@@ -62,8 +64,8 @@ object Server {
 
   def main(args: Array[String]): Unit = {
     val conf = ConfigFactory.load()
-    val route = lockedroute(conf)
-    //val route = runChimpCheck(conf)
+    //val route = lockedroute(conf)
+    val route = runChimpCheck(conf)
     val port = if (args.length > 0){
       args(0).toInt
     } else conf.getInt("port")

@@ -43,7 +43,7 @@ COPY start_web_server.bash start_web_server.bash
 COPY start_docker.bash start_docker.bash
 COPY start_adb_stream.bash start_adb_stream.bash
 COPY replacements.bash replacements.bash
-ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
+ADD chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git pull
 RUN cd /chimpcheck && git checkout docker_input
 ENV STREAM_PORT 9002
