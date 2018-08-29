@@ -93,10 +93,10 @@ class Dropdown extends Component {
           document.getElementById('testButton').disabled = false
           try{
             var json = JSON.parse(data)
-            const stat = json.getElementById('status').innerHTML
-            const res = json.getElementById('eventTrace').innerHTML
-            const trace = json.getElementById('stackTrace').innerHTML
-            const col = json.getElementById('color').innerHTML
+            const stat = json.status
+            const res = json.eventTrace
+            const trace = json.stackTrace
+            const col = json.color
             original.setState({results:res, status: stat, trace:trace, color: col});
           } catch(err){
             original.setState({results:data, status: 'Unknown', trace:'', color: '#888888'})
