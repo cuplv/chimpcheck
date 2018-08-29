@@ -3,20 +3,49 @@
 }
 
 .App-logo {
-  height: 80px;
+  height: 70px;
+  float: left;
 }
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 110px;
   padding: 20px;
   color: white;
 }
 
+.introduction {
+  background-color: #eee;
+}
+
 .App-title {
   font-size: 1.5em;
+  text-align: left;
+  transform: translate(25px, 25px);
 }
 
 .App-intro {
   font-size: large;
+}
+
+.App-project{
+  font-size: 1.5em;
+  transform: translate(0px, -15px);
+  text-align: right;
+}
+
+.spacey{
+  padding: 40px;
+}
+
+.spaceySmall{
+  padding: 20px;
+}
+
+.somePad{
+  padding: 5px;
+}
+
+.nl{
+  padding: 1px;
 }

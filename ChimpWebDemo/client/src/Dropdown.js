@@ -92,22 +92,29 @@ class Dropdown extends Component {
   render() {
         return (
             <div>
-            <label htmlFor='sel1'>Select an Application</label> 
-            <select className="form-control" onChange={this.onChangeApp.bind(this)} id="sel1">
+            <div className='row'>
+              <div className='col-6'>
+                <label htmlFor='sel1'>App</label>
+                <select className="form-control" onChange={this.onChangeApp.bind(this)} id="sel1">
                 {
                     app_names.map(option => {
                             return <option value={option} key={option} >{option}</option>})
                 }
-            </select>
-            <label htmlFor='sel1'>Select a Test</label>
-            <select className ='form-control' onChange = {this.onChangeTest.bind(this)} id = 'sel1'> {
+                </select>
+               </div>
+               <div className='col-6'>
+                 <label htmlFor='sel1'>Test</label>
+                 <select className ='form-control' onChange = {this.onChangeTest.bind(this)} id = 'sel1'> {
                     this.state.tests.map(option => {
                         return <option value={option} key={option} >{option}</option>})
                     }
-            </select>
+                 </select>
+               </div>
+            </div>
+            <div className="spaceySmall"></div>
             <div className='row'>
               <div className='col'>
-                <textarea className="w-100 p-7" rows="4" value={this.state.written_test} onChange ={this.handleChange}></textarea>
+                <textarea className="w-100 p-7" rows="15" value={this.state.written_test} onChange ={this.handleChange}></textarea>
               </div>
             </div>
                 <div className='row'>
@@ -117,7 +124,7 @@ class Dropdown extends Component {
                 </div>
                 <div className='row'>
                     <div className='col'>
-                      <textarea className="w-100 p-7" rows="10" value={this.state.results} readOnly></textarea>
+                      <textarea style={{display:"none"}} id="output" value={this.state.results} readOnly></textarea>
                     </div>
                 </div>
             </div>
