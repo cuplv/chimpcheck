@@ -36,7 +36,9 @@ class Dropdown extends Component {
       test: this.getTestName(test_names[0][0]),
       written_test: start_scripts[this.getTestName(test_names[0][0])],
       results: "Test output",
-      status: ""
+      status: "",
+      color: "#000000",
+      trace: ""
     };
   }
 
@@ -89,8 +91,16 @@ class Dropdown extends Component {
           res.text())
         .then(function(data){ 
           document.getElementById('testButton').disabled = false
-          original.setState({results:data, status: ""});
-            
+          try{
+            var json = JSON.parse(data)
+            const stat = json.getElementById('status').innerHTML
+            const res = json.getElementById('eventTrace').innerHTML
+            const trace = json.getElementById('stackTrace').innerHTML
+            const col = json.getElementById('color').innerHTML
+            original.setState({results:res, status: stat, trace:trace, color: col});
+          } catch(err){
+            original.setState({results:data, status: 'Unknown', trace:'', color: '#888888'})
+          }
       })
   }
   render() {
@@ -142,7 +152,7 @@ class Dropdown extends Component {
             </div>
             <div className="col-4">
               <label>Executed Instructions</label>
-              <textarea className="w-100 p-7" rows="6" readOnly value={this.state.results}></textarea>
+              <textarea className="w-100 p-7" rows="6" readOnly style={{color: this.state.color}} value={this.state.results}></textarea>
               <div className='spaceySmall'></div>
               <label>Stack Trace (On Exception)</label>
               <textarea className="w-100 p-7" rows="10" readOnly></textarea>

@@ -29,6 +29,10 @@ object Server {
     route
   }
 
+  def errorToMessage(err: Exception): String = {
+    s"{color:\"#888888\", status:\"Internal Err.\", stackTrace:\"\", eventTrace:${JsString(err.getMessage)}"
+  }
+
   def runChimpCheck(conf: Config): server.Route = {
     withRequestTimeout(1.hour) {
       post {
@@ -38,21 +42,21 @@ object Server {
               try {
                 complete(ServerLogic.setUpEmulator(queryStr, conf))
               } catch {
-                case e: Exception => complete(e.getMessage())
+                case e: Exception => complete(errorToMessage(e))
               }
             } ~
             path("runADB") {
               try {
                 complete(ServerLogic.runAnEmulator(queryStr, conf))
               } catch {
-                case e: Exception => complete(e.getMessage())
+                case e: Exception => complete(errorToMessage(e))
               }
             } ~
             path("tearDown") {
               try {
                 complete(ServerLogic.closeAnEmulator(queryStr, conf))
               } catch {
-                case e: Exception => complete(e.getMessage())
+                case e: Exception => complete(errorToMessage(e))
               }
             }
         }

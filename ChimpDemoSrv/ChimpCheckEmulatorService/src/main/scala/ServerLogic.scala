@@ -58,7 +58,7 @@ object ServerLogic {
               case _ => throw new Exception("An unknown error occurred.")
             }
           case _ => output.fields.get("output") match{
-            case Some(JsString(err)) => return err
+            case Some(JsString(err)) => throw new Exception(err)
             case _ => throw new Exception("An unknown error occurred.")
           }
         }
