@@ -30,7 +30,7 @@ object Server {
   }
 
   def errorToMessage(err: Exception): String = {
-    s"{color:\"#888888\", status:\"Internal Err.\", stackTrace:\"\", eventTrace:${JsString(err.getMessage)}"
+    "{color:\"#888888\", status:\"Internal Err.\", stackTrace:\"\","+s"eventTrace:${JsString(err.getMessage)}}"
   }
 
   def runChimpCheck(conf: Config): server.Route = {

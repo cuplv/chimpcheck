@@ -63,7 +63,7 @@ object OutputTransformer {
       case _ => s"#888888"
     }
     val res = result match{
-      case "Success" | "Crashed" | "Blocked" | "AssertFailed" | "DriverExcept" => res
+      case "Success" | "Crashed" | "Blocked" | "AssertFailed" | "DriverExcept" => result
       case _ => "Unknown"
     }
     val stackTrace = findResult(outputList, "stack=", addNewLine=true)
