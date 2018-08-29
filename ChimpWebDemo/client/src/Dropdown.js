@@ -71,9 +71,9 @@ class Dropdown extends Component {
   onClick(e) {
     var app = this.state.appname;
     var script = this.state.written_test;
-    var status = this.state.status;
-    status = "Running";
     var original = this;
+    this.setState({status:"Running"});
+    document.getElementById('testButton').disabled = true;
     fetch('/test', {
       method: 'POST',
       headers: {
@@ -88,7 +88,8 @@ class Dropdown extends Component {
       }).then(res => 
           res.text())
         .then(function(data){ 
-          original.setState({results:data});
+          document.getElementById('testButton').disabled = false
+          original.setState({results:data, status: ""});
             
       })
   }
@@ -125,7 +126,7 @@ class Dropdown extends Component {
             </div>
                 <div className='row'>
                     <div className='col'>
-                    <button className='btn-normal' onClick={this.onClick.bind(this)}> Test </button>
+                    <button id='testButton' className='btn-normal' onClick={this.onClick.bind(this)}> Test </button>
                     </div>
                 </div>
             </div>
@@ -137,7 +138,7 @@ class Dropdown extends Component {
             <textarea rows="1" cols="14" readOnly value={this.state.status}></textarea>
             <div className='nl'></div>
             <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
-            <script>"document.getElementById('streamed').src = document.location.hostname + ':9003"</script>
+            <script>"document.getElementById('streamed').src = document.location.hostname + ':9002"</script>
             </div>
             <div className="col-4">
               <label>Executed Instructions</label>
