@@ -155,7 +155,7 @@ class Dropdown extends Component {
               <textarea className="w-100 p-7" rows="6" readOnly style={{color: this.state.color}} value={this.state.results}></textarea>
               <div className='spaceySmall'></div>
               <label>Stack Trace (On Exception)</label>
-              <textarea className="w-100 p-7" rows="10" readOnly></textarea>
+              <textarea className="w-100 p-7" rows="10" readOnly value={this.state.trace}></textarea>
             </div>
           </div>
         </div>
