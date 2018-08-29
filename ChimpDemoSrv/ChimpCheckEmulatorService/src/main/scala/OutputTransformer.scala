@@ -2,7 +2,7 @@ import java.io.File
 
 import edu.colorado.plv.chimp.combinator.EventTrace
 import edu.colorado.plv.fixr.bash.android.Adb
-import spray.json.JsString
+import spray.json.{JsObject, JsString}
 
 import scala.io.Source
 
@@ -71,7 +71,8 @@ object OutputTransformer {
       case "" => firstRet
       case x => s"$firstRet\nStack Trace: $x"
     }*/
-    s"{color: ${JsString(colored)}, status: $result, stackTrace: ${JsString(stackTrace)}, eventTrace: ${JsString(realTrace.toString)} }"
+    JsObject("color"-> JsString(colored), "status" -> JsString(result),
+      "stackTrace" -> JsString(stackTrace), "eventTrace" -> JsString(realTrace.toString)).prettyPrint
   }
 }
 
