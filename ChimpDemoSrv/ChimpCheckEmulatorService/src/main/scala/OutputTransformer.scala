@@ -71,7 +71,7 @@ object OutputTransformer {
       case "" => firstRet
       case x => s"$firstRet\nStack Trace: $x"
     }*/
-    s"{color: ${JsString(colored)}, status: $result, stackTrace: ${JsString(stackTrace)}, eventTrace: ${JsString(realTrace.toString)}"
+    s"{color: ${JsString(colored)}, status: $result, stackTrace: ${JsString(stackTrace)}, eventTrace: ${JsString(realTrace.toString)} }"
   }
 }
 
