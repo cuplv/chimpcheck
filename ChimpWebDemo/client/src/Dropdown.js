@@ -35,7 +35,8 @@ class Dropdown extends Component {
       tests: test_names[0],
       test: this.getTestName(test_names[0][0]),
       written_test: start_scripts[this.getTestName(test_names[0][0])],
-      results: "Test output"
+      results: "Test output",
+      status: ""
     };
   }
 
@@ -70,6 +71,8 @@ class Dropdown extends Component {
   onClick(e) {
     var app = this.state.appname;
     var script = this.state.written_test;
+    var status = this.state.status;
+    status = "Running";
     var original = this;
     fetch('/test', {
       method: 'POST',
@@ -91,6 +94,9 @@ class Dropdown extends Component {
   }
   render() {
         return (
+        <div id="container">
+          <div className="row">
+            <div className="col-4">
             <div>
             <div className='row'>
               <div className='col-6'>
@@ -122,13 +128,26 @@ class Dropdown extends Component {
                     <button className='btn-normal' onClick={this.onClick.bind(this)}> Test </button>
                     </div>
                 </div>
-                <div className='row'>
-                    <div className='col'>
-                      <textarea style={{display:"none"}} id="output" value={this.state.results} readOnly></textarea>
-                    </div>
-                </div>
             </div>
+            <br/>
 
+            </div>
+            <div className="col-4">
+            <label>Status:</label>
+            <textarea rows="1" cols="14" readOnly value={this.state.status}></textarea>
+            <div className='nl'></div>
+            <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
+            <script>"document.getElementById('streamed').src = document.location.hostname + ':9003"</script>
+            </div>
+            <div className="col-4">
+              <label>Executed Instructions</label>
+              <textarea className="w-100 p-7" rows="6" readOnly value={this.state.results}></textarea>
+              <div className='spaceySmall'></div>
+              <label>Stack Trace (On Exception)</label>
+              <textarea className="w-100 p-7" rows="10" readOnly></textarea>
+            </div>
+          </div>
+        </div>
         );
   }
 }
