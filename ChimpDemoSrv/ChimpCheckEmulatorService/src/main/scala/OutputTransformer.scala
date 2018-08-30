@@ -79,11 +79,11 @@ object OutputTransformer {
 
 object OutputTransformerTest {
   def main(args: Array[String]): Unit = {
-    //val file = new File("successTest.txt")
-    val file = new File("failedTest.txt")
+    val file = new File("successTest.txt")
+    //val file = new File("failedTest.txt")
     //val eventTrace = "//If we land on the \"Turm\" screen, then Click(*) won't work, so we need to go back to the previous screen.\nval checkTurm = Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)\n//This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.\nval traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip"
-    //val eventTrace = "Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK) :>> (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) :>> LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate"
-    //println(InputTransformer.transformInput(eventTrace, "kisten"))
-    println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
+    val eventTrace = "Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK) :>> (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) :>> LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate"
+    println(InputTransformer.transformInput(eventTrace, "nextcloud"))
+    //println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
   }
 }

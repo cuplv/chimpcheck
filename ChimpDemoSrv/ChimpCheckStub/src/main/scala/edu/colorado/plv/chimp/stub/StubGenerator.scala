@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 import edu.colorado.plv.chimp.generator._
-import de.d120.ophasekistenstapeln.R
+import com.owncloud.android.R
 
 
 object StubGenerator extends App {
@@ -19,10 +19,9 @@ object StubGenerator extends App {
   val test = "10"
 
   // To support Click(R.id) please import the R class file
-  //If we land on the "Turm" screen, then Click(*) won't work, so we need to go back to the previous screen.
-  val checkTurm = Try((isDisplayed("Turm") Then ClickBack:>>Skip).generator.sample.get)
-  //This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.
-  val traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip
+  val traceGen = {
+  Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com"):>> Type(R.id.account_username, "22203"):>> Type(R.id.account_password, "12321qweqaz!") :>> Click(R.id.buttonOK) :>> (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)) :>> LongClick("Documents") :>> ClickMenu :>> Click("Move") :>> Rotate
+  }
 
   val samples: List[EventTrace] =
     List.fill(1)(traceGen.generator().sample.get)

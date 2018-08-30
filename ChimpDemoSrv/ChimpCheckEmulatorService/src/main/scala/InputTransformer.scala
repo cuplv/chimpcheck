@@ -38,12 +38,12 @@ object InputTransformer {
     }
     */
     val (newVal, _) = strList.foldRight(List[String](), fileArr.length){
-      case (s, (lis, x)) if x <= (fileArr.length-16) && x > 22 =>
+      case (s, (lis, x)) if x <= (fileArr.length-17) && x > 23 =>
         (lis, x-1)
-      case (s, (lis, 22)) => val newLis = inputList.foldRight(lis) {
-        case (x, myLis) => s"  $x" :: myLis
+      case (s, (lis, 23)) => val newLis = inputList.foldRight(lis) {
+        case (x, myLis) => s"    $x" :: myLis
       }
-        (newLis, 21)
+        (newLis, 22)
       case (s, (lis, x)) => s match{
         case "import plv.colorado.edu.chimptrainer.R"
              | "import com.owncloud.android.R" | "import de.d120.ophasekistenstapeln.R" =>
