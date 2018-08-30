@@ -49,3 +49,15 @@
 .nl{
   padding: 1px;
 }
+
+.App-footer {
+  background-color: #222;
+  height: 130px;
+  padding: 20px;
+  color: white;
+}
+
+.CUPLV-Logo {
+  height: 80px;
+  float: left;
+}

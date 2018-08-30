@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import logo from './chimpLogo.png';
+import logo2 from './cuplv-logo.png';
 //import emulator from './emulator.jpeg';
 import './App.css';
 import Dropdown from './Dropdown'
@@ -20,7 +21,9 @@ class App extends Component {
         <div className='somePad'></div>
         
             <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
-            
+        <header className="App-footer">
+          <img src={logo2} className="CUPLV-logo" alt="logo2" />   
+        </header>
       </div>
     );
   }
