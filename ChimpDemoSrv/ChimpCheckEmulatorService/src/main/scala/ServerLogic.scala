@@ -86,7 +86,7 @@ object ServerLogic {
           writer.append(cmd.cmd.substring(cmd.cmd.indexOf("am instrument")))
           writer.close()
           Adb.extend(s"-H $newHost -P $adbPort").push("runMe.bash", "/data/local/tmp").!!!
-          Adb.shell("sh /data/local/tmp/runMe.sh") match {
+          Adb.shell("sh /data/local/tmp/runMe.sh").!!! match {
             case s: SuccTry[_, _] => s.toString
             case f: FailTry[_, Fail] => throw new Exception(f.error.stderr)
           }
