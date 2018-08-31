@@ -81,10 +81,7 @@ object ServerLogic {
     val chimpCheckReturn = cmd.!!! match{
       case s: SuccTry[_, _] => s.toString
       case f: FailTry[_, _] =>
-        val writer = new BufferedWriter(new FileWriter(new File("runMe.bash"), false))
-        writer.append(cmd.cmd)
-        writer.close()
-        Cmd("bash runMe.bash").!!!.toString
+        throw new Exception(f.error.stderr)
     }
     /*val chimpCheckReturn =
       s"adb -H $newHost -P $adbPort -s emulator-5554 shell am instrument -r -w -e debug false " +
