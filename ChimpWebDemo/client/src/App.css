@@ -14,10 +14,15 @@
   color: white;
 }
 
+.CodeMirror {
+  text-align: left;
+}
+
 .App-title {
   font-size: 1.5em;
   text-align: left;
-  transform: translate(25px, -5px);
+  transform: translate(25px, -30px);
+  width: 250px;
 }
 
 .App-intro {
@@ -26,7 +31,7 @@
 
 .App-project{
   font-size: 1.5em;
-  transform: translate(0px, -15px);
+  transform: translate(0px, 5px);
   text-align: right;
 }
 

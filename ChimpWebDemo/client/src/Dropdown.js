@@ -1,9 +1,13 @@
 import React, {Component} from 'react';
+import codemirror from 'codemirror';
+
+import "codemirror/mode/clike/clike.js";
+import "codemirror/lib/codemirror.css";
 
 var app_test = {
-  'ChimpTrainer': ['Log In and Randomly Slide', 'Log In and Crash on Countdown'],
+  'Kistenstapleln': ['Randomly Click', 'Crash on Countdown'],
   'Nextcloud': ['Look at and Move Documents', 'Log In and Crash on Rotation'],
-  'Kistenstapleln': ['Randomly Click', 'Crash on Countdown']
+  'ChimpTrainer': ['Log In and Randomly Slide', 'Log In and Crash on Countdown']
 };
 
 var start_scripts = {
@@ -17,14 +21,15 @@ var start_scripts = {
 
 var app_names = Object.keys(app_test)
 var test_names = Object.values(app_test)
+var cMirror = null;
 class Dropdown extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this)
     this.state = {
-      appname: app_names[2],
-      tests: test_names[2],
-      test: test_names[2][0],
+      appname: app_names[0],
+      tests: test_names[0],
+      test: test_names[0][0],
       written_test: "// " + test_names[0][0] + "\n" + start_scripts[test_names[0][0]],
       results: "",
       status: "",
@@ -40,6 +45,7 @@ class Dropdown extends Component {
       test: app_test[e.target.value][0],
       written_test: "// " + app_test[e.target.value][0] + "\n" + start_scripts[app_test[e.target.value][0]],
     })
+    cMirror.setValue("// " + app_test[e.target.value][0] + "\n" + start_scripts[app_test[e.target.value][0]])
     console.log(this.state)
   }
 
@@ -49,16 +55,21 @@ class Dropdown extends Component {
       test: testName,
       written_test: "// " + testName + "\n" + start_scripts[testName]
     })
+    cMirror.setValue("// " + testName + "\n" + start_scripts[testName])
   }
 
   // From https://reactjs.org/docs/forms.html
   handleChange(e) {
     this.setState({written_test: e.target.value});
+    cMirror.setValue(e.target.value)
   }
 
   onClick(e) {
     var app = this.state.appname;
     var script = this.state.written_test;
+    try{
+      script = cMirror.getValue().substr(0); // Makes sure to only update script if getValue is a string.
+    } catch(err){ console.log(err); };
     var original = this;
     this.setState({status:"Running", trace:"", results:""});
     document.getElementById('testButton').disabled = true;
@@ -80,7 +91,7 @@ class Dropdown extends Component {
           try{
             var json = JSON.parse(data)
             const stat = json.status
-            const res = json.eventTrace.replace(/ :>> /g, "\n")
+            const res = json.eventTrace.replace(/ :>> /g, ":>>\n")
             const trace = json.stackTrace.replace(/at /g, "")
             const col = json.color
             original.setState({results:res, status: stat, trace:trace, color: col});
@@ -89,6 +100,14 @@ class Dropdown extends Component {
           }
       })
   }
+  
+  componentDidMount(){
+    cMirror = codemirror.fromTextArea(document.getElementById("input"), {
+      mode: 'text/x-scala',
+      
+    })
+  }  
+
   render() {
         return (
         <div id="container">
@@ -117,10 +136,7 @@ class Dropdown extends Component {
             <div className="spaceySmall"></div>
             <div className='row'>
               <div className='col'>
-                <textarea className="w-100 p-7" rows="15" value={this.state.written_test} onChange ={this.handleChange} spellcheck="false"></textarea>
-                <script>
-                  
-                </script>
+                <textarea id="input" className="w-100 p-7" rows="15" value={this.state.written_test} onChange ={this.handleChange} spellCheck="false"></textarea>
               </div>
             </div>
             <div className="somePad"></div>

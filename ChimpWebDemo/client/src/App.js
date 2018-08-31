@@ -11,11 +11,11 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <div className="App-title">
-            <a style={{color: "#ffffff"}} href="http://plv.colorado.edu/chimpcheck">ChimpCheck</a>
-          </div>
           <div className="App-project">
-            <a style={{color: "#ffffff"}} href="http://plv.colorado.edu/chimpcheck/tutorial">Tutorial</a>
+            <a style={{color: "#CFB87C"}} href="http://plv.colorado.edu/chimpcheck/tutorial">Tutorial</a>
+          </div>
+          <div className="App-title">
+            <a style={{color: "#CFB87C"}} href="http://plv.colorado.edu/chimpcheck">ChimpCheck</a>
           </div>
         </header>
         <div className='somePad'></div>
