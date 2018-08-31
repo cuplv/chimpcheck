@@ -4,6 +4,7 @@ RUN git clone https://github.com/cuplv/chimpcheck \
     && cd ./chimpcheck/ChimpDriver \
     && git submodule init \
     && git submodule update
+    && git checkout docker_polish_frontend
 
 RUN cd ./chimpcheck/ChimpDriver && ./gradlew uploadArchives
 RUN cd ./chimpcheck/ScalaBashing && sbt publishLocal
@@ -45,6 +46,6 @@ COPY start_adb_stream.bash start_adb_stream.bash
 COPY replacements.bash replacements.bash
 ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git pull
-RUN cd /chimpcheck && git checkout docker_input
+RUN cd /chimpcheck && git checkout docker_polish_frontend
 ENV STREAM_PORT 9002
 ENTRYPOINT ["/usr/bin/supervisord"]
