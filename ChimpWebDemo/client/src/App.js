@@ -15,7 +15,7 @@ class App extends Component {
             <a style={{color: "#ffffff"}} href="http://plv.colorado.edu/chimpcheck">ChimpCheck</a>
           </div>
           <div className="App-project">
-            <a style={{color: "#ffffff"}} href="http://plv.colorado.edu/chimpcheck/getting-started">Tutorial</a>
+            <a style={{color: "#ffffff"}} href="http://plv.colorado.edu/chimpcheck/tutorial">Tutorial</a>
           </div>
         </header>
         <div className='somePad'></div>

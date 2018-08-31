@@ -8,14 +8,10 @@
 }
 
 .App-header {
-  background-color: #222;
+  background-color: #565A5C;
   height: 90px;
   padding: 20px;
   color: white;
-}
-
-.introduction {
-  background-color: #eee;
 }
 
 .App-title {
@@ -51,7 +47,7 @@
 }
 
 .App-footer {
-  background-color: #ddd;
+  background-color: #565A5C;
   height: 92px;
   padding: 0px;
   color: white;

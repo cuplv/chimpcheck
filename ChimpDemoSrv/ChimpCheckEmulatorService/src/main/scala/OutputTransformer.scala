@@ -54,7 +54,7 @@ object OutputTransformer {
       case _ => s"Trace $realTrace led to something weird happening. Outcome $result"
     }*/
     val colored = result match{
-      case "Success" => s"#00ff00"
+      case "Success" => s"#00cc00"
       case "Crashed" => s"#ff0000"
       case "Blocked" => s"#ffdd00"
       case "AssertFailed" => s"#ff0000"
@@ -82,8 +82,8 @@ object OutputTransformerTest {
     val file = new File("successTest.txt")
     //val file = new File("failedTest.txt")
     //val eventTrace = "//If we land on the \"Turm\" screen, then Click(*) won't work, so we need to go back to the previous screen.\nval checkTurm = Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)\n//This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.\nval traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip"
-    val eventTrace = "Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK) :>> (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) :>> LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate"
-    println(InputTransformer.transformInput(eventTrace, "nextcloud"))
+    val eventTrace = "// This crashes the app by finishing a countdown on another page.\n\nClick(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> Click(\"Punktzahl berechnen\") :>> Sleep(10000)"
+    InputTransformer.transformInput(eventTrace, "kisten")
     //println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
   }
 }

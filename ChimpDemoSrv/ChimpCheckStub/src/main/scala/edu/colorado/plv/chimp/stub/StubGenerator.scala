@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
 import edu.colorado.plv.chimp.generator._
-import com.owncloud.android.R
+import de.d120.ophasekistenstapeln.R
 
 
 object StubGenerator extends App {
@@ -20,7 +20,9 @@ object StubGenerator extends App {
 
   // To support Click(R.id) please import the R class file
   val traceGen = {
-  Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com"):>> Type(R.id.account_username, "22203"):>> Type(R.id.account_password, "12321qweqaz!") :>> Click(R.id.buttonOK) :>> (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)) :>> LongClick("Documents") :>> ClickMenu :>> Click("Move") :>> Rotate
+    // This crashes the app by finishing a countdown on another page.
+
+    Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> Click("Punktzahl berechnen") :>> Sleep(10000)
   }
 
   val samples: List[EventTrace] =
