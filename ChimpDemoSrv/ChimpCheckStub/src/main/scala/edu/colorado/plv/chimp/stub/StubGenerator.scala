@@ -21,8 +21,9 @@ object StubGenerator extends App {
   // To support Click(R.id) please import the R class file
   val traceGen = {
     // This crashes the app by finishing a countdown on another page.
-
-    Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> Click("Punktzahl berechnen") :>> Sleep(10000)
+    
+    Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> 
+      Click("Punktzahl berechnen") :>> Sleep(10000)
   }
 
   val samples: List[EventTrace] =

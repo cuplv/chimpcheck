@@ -82,7 +82,7 @@ object OutputTransformerTest {
     val file = new File("successTest.txt")
     //val file = new File("failedTest.txt")
     //val eventTrace = "//If we land on the \"Turm\" screen, then Click(*) won't work, so we need to go back to the previous screen.\nval checkTurm = Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)\n//This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.\nval traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip"
-    val eventTrace = "// This crashes the app by finishing a countdown on another page.\n\nClick(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> Click(\"Punktzahl berechnen\") :>> Sleep(10000)"
+    val eventTrace = "// This crashes the app by finishing a countdown on another page.\n\nClick(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> \n  Click(\"Punktzahl berechnen\") :>> Sleep(10000)"
     InputTransformer.transformInput(eventTrace, "kisten")
     //println(OutputTransformer.transformOutput(Source.fromFile(file).mkString))
   }
