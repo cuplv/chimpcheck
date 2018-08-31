@@ -3,7 +3,7 @@ FROM cuplv-android-emulator
 RUN git clone https://github.com/cuplv/chimpcheck \
     && cd ./chimpcheck/ChimpDriver \
     && git submodule init \
-    && git submodule update
+    && git submodule update \
     && git checkout docker_polish_frontend
 
 RUN cd ./chimpcheck/ChimpDriver && ./gradlew uploadArchives
