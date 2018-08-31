@@ -16,11 +16,11 @@ var test_explanations = {
 }
 
 var start_scripts = {
-  'trainer-1': "// This logs into the ChimpTrainer application using a known username and password, and then goes to the swiping screen.\nval basicTrace = Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>>\n  Click(\"Login\") :>> Click(\"Swipe Testing\")\n// These are the three sliders.\nval lsSeekbar = List(R.id.seekBar, R.id.seekBar2, R.id.seekBar3)\n// These are the directions that the sliders can slide. (How we want to swipe)\nval lsDirection:List[Orientation] = List(Left, Right)\n// This randomly swipes the sliders a specified amount of times.\ndef randomSwipe(times: Int, action: EventTrace): EventTrace ={\n  val r = scala.util.Random\n  times match {\n    case 0 => action\n    case _ => randomSwipe(times-1, action :>> Swipe(lsSeekbar(r.nextInt(3)), lsDirection(r.nextInt(2))))\n  }\n}\n// This logs in and then does the random sliding 10 times.\nval traceGen = randomSwipe(10, basicTrace)",
-  'trainer-2': "// This logs into the ChimpTrainer application using a known username and password.\nval traceLogin = Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>> Click(\"Login\")\n// This starts a countdown, and waits for that to end.\nval traceCount = Click(\"Countdowntimer Testing\") :>> Click(\"10 seconds\") :>> Sleep(10000)\n// This starts a countdown, and then moves to another screen.\nval traceCountCrash = Click(\"5 seconds\") :>> ClickBack :>> Sleep(5000)\nval traceGen = traceLogin :>> traceCount :>> traceCountCrash",
-  'nextcloud-1': "// This section of the trace logs into the Nextcloud application using a known username and password.\nval traceLogin = Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK)\n// In some versions of the Android Application, there is a permission screen to get past; This just passes through the permission screen.\nval traceAllow = (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000) )\n// This navigates to the About.txt file in the Documents folder and takes a look at it, and then navigates back.\nval traceSeeAbout = Click(\"Documents\") :>> Sleep(2000) :>> Click(\"About.odt\") :>> Sleep(2000) :>> Click(\"About.txt\") :>> Sleep(2000) :>>ClickBack :>> ClickBack\n// This navigates to the Hummingbird.jpg picture in the Photos folder and takes a look at it, and then navigates back.\nval traceSeeHummingbird = Sleep(1500) :>> Click(\"Photos\") :>> Click(\"Coast.jpg\") :>> ClickBack :>> Click(\"Hummingbird.jpg\") :>> ClickBack :>> ClickBack \n// This selects the Nextcloud Manual and moves it into the documents folder.\nval moveManual =  LongClick(\"Nextcloud Manual.pdf\") :>> Sleep(2000) :>> ClickMenu :>> Click(\"Move\") :>> Click(\"Documents\") :>>Sleep(1000) :>> Click(\"Choose\") :>> Sleep(2000) \n// This selects the Nextcloud Manual and moves it back into the root directory.\nval moveBackManual =  Click(\"Documents\")  :>>LongClick(\"Nextcloud Manual.pdf\") :>> ClickMenu:>> Sleep(2000) :>> Click(\"Move\") :>> Click(\"Choose\") :>> Sleep(5000)\n\nval traceGen = traceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManual :>> moveBackManual",
-  'nextcloud-2': "// This section of the trace logs into the Nextcloud application using a known username and password.\nval traceLogin = Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\") :>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK)\n// In some versions of the Android Application, there is a permission screen to get past; This just passes through the permission screen.\nval traceAllow = (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) \n// This demonstrates a crash within the application; If you go to the Move screen and immediately rotate the emulator, the application will crash.\nval traceCrash = LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate\nval traceGen = traceLogin :>> traceAllow :>> traceCrash",
-  'kisten-1': "//If we land on the \"Turm\" screen, then Click(*) won't work, so we need to go back to the previous screen.\nval checkTurm = Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)\n//This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.\nval traceGen = Repeat(500, Click(*) :>> checkTurm) :>> Skip",
+  'trainer-1': "// This logs into the ChimpTrainer application using a known username and password, and then goes to the swiping screen.\nval basicTrace = Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>>\n  Click(\"Login\") :>> Click(\"Swipe Testing\")\n// These are the three sliders.\nval lsSeekbar = List(R.id.seekBar, R.id.seekBar2, R.id.seekBar3)\n// These are the directions that the sliders can slide. (How we want to swipe)\nval lsDirection:List[Orientation] = List(Left, Right)\n// This randomly swipes the sliders a specified amount of times.\ndef randomSwipe(times: Int, action: EventTrace): EventTrace ={\n  val r = scala.util.Random\n  times match {\n    case 0 => action\n    case _ => randomSwipe(times-1, action :>> Swipe(lsSeekbar(r.nextInt(3)), lsDirection(r.nextInt(2))))\n  }\n}\n// This logs in and then does the random sliding 10 times.\nrandomSwipe(10, basicTrace)",
+  'trainer-2': "// This logs into the ChimpTrainer application using a known username and password.\nval traceLogin = Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> Type(\"password\",\"test\") :>> Click(\"Login\")\n// This starts a countdown, and waits for that to end.\nval traceCount = Click(\"Countdowntimer Testing\") :>> Click(\"10 seconds\") :>> Sleep(10000)\n// This starts a countdown, and then moves to another screen.\nval traceCountCrash = Click(\"5 seconds\") :>> ClickBack :>> Sleep(5000)\ntraceLogin :>> traceCount :>> traceCountCrash",
+  'nextcloud-1': "// This section of the trace logs into the Nextcloud application using a known username and password.\nval traceLogin = Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\"):>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK)\n// In some versions of the Android Application, there is a permission screen to get past; This just passes through the permission screen.\nval traceAllow = (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000) )\n// This navigates to the About.txt file in the Documents folder and takes a look at it, and then navigates back.\nval traceSeeAbout = Click(\"Documents\") :>> Sleep(2000) :>> Click(\"About.odt\") :>> Sleep(2000) :>> Click(\"About.txt\") :>> Sleep(2000) :>>ClickBack :>> ClickBack\n// This navigates to the Hummingbird.jpg picture in the Photos folder and takes a look at it, and then navigates back.\nval traceSeeHummingbird = Sleep(1500) :>> Click(\"Photos\") :>> Click(\"Coast.jpg\") :>> ClickBack :>> Click(\"Hummingbird.jpg\") :>> ClickBack :>> ClickBack \n// This selects the Nextcloud Manual and moves it into the documents folder.\nval moveManual =  LongClick(\"Nextcloud Manual.pdf\") :>> Sleep(2000) :>> ClickMenu :>> Click(\"Move\") :>> Click(\"Documents\") :>>Sleep(1000) :>> Click(\"Choose\") :>> Sleep(2000) \n// This selects the Nextcloud Manual and moves it back into the root directory.\nval moveBackManual =  Click(\"Documents\")  :>>LongClick(\"Nextcloud Manual.pdf\") :>> ClickMenu:>> Sleep(2000) :>> Click(\"Move\") :>> Click(\"Choose\") :>> Sleep(5000)\n\ntraceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManual :>> moveBackManual",
+  'nextcloud-2': "// This section of the trace logs into the Nextcloud application using a known username and password.\nval traceLogin = Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\"):>> Type(R.id.account_username, \"22203\") :>> Type(R.id.account_password, \"12321qweqaz!\") :>> Click(R.id.buttonOK)\n// In some versions of the Android Application, there is a permission screen to get past; This just passes through the permission screen.\nval traceAllow = (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) \n// This demonstrates a crash within the application; If you go to the Move screen and immediately rotate the emulator, the application will crash.\nval traceCrash = LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate\ntraceLogin :>> traceAllow :>> traceCrash",
+  'kisten-1': "//If we land on the \"Turm\" screen, then Click(*) won't work, so we need to go back to the previous screen.\nval checkTurm = Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)\n//This clicks randomly 500 times, unless it gets to the Turm screen, where it goes back a screen.\nRepeat(500, Click(*) :>> checkTurm) :>> Skip",
   'kisten-2': "//This is a fairly simple crash; We just head to the Countdown page, start a countdown, and then move to another screen.\nval traceGen = Click(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> Click(\"Punktzahl berechnen\") :>> Sleep(10000)"
 }
 
@@ -35,7 +35,7 @@ class Dropdown extends Component {
       tests: test_names[0],
       test: this.getTestName(test_names[0][0]),
       written_test: start_scripts[this.getTestName(test_names[0][0])],
-      results: "Test output",
+      results: "",
       status: "",
       color: "#000000",
       trace: ""
@@ -74,7 +74,7 @@ class Dropdown extends Component {
     var app = this.state.appname;
     var script = this.state.written_test;
     var original = this;
-    this.setState({status:"Running"});
+    this.setState({status:"Running", trace:"", results:""});
     document.getElementById('testButton').disabled = true;
     fetch('/test', {
       method: 'POST',
@@ -131,12 +131,14 @@ class Dropdown extends Component {
             <div className="spaceySmall"></div>
             <div className='row'>
               <div className='col'>
-                <textarea className="w-100 p-7" rows="15" value={this.state.written_test} onChange ={this.handleChange}></textarea>
+                <textarea className="w-100 p-7" rows="15" value={this.state.written_test} onChange ={this.handleChange} spellcheck="false"></textarea>
               </div>
             </div>
+            <div className="somePad"></div>
+            <div className="somePad"></div>
                 <div className='row'>
                     <div className='col'>
-                    <button id='testButton' className='btn-normal' onClick={this.onClick.bind(this)}> Test </button>
+                    <button id='testButton' className='btn-normal' onClick={this.onClick.bind(this)}> Generate </button>
                     </div>
                 </div>
             </div>
@@ -152,7 +154,7 @@ class Dropdown extends Component {
             </div>
             <div className="col-4">
               <label>Executed Instructions</label>
-              <textarea className="w-100 p-7" rows="6" readOnly style={{color: this.state.color}} value={this.state.results}></textarea>
+              <textarea className="w-100 p-7" rows="9" readOnly style={{color: this.state.color}} value={this.state.results}></textarea>
               <div className='spaceySmall'></div>
               <label>Stack Trace (On Exception)</label>
               <textarea className="w-100 p-7" rows="10" readOnly value={this.state.trace}></textarea>

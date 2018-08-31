@@ -19,10 +19,9 @@ class App extends Component {
           </div>
         </header>
         <div className='somePad'></div>
-        
             <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
         <header className="App-footer">
-          <img src={logo2} className="CUPLV-logo" alt="logo2" />   
+          <img src={logo2} className="CUPLV-Logo" alt="logo2" />   
         </header>
       </div>
     );
