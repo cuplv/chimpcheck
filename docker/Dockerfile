@@ -1,10 +1,9 @@
 FROM cuplv-android-emulator
 
-RUN git clone https://github.com/cuplv/chimpcheck \
-    && cd ./chimpcheck/ChimpDriver \
-    && git submodule init \
-    && git submodule update \
-    && git checkout demo_polish_frontend
+RUN git clone https://github.com/cuplv/chimpcheck
+RUN cd chimpcheck && git checkout demo_polish_frontend
+RUN cd chimpcheck && git submodule init \
+    && git submodule update
 
 RUN cd ./chimpcheck/ChimpDriver && ./gradlew uploadArchives
 RUN cd ./chimpcheck/ScalaBashing && sbt publishLocal
@@ -48,4 +47,5 @@ ADD chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git pull
 RUN cd /chimpcheck && git checkout demo_polish_frontend
 ENV STREAM_PORT 9002
+ENV STREAM_ADDRESS localhost
 ENTRYPOINT ["/usr/bin/supervisord"]
