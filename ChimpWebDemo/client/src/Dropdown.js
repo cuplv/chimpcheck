@@ -155,7 +155,6 @@ class Dropdown extends Component {
             <textarea rows="1" cols="14" readOnly value={this.state.status}></textarea>
             <div className='nl'></div>
             <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
-            <script>"document.getElementById('streamed').src = document.location.hostname + ':9002"</script>
             </div>
             <div className="col-4">
               <label>Executed Instructions</label>

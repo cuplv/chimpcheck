@@ -47,4 +47,5 @@ ADD chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git pull
 RUN cd /chimpcheck && git checkout demo_polish_frontend
 ENV STREAM_PORT 9002
+ENV STREAM_ADDRESS localhost
 ENTRYPOINT ["/usr/bin/supervisord"]
