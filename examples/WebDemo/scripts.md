@@ -48,7 +48,7 @@ traceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManu
 ### Log In and Crash on Rotation
 
 ```scala
-"// This trace logs in, accepts permissions if possible, and then 
+// This trace logs in, accepts permissions if possible, and then 
 // crashes the application by rotating on the move screen.
 
 val traceLogin = Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\") :>>
