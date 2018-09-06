@@ -23,6 +23,176 @@ Click(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>>
 ```
 
 ## Nextcloud App
+### Randomly exercise interesting user interactions
+
+```scala
+import org.scalacheck.Gen
+import org.scalacheck.Gen._
+import scala.util.Random
+val rand = new Random()
+
+def findCoord(): Coord = {
+  val x = rand.nextInt(320)
+  val y = rand.nextInt(240)
+  Coord(x, y)
+}
+
+val g_GS = Click(*) <+> LongClick(*) <+> TypeG(const(*), Gen.alphaStr) <+>
+  Swipe(*, *) <+> Pinch(findCoord(), findCoord(), findCoord(), findCoord()) <+>
+  SleepG(Gen.choose(500, 2000))
+
+val g_Intr = Rotate
+
+val relevantMonkey = g_GS <+> g_Intr
+
+Repeat(10, relevantMonkey)
+```
+
+### Express the user interactions necessary to succesfully login
+```scala
+import org.scalacheck.Gen
+import org.scalacheck.Gen._
+import scala.util.Random
+val rand = new Random()
+
+def findCoord(): Coord = {
+  val x = rand.nextInt(320)
+  val y = rand.nextInt(240)
+  Coord(x, y)
+}
+
+val g_GS = Click(*) <+> LongClick(*) <+> TypeG(const(*), Gen.alphaStr) <+>
+  Swipe(*, *) <+> Pinch(findCoord(), findCoord(), findCoord(), findCoord()) <+>
+  SleepG(Gen.choose(500, 2000))
+
+val g_Intr = Rotate
+
+val relevantMonkey = g_GS <+> g_Intr
+
+// User-input sequence to successfully login in the App
+val login: TraceGen = Click(R.id.skip) *>>
+  Type(R.id.hostUrlInput, "ncloud.zaclys.com") *>>
+  Type(R.id.account_username, "22203") *>>
+  Type(R.id.account_password, "12321qweqaz!") *>>  Click(R.id.buttonOK)
+
+login *>> Repeat(10, relevantMonkey)
+```
+
+### Remove the interruptible user interaction when logging in
+```scala
+import org.scalacheck.Gen
+import org.scalacheck.Gen._
+import scala.util.Random
+
+val rand = new Random()
+
+def findCoord(): Coord = {
+  val x = rand.nextInt(320)
+  val y = rand.nextInt(240)
+  Coord(x, y)
+}
+
+val g_GS = Click(*) <+> LongClick(*) <+> TypeG(const(*), Gen.alphaStr) <+>
+  Swipe(*, *) <+> Pinch(findCoord(), findCoord(), findCoord(), findCoord()) <+>
+  SleepG(Gen.choose(500, 2000))
+
+val g_Intr = Rotate
+
+val relevantMonkey = g_GS <+> g_Intr
+
+val login: TraceGen = Click(R.id.skip) :>>
+  Type(R.id.hostUrlInput, "ncloud.zaclys.com") :>>
+  Type(R.id.account_username, "22203") :>>
+  Type(R.id.account_password, "12321qweqaz!") :>>  Click(R.id.buttonOK)
+
+login *>> Repeat(10, relevantMonkey)
+```
+
+### Express the user interaction to use when the App requests for user permissions
+```scala
+import org.scalacheck.Gen
+import org.scalacheck.Gen._
+import scala.util.Random
+
+val rand = new Random()
+
+def findCoord(): Coord = {
+  val x = rand.nextInt(320)
+  val y = rand.nextInt(240)
+  Coord(x, y)
+}
+
+val g_GS = Click(*) <+> LongClick(*) <+> TypeG(const(*), Gen.alphaStr) <+>
+  Swipe(*, *) <+> Pinch(findCoord(), findCoord(), findCoord(), findCoord()) <+>
+  SleepG(Gen.choose(500, 2000))
+
+val g_Intr = Rotate
+
+val relevantMonkey = g_GS <+> g_Intr
+
+val login: TraceGen = Click(R.id.skip) :>>
+  Type(R.id.hostUrlInput, "ncloud.zaclys.com") :>>
+  Type(R.id.account_username, "22203") :>>
+  Type(R.id.account_password, "12321qweqaz!") :>>  Click(R.id.buttonOK)
+
+// User interactions to allow Android permission
+val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
+
+login :>> permiss *>> Repeat(10, relevantMonkey)
+```
+
+### Generate only a subset of relevant user interactions
+```scala
+val login: TraceGen = Click(R.id.skip) :>>
+  Type(R.id.hostUrlInput, "ncloud.zaclys.com") :>>
+  Type(R.id.account_username, "22203") :>>
+  Type(R.id.account_password, "12321qweqaz!") :>>  Click(R.id.buttonOK)
+
+val relevantInteractions: Seq[(Int, TraceGen)] = Seq(
+  (30, EventTrace.trace(Click(*))),
+  (30, EventTrace.trace(LongClick(*))),
+  (30, EventTrace.trace(Rotate)),
+  (30, EventTrace.trace(ClickMenu))
+)
+val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
+
+// Exercise only the relevant interactions
+login :>> permiss *>>
+  SubservientGorilla(Sleep(500) :>> Skip)(GorillaConfig(10, relevantInteractions))
+
+val login: TraceGen = Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com") :>> Type(R.id.account_username, "22203") :>>
+  Type(R.id.account_password, "12321qweqaz!") :>>  Click(R.id.buttonOK)
+val newConfig: Seq[(Int, TraceGen)] = Seq(
+  (30, EventTrace.trace(Click(*))),
+  (30, EventTrace.trace(LongClick(*))),
+  (30, EventTrace.trace(Rotate)),
+  (30, EventTrace.trace(ClickMenu))
+)
+val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
+
+login :>> permiss *>> SubservientGorilla(Sleep(500) :>> Skip)(GorillaConfig(10, newConfig))
+```
+
+### Concise test case to log in and crash the app
+```scala
+// Log In and crash on phone rotation
+// This trace logs in, accepts permissions if possible, and then 
+// crashes the application by rotating on the move screen.
+
+val traceLogin = Click(R.id.skip) :>>
+  Type(R.id.hostUrlInput, "ncloud.zaclys.com") :>>
+  Type(R.id.account_username, "22203") :>>
+  Type(R.id.account_password, "12321qweqaz!"):>>
+  Click(R.id.buttonOK)
+
+val traceAllow = (isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000))
+
+val traceCrash = LongClick("Documents") :>> ClickMenu :>>
+  Click("Move") :>> Rotate
+
+traceLogin :>> traceAllow :>> traceCrash
+```
+
 
 ### Look at and Move Documents
 
@@ -44,21 +214,6 @@ val moveBackManual =  Click("Documents") :>> LongClick("Nextcloud Manual.pdf") :
 
 traceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManual :>> moveBackManual
 ```
-
-### Log In and Crash on Rotation
-
-```scala
-// This trace logs in, accepts permissions if possible, and then 
-// crashes the application by rotating on the move screen.
-
-val traceLogin = Click(R.id.skip) :>> Type(R.id.hostUrlInput, \"ncloud.zaclys.com\") :>>
-  Type(R.id.account_username, \"22203\") :>> Type(R.id.account_password, \"12321qweqaz!\"):>>
-  Click(R.id.buttonOK)
-val traceAllow = (isDisplayed(\"Allow\") Then Click(\"Allow\"):>> Sleep(1000)) 
-val traceCrash = LongClick(\"Documents\") :>> ClickMenu :>> Click(\"Move\") :>> Rotate
-traceLogin :>> traceAllow :>> traceCrash
-```
-
 
 ## Chimptrainer
 
