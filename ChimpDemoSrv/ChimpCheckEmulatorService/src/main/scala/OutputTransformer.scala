@@ -56,7 +56,7 @@ object OutputTransformer {
     val colored = result match{
       case "Success" => s"#00cc00"
       case "Crashed" => s"#ff0000"
-      case "Blocked" => s"#ffdd00"
+      case "Blocked" => s"#dd8800"
       case "AssertFailed" => s"#ff0000"
       case "DriverExcept" => s"#990000"
       case "Unknown" => s"#888888"
