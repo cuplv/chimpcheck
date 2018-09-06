@@ -1,26 +1,5 @@
 # Scripts pre-loaded in the web demo
 
-## Kistenstapleln App
-
-### Randomly Click
-
-```scala
-// This randomly clicks 500 times; 
-// If it ever reaches the Turm screen, it will go back to the previous screen.
-
-val checkTurm = 
-  Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)
-Repeat(500, Click(*) :>> checkTurm) :>> Skip",
-```
-
-### Crash on Countdown
-
-```scala
-// This crashes the app by finishing a countdown on another page.
-
-Click(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> 
-  Click(\"Punktzahl berechnen\") :>> Sleep(10000)
-```
 
 ## Nextcloud App
 ### Randomly exercise interesting user interactions
@@ -214,6 +193,29 @@ val moveBackManual =  Click("Documents") :>> LongClick("Nextcloud Manual.pdf") :
 
 traceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManual :>> moveBackManual
 ```
+
+## Kistenstapleln App
+
+### Randomly Click
+
+```scala
+// This randomly clicks 500 times; 
+// If it ever reaches the Turm screen, it will go back to the previous screen.
+
+val checkTurm = 
+  Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)
+Repeat(500, Click(*) :>> checkTurm) :>> Skip
+```
+
+### Crash on Countdown
+
+```scala
+// This crashes the app by finishing a countdown on another page.
+
+Click(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> 
+  Click(\"Punktzahl berechnen\") :>> Sleep(10000)
+```
+
 
 ## Chimptrainer
 
