@@ -35,6 +35,9 @@ RUN cd ./chimpcheck/ChimpWebDemo/client && npm install
 EXPOSE 3001
 EXPOSE 9002
 
+# Make sure sbt is loaded for Backend
+RUN cd ./chimpcheck/ChimpDemoSrv/ChimpCheckEmulatorService && sbt compile
+
 #Get Ports Exposed for WebSocket Forwarder
 # EXPOSE 19002
 
@@ -43,7 +46,7 @@ COPY start_web_server.bash start_web_server.bash
 COPY start_docker.bash start_docker.bash
 COPY start_adb_stream.bash start_adb_stream.bash
 COPY replacements.bash replacements.bash
-ADD chimpcheck.conf /etc/supervisor/conf.d
+ADD dummy_chimpcheck.conf /etc/supervisor/conf.d
 RUN cd /chimpcheck && git pull
 RUN cd /chimpcheck && git checkout demo_polish_frontend
 
