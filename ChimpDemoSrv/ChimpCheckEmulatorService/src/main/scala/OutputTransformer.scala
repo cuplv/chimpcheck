@@ -41,9 +41,17 @@ object OutputTransformer {
 
   def transformOutput(output: String): String = {
     val outputList = output.split("\n").toList
-    val result = findResultOneLine(outputList, "ChimpDriver-Outcome=")
     val trace = findResult(outputList, "ChimpDriver-ExecutedTrace=")
+    val tempResult = findResultOneLine(outputList, "ChimpDriver-Outcome=")
+    val result = tempResult match{
+      case  "Crashed" | "Blocked" | "AssertFailed" | "DriverExcept" | "Unknown" => tempResult
+      case _ => trace.length match{
+        case 0 => tempResult
+        case _ => "Crashed"
+      }
+    }
     val realTrace = EventTrace.fromBase64(trace)
+    val stackTrace = findResult(outputList, "stack=", addNewLine=true)
     /*val firstRet = result match{
       case "Success" => s"Trace $realTrace got run through successfully!"
       case "Crashed" => s"Trace $realTrace got the program to crash!"
@@ -53,6 +61,7 @@ object OutputTransformer {
       case "Unknown" | "" => s"Trace $realTrace ended for an unknown reason."
       case _ => s"Trace $realTrace led to something weird happening. Outcome $result"
     }*/
+
     val colored = result match{
       case "Success" => s"#00cc00"
       case "Crashed" => s"#ff0000"
@@ -66,12 +75,11 @@ object OutputTransformer {
       case "Success" | "Crashed" | "Blocked" | "AssertFailed" | "DriverExcept" => result
       case _ => "Unknown"
     }
-    val stackTrace = findResult(outputList, "stack=", addNewLine=true)
     /*findResult(outputList, "stack=", addNewLine=true) match{
       case "" => firstRet
       case x => s"$firstRet\nStack Trace: $x"
     }*/
-    JsObject("color"-> JsString(colored), "status" -> JsString(result),
+    JsObject("color"-> JsString(colored), "status" -> JsString(res),
       "stackTrace" -> JsString(stackTrace), "eventTrace" -> JsString(realTrace.toString)).prettyPrint
   }
 }
