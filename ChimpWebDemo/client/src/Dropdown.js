@@ -191,28 +191,28 @@ val moveManual =  LongClick("Nextcloud Manual.pdf") :>> Sleep(2000) :>> ClickMen
 val moveBackManual =  Click("Documents") :>> LongClick("Nextcloud Manual.pdf") :>> 
       ClickMenu:>> Sleep(2000) :>> Click("Move") :>> Click("Choose") :>> Sleep(5000)
 
-traceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManual :>> moveBackManual`
-
+traceLogin :>> traceAllow :>> traceSeeAbout :>> traceSeeHummingbird :>> moveManual :>> moveBackManual`,
 // Kistenstapeln
   'Randomly Click' : `// This randomly clicks 500 times;
 // If it ever reaches the Turm screen, it will go back to the previous screen.
 
 val checkTurm = 
-  Try((isDisplayed(\"Turm\") Then ClickBack:>>Skip).generator.sample.get)
-Repeat(500, Click(*) :>> checkTurm) :>> Skip`,
+  Try((isDisplayed("Turm") Then ClickBack:>>Skip).generator.sample.get)
+Repeat(500, Click(*) :>> checkTurm) :>> Skip
+`,
   //
   'Crash on Countdown' : `
 // This crashes the app by finishing a countdown on another page.
 
-Click(\"Countdown\") :>> Click(\"0:10\") :>> Click(\"Countdown\") :>> 
-  Click(\"Punktzahl berechnen\") :>> Sleep(10000)
+Click("Countdown") :>> Click("0:10") :>> Click("Countdown") :>> 
+  Click("Punktzahl berechnen") :>> Sleep(10000)
 `,
 // Chimptrainer
   'Log In and Randomly Slide' : `
 // This logs into the application and swipes sliders 10 times.
 
-val basicTrace = Sleep(1000) :>> Click(\"Begin\") :>> Type(\"username\",\"test\") :>> 
-  Type(\"password\",\"test\") :>> Click(\"Login\") :>> Click(\"Swipe Testing\")
+val basicTrace = Sleep(1000) :>> Click("Begin") :>> Type("username","test") :>> 
+  Type("password","test") :>> Click("Login") :>> Click("Swipe Testing")
 val lsSeekbar = List(R.id.seekBar, R.id.seekBar2, R.id.seekBar3)
 val lsDirection:List[Orientation] = List(Left, Right)
 def randomSwipe(times: Int, action: EventTrace): EventTrace ={
