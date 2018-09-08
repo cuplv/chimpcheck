@@ -145,7 +145,7 @@ val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
 
 // Exercise only the relevant interactions
 login :>> permiss *>>
-  SubservientGorilla(Sleep(500) :>> Skip)(GorillaConfig(10, relevantInteractions))a
+  SubservientGorilla(Sleep(500) :>> Skip)(GorillaConfig(10, relevantInteractions))
 `,
   //
   'Concise test case to log in and crash the app' : `// Log In and crash on phone rotation
