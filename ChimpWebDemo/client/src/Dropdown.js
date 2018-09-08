@@ -137,9 +137,9 @@ login :>> permiss *>> Repeat(10, relevantMonkey)
 
 val relevantInteractions: Seq[(Int, TraceGen)] = Seq(
   (30, EventTrace.trace(Click(*))),
+  (30, ClickMenu :>> Click(*)),
   (30, EventTrace.trace(LongClick(*))),
-  (30, EventTrace.trace(Rotate)),
-  (30, EventTrace.trace(ClickMenu))
+  (30, EventTrace.trace(Rotate))
 )
 val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
 
