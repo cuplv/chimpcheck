@@ -138,18 +138,6 @@ val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
 // Exercise only the relevant interactions
 login :>> permiss *>>
   SubservientGorilla(Sleep(500) :>> Skip)(GorillaConfig(10, relevantInteractions))
-
-val login: TraceGen = Click(R.id.skip) :>> Type(R.id.hostUrlInput, "ncloud.zaclys.com") :>> Type(R.id.account_username, "22203") :>>
-  Type(R.id.account_password, "12321qweqaz!") :>>  Click(R.id.buttonOK)
-val newConfig: Seq[(Int, TraceGen)] = Seq(
-  (30, EventTrace.trace(Click(*))),
-  (30, EventTrace.trace(LongClick(*))),
-  (30, EventTrace.trace(Rotate)),
-  (30, EventTrace.trace(ClickMenu))
-)
-val permiss = isDisplayed("Allow") Then Click("Allow"):>> Sleep(1000)
-
-login :>> permiss *>> SubservientGorilla(Sleep(500) :>> Skip)(GorillaConfig(10, newConfig))
 ```
 
 ### Concise test case to log in and crash the app
