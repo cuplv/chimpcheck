@@ -43,15 +43,15 @@ object OutputTransformer {
     val outputList = output.split("\n").toList
     val trace = findResult(outputList, "ChimpDriver-ExecutedTrace=")
     val tempResult = findResultOneLine(outputList, "ChimpDriver-Outcome=")
+    val stackTrace = findResult(outputList, "stack=", addNewLine=true)
     val result = tempResult match{
       case  "Crashed" | "Blocked" | "AssertFailed" | "DriverExcept" | "Unknown" => tempResult
-      case _ => trace.length match{
+      case _ => stackTrace.length match{
         case 0 => tempResult
         case _ => "Crashed"
       }
     }
     val realTrace = EventTrace.fromBase64(trace)
-    val stackTrace = findResult(outputList, "stack=", addNewLine=true)
     /*val firstRet = result match{
       case "Success" => s"Trace $realTrace got run through successfully!"
       case "Crashed" => s"Trace $realTrace got the program to crash!"
