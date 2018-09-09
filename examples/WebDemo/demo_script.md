@@ -6,7 +6,7 @@ Sergio - semantic of script: I show what is visible during the speech and then w
   - Hi I’m Shawn Meier and I will be presenting the Chimpcheck tool.
 
 - [Show the nextcloud issue] (issuelink)[https://github.com/nextcloud/android/issues/448]
-    - Here we will be demonstrating how Chimpcheck allow to test android applications specifying relevant user interactions.
+    - Here we will be demonstrating how Chimpcheck allows us to test android applications specifying relevant user interactions.
     - Suppose I am the developer of the NextCloud Android app, a client for file synchronization and sharing, and I get a bug report for a crash in the app.
     - I tried to reproduce the bug manually exercising the App but without success.
     - How can I find the exact sequence of user interactions that reproduce the bug?
