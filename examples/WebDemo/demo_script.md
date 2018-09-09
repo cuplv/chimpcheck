@@ -1,37 +1,55 @@
 --------Shawn's rewrite
-- Intro
-    - Hi I’m [name] and I will be presenting the chimpcheck system for exercising android applications and finding defects.
+
+Sergio - semantic of script: I show what is visible during the speech and then what to say 
+
 - [Show chimp check page with application visible]
-    - Here we will be demonstrating the chimp check method of testing android applications for runtime crashes.
-    - Specifically we will be demonstrating our technology with the NextCloud application.
- [show chimp check script]
-    - A Chimp Check script is a domain specific language that allows a tester to specify a set of events and randomly select actions to test the application.
-    - We will start with the simplest script that we call relevant monkey.
-    - This script randomly chooses actions in the user interface to perform.
-    - Such actions may include clicking on buttons, swiping the screen, zooming or rotation.
-    - For those who are familiar with the android UI exerciser monkey we will demonstrate how chimp check allows for more efficient and robust exploration.
-- [show login page, (I assume it gets here and gets stuck?)]
-    - Here we see our first major limitation to such random testing, a login page.
-    - With chimp check we can specify a log in username and password.
-- [specify login in the script with the  *>> operator, (note I would refer them to the documentation for specific operators and keep the video short]
+  - Hi I’m Shawn Meier and I will be presenting the Chimpcheck tool.
+
+- [Show the nextcloud issue] (issuelink)[https://github.com/nextcloud/android/issues/448]
+    - Here we will be demonstrating how Chimpcheck allow to test android applications specifying relevant user interactions.
+    - Suppose I am the developer of the NextCloud Android app, a client for file synchronization and sharing, and I get a bug report for a crash in the app.
+    - I tried to reproduce the bug manually exercising the App but without success.
+    - How can I find the exact sequence of user interactions that reproduce the bug?
+    - We will demonstrate how Chimpcheck helps developers to test Android applications merging automated testing and user insights.
+
+- [Show first chimp check script]
+    - A ChimpCheck script is a domain specific language that allows a tester to specify a set of user interactions and randomly select actions to test the application.
+    - We first try the simplest ChimpCheck script, called relevant monkey, that randomly exercises user interactions such as clicking on buttons, swiping the screen, zooming or rotating the phone.
+
+- [show result of the script]
+    - Exercising user interactions randomly does not help me reproducing the bug. However, I notice that the test execution does not login to the App.
+    - Here we see a major limitation of random testing: it cannot produce complex user inputs, such as the login credentials.
+
+- [show the script 2 with hte login operator]
+    - With chimpcheck we can inject the user knowledge of the application, like inserting username and password in the login screen.  
+    - In Chimpcheck I can express a specific sequence of user inputs, like inserting the user name and password and clicking the OK button on a login page.  
     - After logging in we can continue issuing random commands for testing.
-    - Chimp check is designed to intersperse random actions to test the application which may not be desirable during login.
-    - For this reason we introduced another operator that simply logs in and then we can resume random operation later.
-- [change to :>> operator]
-    - One more challenge is the permission screen, with chimp check it is easy to handle this reliably with minor changes.
-- [change script to handle dismissing permission window]
-    - This dismisses the permission window without risking hitting the deny button
-    - Now that we are past the initial setup we would like to focus on actually discovering crashes in the application.
-    - As a tester we have some intuition about what kinds of actions lead to crashes.
-    - With chimp check we can leverage this knowledge and specify certain actions such as Long Clicks, Clicks, Rotation, and ClickMenu wich we have an intuition are related to the crash
-- [Change scrip to add long click rotation etc]
-    - Now one problem we can run into is that we would like to wait for the UI to catch up, this can be done with [TODO, add in some details about script specifics]
-- [add update into chimp check to wait for UI]
-    - Finally we can see that a crash may sometimes occur in the testing process.
-    - We can use the output of chimp check to refine the script and reproduce.
+
+- [change to :>> operator, script 3]
+    - The Chimpcheck operator *>> is designed to interleave relevant user interactions with interruptions that often happens on a phone, like phone rotation rotation.
+    - To test the application we can use the operator :>> that simply logs in without any interruption.
+
+- [show the permission screen, end of script 3]
+    - One more challenge we face in our testing is the permission screen, with chimp check it is easy to handle this reliably with minor changes.
+
+- [change script to handle dismissing permission window, script 4]
+    - This dismisses the permission window always hitting the allow button
+    - Now that we are past the initial setup we would like to focus on actually replicating the crash in the application.
+    - We have some intuition about what kinds of actions lead to crashes.
+
+- [Change scrip to add long click rotation etc, script 5]
+    - With chimpcheck we leverage this knowledge and specify only the actions we think are related to the crash, such as Long Clicks, Clicks, Rotation, and ClickMenu 
+
+
 - [paste in refined chimp check script and run]
+    - Now one problem we run into is that we would like to wait for the UI to respond before issuing new user interactions: this can be done parameterizing the set of user interactions that will be explored during in the random testing.
     - With the refined chimp check script we can see that the crash occurs almost every time.
-    - [TODO: describe crash, did we issue a pull request?]
+  
+    - Finally we can see that this last script reproduces the crash with the input sequence that logs in, accept the permissions, clicks on documents, the menu, the move button, and then rotates the screen.
+  
+- [show the crashing sequence, script 6]
+  - We can use the output of chimp check to refine the script and reproduce.
+
 ---------
 So, let's say that you have an application that crashes, and you don't know why it's crashing. Well, to start, we have a simple script right here; this script is called relevantMonkey, which is a series of commands that goes through an application randomly clicking and prodding. We can see that we have commands like Click(*) <+> LongClick(*), which is clicking or long-clicking a value. You can also see that the program can swipe at the screen, pinch the screen at any point, and rotate the screen.
 
