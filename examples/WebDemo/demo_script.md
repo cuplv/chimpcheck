@@ -38,10 +38,8 @@ Sergio - semantic of script: I show what is visible during the speech and then w
     - We have some intuition about what kinds of actions lead to crashes.
 
 - [Change scrip to add long click rotation etc, script 5]
-    - With chimpcheck we leverage this knowledge and specify only the actions we think are related to the crash, such as Long Clicks, Clicks, Rotation, and ClickMenu 
+    - With chimpcheck we leverage this knowledge and specify only the actions we think are related to the crash, such as Long Clicks, Clicks, Rotation, and clicking an option from the menu. (ClickMenu)
 
-
-- [paste in refined chimp check script and run]
     - Now one problem we run into is that we would like to wait for the UI to respond before issuing new user interactions: this can be done parameterizing the set of user interactions that will be explored during in the random testing.
     - With the refined chimp check script we can see that the crash occurs almost every time.
   
