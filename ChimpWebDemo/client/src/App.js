@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import emulator from './emulator.jpeg';
+import logo from './chimpLogo.png';
+//import emulator from './emulator.jpeg';
 import './App.css';
 import Dropdown from './Dropdown'
 
@@ -14,13 +14,14 @@ class App extends Component {
         </header>
         <div id="container">
           <div className="row">
-            <div className="col-4">
+            <div className="col-6">
             <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
             <br/>
 
             </div>
-            <div className="col-4">
-            <iframe src="http://localhost:9002" title="proxied" width="360" height="520" frameBorder="0"></iframe>
+            <div className="col-6">
+            <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
+            <script>"document.getElementById('streamed').src = document.location.hostname + ':9002"</script>
             </div>
           </div>
         </div>
