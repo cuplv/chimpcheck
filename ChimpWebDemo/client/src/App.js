@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import logo from './chimpLogo.png';
+import logo2 from './cuplv-logo.png';
 //import emulator from './emulator.jpeg';
 import './App.css';
 import Dropdown from './Dropdown'
@@ -10,21 +11,18 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">ChimpCheck Web</h1>
-        </header>
-        <div id="container">
-          <div className="row">
-            <div className="col-6">
-            <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
-            <br/>
-
-            </div>
-            <div className="col-6">
-            <iframe src="http://localhost:9002" id="streamed" title="streamed" width="360" height="520" frameBorder="0"></iframe>
-            <script>"document.getElementById('streamed').src = document.location.hostname + ':9002"</script>
-            </div>
+          <div className="App-project">
+            <a style={{color: "#CFB87C"}} href="http://plv.colorado.edu/chimpcheck/tutorial">Tutorial</a>
           </div>
-        </div>
+          <div className="App-title">
+            <a style={{color: "#CFB87C"}} href="http://plv.colorado.edu/chimpcheck">ChimpCheck</a>
+          </div>
+        </header>
+        <div className='somePad'></div>
+            <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
+        <header className="App-footer">
+          <img src={logo2} className="CUPLV-Logo" alt="logo2" />   
+        </header>
       </div>
     );
   }
