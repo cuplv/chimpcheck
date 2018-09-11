@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import emulator from './emulator.jpeg';
+import logo from './chimpLogo.png';
+import logo2 from './cuplv-logo.png';
+//import emulator from './emulator.jpeg';
 import './App.css';
 import Dropdown from './Dropdown'
 
@@ -10,20 +11,18 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">ChimpCheck Web</h1>
-        </header>
-        <div id="container">
-          <div className="row">
-            <div className="col-4">
-            <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
-            <br/>
-
-            </div>
-            <div className="col-4">
-            <img src={emulator} height="500" width="250" alt="logo" />
-            </div>
+          <div className="App-project">
+            <a style={{color: "#CFB87C"}} href="http://plv.colorado.edu/chimpcheck/tutorial">Tutorial</a>
           </div>
-        </div>
+          <div className="App-title">
+            <a style={{color: "#CFB87C"}} href="http://plv.colorado.edu/chimpcheck">ChimpCheck</a>
+          </div>
+        </header>
+        <div className='somePad'></div>
+            <Dropdown id="dd-app" parent="null" value="default" label="App Name" options={['ChimpTrainer', 'Nextcloud', 'Kistenstapleln']} />
+        <header className="App-footer">
+          <img src={logo2} className="CUPLV-Logo" alt="logo2" />   
+        </header>
       </div>
     );
   }

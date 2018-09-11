@@ -3,26 +3,63 @@
 }
 
 .App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+  height: 50px;
+  float: left;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
+  background-color: #565A5C;
+  height: 90px;
   padding: 20px;
   color: white;
 }
 
+.CodeMirror {
+  text-align: left;
+}
+
 .App-title {
   font-size: 1.5em;
+  text-align: left;
+  transform: translate(25px, -30px);
+  width: 250px;
 }
 
 .App-intro {
   font-size: large;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.App-project{
+  font-size: 1.5em;
+  transform: translate(0px, 5px);
+  text-align: right;
+}
+
+.spacey{
+  padding: 40px;
+}
+
+.spaceySmall{
+  padding: 20px;
+}
+
+.somePad{
+  padding: 5px;
+}
+
+.nl{
+  padding: 1px;
+}
+
+.App-footer {
+  background-color: #565A5C;
+  height: 92px;
+  padding: 0px;
+  color: white;
+}
+
+.CUPLV-Logo {
+  height: 80px;
+  transform: translate(0px, 10px);
+  float: left;
 }

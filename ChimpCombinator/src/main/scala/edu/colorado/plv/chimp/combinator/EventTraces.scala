@@ -28,7 +28,7 @@ case class EventTrace(events: Seq[UIEvent]) extends ProtoMsg[pb.EventTrace] {
    def :>>(trace: EventTrace): EventTrace = EventTrace( events ++ trace.events )
    def :>>(traceGen: TraceGen): TraceGen = AtomSeq(Path(this),traceGen)
    override def toMsg(): pb.EventTrace = pb.EventTrace( events.map(_.toMsg()) )
-   override def toString(): String = events.mkString(" :> ")
+   override def toString(): String = events.mkString(" :>> ")
    def toBase64(): String = Base64.encode( toMsg().toByteArray )
 }
 
