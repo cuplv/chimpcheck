@@ -23,7 +23,7 @@ ChimpCheck paper can be found here: [arxiv](https://arxiv.org/abs/1708.08613)
 
 It is offically accepted to the [Onward! 2017](https://2017.onward-conference.org/track/onward-2017-Onward-Papers#event-overview)
 
-If you are interested, keynotes for our talk can be found [here](./images/ChimpCheck_Onward_Talk_Peilun.key)
+If you are interested, keynotes for our talk can be found [here](https://github.com/cuplv/chimpcheck/raw/gh-pages/ChimpCheck_Onward_Talk_Peilun.key)
 
 There is also a screencast version of our talk:
 
