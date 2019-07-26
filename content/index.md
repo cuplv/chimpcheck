@@ -21,9 +21,20 @@ ChimpCheck on Github: [https://github.com/cuplv/ChimpCheck](https://github.com/c
 
 ChimpCheck paper can be found here: [arxiv](https://arxiv.org/abs/1708.08613)
 
-It is offically accepted to appear in the [Onward! 2017](https://2017.onward-conference.org/track/onward-2017-Onward-Papers#event-overview)
+It is offically accepted to the [Onward! 2017](https://2017.onward-conference.org/track/onward-2017-Onward-Papers#event-overview)
+
+If you are interested, keynotes for our talk can be found [here](./images/ChimpCheck_Onward_Talk_Peilun.key)
+
+There is also a screencast version of our talk:
 
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/XRjtMEU3mAE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Demos
+
+Following is a simple video to demonstrate using ChimpCheck to exercises one of the open source app we found on GitHub. For more interesting examples, please check the example folder in the project.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pG41WLBFBQo" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
  

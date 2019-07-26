@@ -16,6 +16,8 @@ weight: 10
 ## Build Instructions
 
 Current state of ChimpCheck is still experimental, hence build scripts we will write currently assume that you have certain libraries published in your local ivy2 repository. Follow these instructions to get started with ChimpCheck.
+
+
 **1. Building dependencies and libraries**
 First, please clone ChimpCheck from its GitHub repo and init its submodule.
 ```
